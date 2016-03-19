@@ -1,11 +1,15 @@
 #include <iostream>
-
+#include "media.h"
+#include "mediasource.h"
 using namespace std;
 
 
 /*001 在自定义数据类型中嵌入其他自定义数据类型:比较数据成员的初始化顺序
 **    (1) 析构函数不能带参数
 **    (2) 数据成员按照类定义中的顺序进行初始化
+**    (3) 嵌入对象的构造函数在执行对象的构造函数体前被调用
+**    (4) 不同嵌入对象的构建顺序由它们的顺序决定
+**    (5) 嵌入对象按构建它们的相反顺序销毁
 */
 #if 0
 class Matter
@@ -130,9 +134,12 @@ private:
 **
 */
 
-
 int main()
 {
+	MediaSource* pMediaSource = new MediaSource(1);
+	cout << "Here is Main function!\n";
+	pMediaSource->Print();
+	delete pMediaSource;
     return 0;
 }
 
