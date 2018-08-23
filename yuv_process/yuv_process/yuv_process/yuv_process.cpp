@@ -132,25 +132,47 @@ void main(int argc, char **argv)
 		}
 	}
 	
-	unsigned int frame_num = 0;
+	unsigned int frame_read = 0;
 	YuvInfo yuv_info;
 	RectangleInfo rec_info;
-	do {
-		ifs->read(buf, frame_size);
-		
-		yuv_info.buf = buf;
-		yuv_info.width = width;
-		yuv_info.height = height;
-		rec_info.left = left;
-		rec_info.top = top;
-		rec_info.right = right;
-		rec_info.bottom = bottom;
+	ifs->read(buf, frame_size);
 
-		draw_red_rectangle(&yuv_info, &rec_info);
-		cout << "finish " << frame_num << " frames" << endl;
+	do {
+		while (frame_read == frame_cnt) {
+			yuv_info.buf = buf;
+			yuv_info.width = width;
+			yuv_info.height = height;
+			rec_info.left = left;
+			rec_info.top = top;
+			rec_info.right = right;
+			rec_info.bottom = bottom;
+
+			draw_red_rectangle(&yuv_info, &rec_info);
+
+			if (coord.getline(lines, 512)) {
+				cout << lines << endl;
+
+				int match_cnt = sscanf_s(lines, "frame=%d, num=%d, idx=%d, left=%d, top=%d, right=%d, bottom=%d",
+					&frame_cnt, &region_num, &region_idx, &left, &top, &right, &bottom);
+				if (match_cnt > 1) {
+					cout << "match_cnt " << match_cnt << " frame_cnt " << frame_cnt
+						<< " region_num " << region_num << " region_idx " << region_idx
+						<< " left " << left << " top " << top
+						<< " right " << right << " bottom " << bottom << endl;
+				}
+			} else {
+				cout << "No MD info now, exit!" << endl;
+				break;
+			}
+			cout << "finish frame " << frame_cnt
+				 << " region " << region_idx << endl;
+		}
 
 		ofs.write(buf, frame_size);
-	} while (frame_num++ < frames);
+
+		ifs->read(buf, frame_size);
+		frame_read++;
+	} while (frame_read < frames);
 
 	cout << "----------End!-------------" << endl;
 
