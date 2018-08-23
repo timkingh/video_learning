@@ -85,6 +85,7 @@ void main(int argc, char **argv)
 	bool help = getarg(false, "-H", "--help", "-?");
 	string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\Bus_352x288_25.yuv", "-i", "--input");
 	string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\Red_352x288_25.yuv", "-o", "--output");
+	string coord_file = getarg("F:\\rkvenc_verify\\input_yuv\\out.md", "-c", "--coordinate");
 	unsigned int width = getarg(352, "-w", "--width");
 	unsigned int height = getarg(288, "-h", "--height");
 	unsigned int left = getarg(10, "-l", "--left");
@@ -107,8 +108,24 @@ void main(int argc, char **argv)
 	
 	cout << "input: " << in_file << endl;
 	string in_path = in_file;
-
 	istream *ifs = new ifstream(in_path.c_str(), ios::binary | ios::in);
+
+	unsigned int frame_cnt, region_num, region_idx;
+	ifstream coord(coord_file.c_str());
+	char lines[512];
+	if (coord.getline(lines, 512)) {
+		cout << lines << endl;
+
+		int match_cnt = sscanf_s(lines, "frame=%d, num=%d, idx=%d, left=%d, top=%d, right=%d, bottom=%d",
+							&frame_cnt, &region_num, &region_idx, &left, &top, &right, &bottom);
+		if (match_cnt > 1) {
+			cout << "match_cnt " << match_cnt << " frame_cnt " << frame_cnt
+				<< " region_num " << region_num << " region_idx " << region_idx
+				<< " left " << left << " top " << top
+				<< " right " << right << " bottom " << bottom << endl;
+		}
+	}
+
 	ifs->read(buf, frame_size);
 
 	YuvInfo yuv_info;
