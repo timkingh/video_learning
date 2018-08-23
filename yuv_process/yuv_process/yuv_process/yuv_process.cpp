@@ -4,27 +4,32 @@
 
 using namespace std;
 
-void main(int argc, char **argv)
+typedef struct {
+	char *buf;
+	unsigned int width;
+	unsigned int height;
+} YuvInfo;
+
+typedef struct {
+	unsigned int left;
+	unsigned int top;
+	unsigned int right;
+	unsigned int bottom;
+} RectangleInfo;
+
+static void draw_red_rectangle(YuvInfo *yuv, RectangleInfo *rec)
 {
-	cout << "----------Test-------------" << endl;
-	unsigned int width = 352, height = 288;
-	unsigned int luma_size = width * height;
-	unsigned int chroma_size = luma_size / 2;
-	unsigned int frame_size = luma_size + chroma_size;
-    char *buf = new char[frame_size];
-	unsigned int idx = 0;
-	
-	string in_path = "F:\\rkvenc_verify\\input_yuv\\Bus_352x288_25.yuv";
-
-	istream *ifs = new ifstream(in_path.c_str(), ios::binary | ios::in);
-	ifs->read(buf, frame_size);
-
+	unsigned int idx;
 	unsigned int x0, y0, x1, y1;
-	char *buf_y = buf;
-	char *buf_u = buf + luma_size;
-	char *buf_v = buf_u + chroma_size / 2;
-	x0 = y0 = 10;
-	x1 = y1 = 100;
+	unsigned int width = yuv->width;
+	unsigned int height = yuv->height;
+	char *buf_y = yuv->buf;
+	char *buf_u = yuv->buf + width * height;
+	char *buf_v = buf_u + width * height / 4;
+	x0 = rec->left;
+	y0 = rec->top;
+	x1 = rec->right;
+	y1 = rec->bottom;
 
 	char *buf_top = buf_y + x0 + y0 * width;
 	char *buf_bottom = buf_y + x0 + y1 * width;
@@ -62,6 +67,34 @@ void main(int argc, char **argv)
 	for (idx = 0; idx < y1 - y0 + 1; idx++) {
 		buf_left[idx * chroma_width] = buf_right[idx * chroma_width] = 255;
 	}
+}
+
+void main(int argc, char **argv)
+{
+	cout << "----------Test-------------" << endl;
+	unsigned int width = 352, height = 288;
+	unsigned int luma_size = width * height;
+	unsigned int chroma_size = luma_size / 2;
+	unsigned int frame_size = luma_size + chroma_size;
+    char *buf = new char[frame_size];
+	unsigned int idx = 0;
+	
+	string in_path = "F:\\rkvenc_verify\\input_yuv\\Bus_352x288_25.yuv";
+
+	istream *ifs = new ifstream(in_path.c_str(), ios::binary | ios::in);
+	ifs->read(buf, frame_size);
+
+	YuvInfo yuv_info;
+	RectangleInfo rec_info;
+	yuv_info.buf = buf;
+	yuv_info.width = width;
+	yuv_info.height = height;
+	rec_info.left = 20;
+	rec_info.top = 10;
+	rec_info.right = 100;
+	rec_info.bottom = 50;
+
+	draw_red_rectangle(&yuv_info, &rec_info);
 
 	string out_path = "F:\\rkvenc_verify\\input_yuv\\Red_352x288_25.yuv";
 	ofstream ofs;
