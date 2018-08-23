@@ -22,11 +22,11 @@ void main(int argc, char **argv)
 	}
 
 	for (idx = luma_size; idx < luma_size + chroma_size / 2; idx++) {
-		buf[idx] = 0;
+		buf[idx] = 84;
 	}
 	
 	for (idx = luma_size + chroma_size / 2; idx < frame_size; idx++) {
-		buf[idx] = 157;
+		buf[idx] = 255;
 	}
 
 	string out_path = "F:\\rkvenc_verify\\input_yuv\\Red_352x288_25.yuv";
