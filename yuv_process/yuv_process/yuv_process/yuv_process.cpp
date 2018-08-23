@@ -92,6 +92,7 @@ void main(int argc, char **argv)
 	unsigned int top = getarg(20, "-t", "--top");
 	unsigned int right = getarg(50, "-r", "--right");
 	unsigned int bottom = getarg(80, "-b", "--bottom");
+	unsigned int frames = getarg(10, "-f", "--frames");
 
 	if (help) {
 		cout << "Usage:" << endl
@@ -109,6 +110,11 @@ void main(int argc, char **argv)
 	cout << "input: " << in_file << endl;
 	string in_path = in_file;
 	istream *ifs = new ifstream(in_path.c_str(), ios::binary | ios::in);
+	
+	cout << "output: " << out_file << endl;
+	string out_path = out_file;
+	ofstream ofs;
+	ofs.open(out_path.c_str(), ios::binary | ios::out);
 
 	unsigned int frame_cnt, region_num, region_idx;
 	ifstream coord(coord_file.c_str());
@@ -125,26 +131,26 @@ void main(int argc, char **argv)
 				<< " right " << right << " bottom " << bottom << endl;
 		}
 	}
-
-	ifs->read(buf, frame_size);
-
+	
+	unsigned int frame_num = 0;
 	YuvInfo yuv_info;
 	RectangleInfo rec_info;
-	yuv_info.buf = buf;
-	yuv_info.width = width;
-	yuv_info.height = height;
-	rec_info.left = left;
-	rec_info.top = top;
-	rec_info.right = right;
-	rec_info.bottom = bottom;
+	do {
+		ifs->read(buf, frame_size);
+		
+		yuv_info.buf = buf;
+		yuv_info.width = width;
+		yuv_info.height = height;
+		rec_info.left = left;
+		rec_info.top = top;
+		rec_info.right = right;
+		rec_info.bottom = bottom;
 
-	draw_red_rectangle(&yuv_info, &rec_info);
+		draw_red_rectangle(&yuv_info, &rec_info);
+		cout << "finish " << frame_num << " frames" << endl;
 
-	cout << "output: " << out_file << endl;
-	string out_path = out_file;
-	ofstream ofs;
-	ofs.open(out_path.c_str(), ios::binary | ios::out);
-	ofs.write(buf, frame_size);
+		ofs.write(buf, frame_size);
+	} while (frame_num++ < frames);
 
 	cout << "----------End!-------------" << endl;
 
