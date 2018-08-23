@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "getopt.hpp"
 
 using namespace std;
 
@@ -80,15 +81,32 @@ static void draw_red_rectangle(YuvInfo *yuv, RectangleInfo *rec)
 
 void main(int argc, char **argv)
 {
-	cout << "----------Test-------------" << endl;
-	unsigned int width = 352, height = 288;
+	cout << "----------Test-------------" << endl; 
+	bool help = getarg(false, "-H", "--help", "-?");
+	string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\Bus_352x288_25.yuv", "-i", "--input");
+	string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\Red_352x288_25.yuv", "-o", "--output");
+	unsigned int width = getarg(352, "-w", "--width");
+	unsigned int height = getarg(288, "-h", "--height");
+	unsigned int left = getarg(10, "-l", "--left");
+	unsigned int top = getarg(20, "-t", "--top");
+	unsigned int right = getarg(50, "-r", "--right");
+	unsigned int bottom = getarg(80, "-b", "--bottom");
+
+	if (help) {
+		cout << "Usage:" << endl
+			<< "yuv_process.exe -i=in.yuv -o=out.yuv "
+			<< "-w width -h height"
+			<< endl;
+	}
+
 	unsigned int luma_size = width * height;
 	unsigned int chroma_size = luma_size / 2;
 	unsigned int frame_size = luma_size + chroma_size;
     char *buf = new char[frame_size];
 	unsigned int idx = 0;
 	
-	string in_path = "F:\\rkvenc_verify\\input_yuv\\Bus_352x288_25.yuv";
+	cout << "input: " << in_file << endl;
+	string in_path = in_file;
 
 	istream *ifs = new ifstream(in_path.c_str(), ios::binary | ios::in);
 	ifs->read(buf, frame_size);
@@ -98,14 +116,15 @@ void main(int argc, char **argv)
 	yuv_info.buf = buf;
 	yuv_info.width = width;
 	yuv_info.height = height;
-	rec_info.left = 20;
-	rec_info.top = 10;
-	rec_info.right = 100;
-	rec_info.bottom = 50;
+	rec_info.left = left;
+	rec_info.top = top;
+	rec_info.right = right;
+	rec_info.bottom = bottom;
 
 	draw_red_rectangle(&yuv_info, &rec_info);
 
-	string out_path = "F:\\rkvenc_verify\\input_yuv\\Red_352x288_25.yuv";
+	cout << "output: " << out_file << endl;
+	string out_path = out_file;
 	ofstream ofs;
 	ofs.open(out_path.c_str(), ios::binary | ios::out);
 	ofs.write(buf, frame_size);
