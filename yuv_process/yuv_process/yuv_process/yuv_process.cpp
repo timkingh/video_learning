@@ -31,6 +31,7 @@ static void draw_red_rectangle(YuvInfo *yuv, RectangleInfo *rec)
 	x1 = rec->right;
 	y1 = rec->bottom;
 
+	/* Y */
 	char *buf_top = buf_y + x0 + y0 * width;
 	char *buf_bottom = buf_y + x0 + y1 * width;
 	for (idx = 0; idx < x1 - x0 + 1; idx++) {
@@ -43,28 +44,36 @@ static void draw_red_rectangle(YuvInfo *yuv, RectangleInfo *rec)
 		buf_left[idx * width] = buf_right[idx * width] = 76;
 	}
 
+	unsigned int c_x0, c_y0, c_x1, c_y1;
 	unsigned int chroma_width = width / 2;
-	buf_top = buf_u + x0 + y0 * chroma_width;
-	buf_bottom = buf_u + x0 + y1 * chroma_width;
-	for (idx = 0; idx < x1 - x0 + 1; idx++) {
+	c_x0 = x0 / 2;
+	c_y0 = y0 / 2;
+	c_x1 = x1 / 2;
+	c_y1 = y1 / 2;
+
+	/* U */
+	buf_top = buf_u + c_x0 + c_y0 * chroma_width;
+	buf_bottom = buf_u + c_x0 + c_y1 * chroma_width;
+	for (idx = 0; idx < c_x1 - c_x0 + 1; idx++) {
 		buf_top[idx] = buf_bottom[idx] = 84;
 	}
 
 	buf_left = buf_top;
-	buf_right = buf_left + (x1 - x0);
-	for (idx = 0; idx < y1 - y0 + 1; idx++) {
+	buf_right = buf_left + (c_x1 - c_x0);
+	for (idx = 0; idx < c_y1 - c_y0 + 1; idx++) {
 		buf_left[idx * chroma_width] = buf_right[idx * chroma_width] = 84;
 	}
 
-	buf_top = buf_v + x0 + y0 * chroma_width;
-	buf_bottom = buf_v + x0 + y1 * chroma_width;
-	for (idx = 0; idx < x1 - x0 + 1; idx++) {
+	/* V */
+	buf_top = buf_v + c_x0 + c_y0 * chroma_width;
+	buf_bottom = buf_v + c_x0 + c_y1 * chroma_width;
+	for (idx = 0; idx < c_x1 - c_x0 + 1; idx++) {
 		buf_top[idx] = buf_bottom[idx] = 255;
 	}
 
 	buf_left = buf_top;
-	buf_right = buf_left + (x1 - x0);
-	for (idx = 0; idx < y1 - y0 + 1; idx++) {
+	buf_right = buf_left + (c_x1 - c_x0);
+	for (idx = 0; idx < c_y1 - c_y0 + 1; idx++) {
 		buf_left[idx * chroma_width] = buf_right[idx * chroma_width] = 255;
 	}
 }
