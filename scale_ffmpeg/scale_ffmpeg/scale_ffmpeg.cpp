@@ -29,13 +29,12 @@ int main()
     uint32_t frames = 10, frame_cnt = 0;
     uint32_t width = 1280, height = 720;
     uint32_t frame_size = width * height * 3 / 2;
-    uint32_t y_size = width * height;
     char *buf = new char[frame_size];
     uint8_t *in_data[3];
     uint32_t out_width = 1280, out_height = 720;
     in_data[0] = (uint8_t *)buf;
-    in_data[1] = in_data[0] + y_size;
-    in_data[2] = in_data[1] + y_size / 4;
+    in_data[1] = in_data[0] + width * height;
+    in_data[2] = in_data[1] + width * height / 4;
 
     cout << "log level " << av_log_get_level() << endl;
     av_log_set_level(56);
@@ -48,17 +47,18 @@ int main()
     linesize[1] = linesize[2] = width / 2;
     pFrameYUV = av_frame_alloc();
 
-    uint32_t out_frame_size = av_image_get_buffer_size(AV_PIX_FMT_YUV420P, out_width, out_height, 8);
+    uint32_t out_frame_size = av_image_get_buffer_size(AV_PIX_FMT_YUV420P, out_width, out_height, 1);
     cout << "buffer size " << out_frame_size << endl;
     out_buffer = (unsigned char *)av_malloc(out_frame_size);
     av_image_fill_arrays(pFrameYUV->data, pFrameYUV->linesize, out_buffer,
-                         AV_PIX_FMT_YUV420P, out_width, out_height, 8);
+                         AV_PIX_FMT_YUV420P, out_width, out_height, 1);
 
     struct SwsContext *img_convert_ctx;
     img_convert_ctx = sws_getContext(width, height, AV_PIX_FMT_YUV420P,
                                      out_width, out_height, AV_PIX_FMT_YUV420P,
                                      SWS_BICUBIC, NULL, NULL, NULL);
 
+    uint32_t y_size = out_width * out_height;
     while (frame_cnt++ < frames) {
         ifs->read(buf, frame_size);
 
@@ -75,9 +75,17 @@ int main()
 
     if (ifs && ifs != &cin)
         delete ifs;
+
     ofs.close();
+
     if (buf)
         delete [] buf;
+
+    if (out_buffer)
+        av_free(out_buffer);
+
+    if (pFrameYUV)
+        av_frame_free(&pFrameYUV);
 
     return 0;
 }
