@@ -1,0 +1,12 @@
+# depslib dependency file v1.0
+1535295171 source:f:\codes\cpp_learning\scale_ffmpeg\scale_ffmpeg\scale_ffmpeg.cpp
+	<stdio.h>
+	<iostream>
+	<fstream>
+	<string>
+	"stdint.h"
+	"libavcodec/avcodec.h"
+	"libavformat/avformat.h"
+	"libswscale/swscale.h"
+	"libavutil/imgutils.h"
+
