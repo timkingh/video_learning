@@ -31,7 +31,7 @@ int main()
     uint32_t frame_size = width * height * 3 / 2;
     char *buf = new char[frame_size];
     uint8_t *in_data[3];
-    uint32_t out_width = 1280, out_height = 720;
+    uint32_t out_width = 640, out_height = 480;
     in_data[0] = (uint8_t *)buf;
     in_data[1] = in_data[0] + width * height;
     in_data[2] = in_data[1] + width * height / 4;
