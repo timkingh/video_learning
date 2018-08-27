@@ -10,3 +10,186 @@
 	"libswscale/swscale.h"
 	"libavutil/imgutils.h"
 
+1535339179 source:f:\cpp_learning\scale_ffmpeg\scale_ffmpeg\scale_ffmpeg.cpp
+	<stdio.h>
+	<iostream>
+	<fstream>
+	<string>
+	"stdint.h"
+	"libavcodec/avcodec.h"
+	"libavformat/avformat.h"
+	"libswscale/swscale.h"
+	"libavutil/imgutils.h"
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\stdint.h
+	<stddef.h>
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavcodec\avcodec.h
+	<errno.h>
+	"libavutil/samplefmt.h"
+	"libavutil/attributes.h"
+	"libavutil/avutil.h"
+	"libavutil/buffer.h"
+	"libavutil/cpu.h"
+	"libavutil/channel_layout.h"
+	"libavutil/dict.h"
+	"libavutil/frame.h"
+	"libavutil/log.h"
+	"libavutil/pixfmt.h"
+	"libavutil/rational.h"
+	"version.h"
+	"libavutil/mem.h"
+	"old_codec_ids.h"
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavutil\samplefmt.h
+	<stdint.h>
+	"avutil.h"
+	"attributes.h"
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavutil\avutil.h
+	"common.h"
+	"error.h"
+	"rational.h"
+	"version.h"
+	"macros.h"
+	"mathematics.h"
+	"log.h"
+	"pixfmt.h"
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavutil\common.h
+	<errno.h>
+	<inttypes.h>
+	<limits.h>
+	<math.h>
+	<stdint.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"attributes.h"
+	"version.h"
+	"libavutil/avconfig.h"
+	"config.h"
+	"intmath.h"
+	"common.h"
+	"mem.h"
+	"internal.h"
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\inttypes.h
+	<_mingw.h>
+	<stdint.h>
+	<stddef.h>
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\_mingw.h
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavutil\attributes.h
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavutil\version.h
+	"macros.h"
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavutil\macros.h
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavutil\avconfig.h
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavutil\mem.h
+	<limits.h>
+	<stdint.h>
+	"attributes.h"
+	"error.h"
+	"avutil.h"
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavutil\error.h
+	<errno.h>
+	<stddef.h>
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavutil\rational.h
+	<stdint.h>
+	<limits.h>
+	"attributes.h"
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavutil\mathematics.h
+	<stdint.h>
+	<math.h>
+	"attributes.h"
+	"rational.h"
+	"intfloat.h"
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavutil\intfloat.h
+	<stdint.h>
+	"attributes.h"
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavutil\log.h
+	<stdarg.h>
+	"avutil.h"
+	"attributes.h"
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavutil\pixfmt.h
+	"libavutil/avconfig.h"
+	"version.h"
+	"old_pix_fmts.h"
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavutil\old_pix_fmts.h
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavutil\buffer.h
+	<stdint.h>
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavutil\cpu.h
+	"attributes.h"
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavutil\channel_layout.h
+	<stdint.h>
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavutil\dict.h
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavutil\frame.h
+	<stdint.h>
+	"avutil.h"
+	"buffer.h"
+	"dict.h"
+	"rational.h"
+	"samplefmt.h"
+	"version.h"
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavcodec\version.h
+	"libavutil/version.h"
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavcodec\old_codec_ids.h
+	"libavutil/common.h"
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavformat\avformat.h
+	<time.h>
+	<stdio.h>
+	"libavcodec/avcodec.h"
+	"libavutil/dict.h"
+	"libavutil/log.h"
+	"avio.h"
+	"libavformat/version.h"
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavformat\avio.h
+	<stdint.h>
+	"libavutil/common.h"
+	"libavutil/dict.h"
+	"libavutil/log.h"
+	"libavformat/version.h"
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavformat\version.h
+	"libavutil/version.h"
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libswscale\swscale.h
+	<stdint.h>
+	"libavutil/avutil.h"
+	"libavutil/log.h"
+	"libavutil/pixfmt.h"
+	"version.h"
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libswscale\version.h
+	"libavutil/version.h"
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavutil\imgutils.h
+	"avutil.h"
+	"pixdesc.h"
+
+1535334555 f:\cpp_learning\scale_ffmpeg\include\libavutil\pixdesc.h
+	<inttypes.h>
+	"attributes.h"
+	"pixfmt.h"
+

@@ -16,9 +16,10 @@ using namespace std;
 
 int main()
 {
+    int ret = 0;
     cout << "Start!" << endl;
-    string in_path = "F:\\yuv\\yyq.yuv";
-    string out_path = "F:\\yuv\\yyq_out.yuv";
+    string in_path = "F:\\rkvenc_verify\\input_yuv\\Bus_352x288_25.YUV420sp";
+    string out_path = "F:\\rkvenc_verify\\input_yuv\\Bus_out.yuv";
 
     cout << "input: " << in_path << endl
          << "output: " << out_path << endl;
@@ -27,25 +28,26 @@ int main()
     ofs.open(out_path.c_str(), ios::binary | ios::out);
 
     uint32_t frames = 10, frame_cnt = 0;
-    uint32_t width = 1280, height = 720;
+    uint32_t width = 352, height = 288;
     uint32_t frame_size = width * height * 3 / 2;
     char *buf = new char[frame_size];
     uint8_t *in_data[3];
-    uint32_t out_width = 640, out_height = 480;
+    uint32_t out_width = 352, out_height = 288;
+
+    /* Todo: impacted by src fmt */
     in_data[0] = (uint8_t *)buf;
     in_data[1] = in_data[0] + width * height;
-    in_data[2] = in_data[1] + width * height / 4;
-
-    cout << "log level " << av_log_get_level() << endl;
-    av_log_set_level(56);
-    cout << "log level " << av_log_get_level() << endl;
+    in_data[2] = in_data[0] + width * height;
 
     AVFrame *pFrameYUV;
     unsigned char *out_buffer;
-    int linesize[3] = {0};
-    linesize[0] = width;
-    linesize[1] = linesize[2] = width / 2;
+    int src_linesize[4] = {0};
+
     pFrameYUV = av_frame_alloc();
+    ret = av_image_fill_linesizes(src_linesize, AV_PIX_FMT_NV12, width);
+    if (ret < 0) {
+        cout << "fill src linesize error ret " << ret << endl;
+    }
 
     uint32_t out_frame_size = av_image_get_buffer_size(AV_PIX_FMT_YUV420P, out_width, out_height, 1);
     cout << "buffer size " << out_frame_size << endl;
@@ -54,7 +56,7 @@ int main()
                          AV_PIX_FMT_YUV420P, out_width, out_height, 1);
 
     struct SwsContext *img_convert_ctx;
-    img_convert_ctx = sws_getContext(width, height, AV_PIX_FMT_YUV420P,
+    img_convert_ctx = sws_getContext(width, height, AV_PIX_FMT_NV12,
                                      out_width, out_height, AV_PIX_FMT_YUV420P,
                                      SWS_BICUBIC, NULL, NULL, NULL);
 
@@ -63,7 +65,7 @@ int main()
         ifs->read(buf, frame_size);
 
         sws_scale(img_convert_ctx, (const unsigned char* const*)in_data,
-                  linesize, 0, height,
+                  src_linesize, 0, height,
                   pFrameYUV->data, pFrameYUV->linesize);
         cout << "frame_cnt " << frame_cnt << endl;
         ofs.write(reinterpret_cast<char*>(pFrameYUV->data[0]), y_size);
