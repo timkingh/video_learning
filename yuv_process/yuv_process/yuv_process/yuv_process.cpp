@@ -90,7 +90,13 @@ static void draw_red_rectangle(YuvInfo *yuv, RectangleInfo *rec)
 
 static void draw_red_dot(YuvInfo *yuv, SadInfo *info)
 {
-    cout << "draw_red_dot" << endl;
+    RectangleInfo rec_info;
+    rec_info.left = info->mb_x * 4;
+    rec_info.top = info->mb_y * 4;
+    rec_info.right = info->mb_x * 4 + 1;
+    rec_info.bottom = info->mb_y * 4 + 1;
+
+    draw_red_rectangle(yuv, &rec_info);
 }
 
 static void rk_handle_md(YuvInfo *yuv, ifstream *sad, SadInfo *info, uint32_t frame_num)
@@ -111,13 +117,13 @@ static void rk_handle_md(YuvInfo *yuv, ifstream *sad, SadInfo *info, uint32_t fr
         draw_red_dot(yuv, info);
 
         if (sad->getline(lines, 512)) {
-            cout << lines << endl;
+            //cout << lines << endl;
             int match_cnt = sscanf_s(lines, "frame=%d mb_width=%d mb_height=%d mb_x=%d mb_y=%d",
                                      &info->frame_cnt, &info->mb_width, &info->mb_height, &info->mb_x, &info->mb_y);
             if (match_cnt > 1) {
-                cout << "match_cnt " << match_cnt << " frame_cnt " << info->frame_cnt
-                     << " mb_width " << info->mb_width << " mb_height " << info->mb_height
-                     << " mb_x " << info->mb_x << " mb_y " << info->mb_y << endl;
+                //cout << "match_cnt " << match_cnt << " frame_cnt " << info->frame_cnt
+                //     << " mb_width " << info->mb_width << " mb_height " << info->mb_height
+                //     << " mb_x " << info->mb_x << " mb_y " << info->mb_y << endl;
             }
         } else {
             cout << "No sad info now, exit!" << endl;
@@ -131,16 +137,16 @@ void main(int argc, char **argv)
     cout << "----------Test-------------" << endl;
     bool help = getarg(false, "-H", "--help", "-?");
     string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576.yuv", "-i", "--input");
-    string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576_out.yuv", "-o", "--output");
+    string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576_hi_rk.yuv", "-o", "--output");
     string coord_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903.md", "-c", "--coordinate");
-    string sad_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576.sad", "-s", "--sad");
+    string sad_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576_150.sad", "-s", "--sad");
     uint32_t width = getarg(720, "-w", "--width");
     uint32_t height = getarg(576, "-h", "--height");
     uint32_t left = getarg(10, "-l", "--left");
     uint32_t top = getarg(20, "-t", "--top");
     uint32_t right = getarg(50, "-r", "--right");
     uint32_t bottom = getarg(80, "-b", "--bottom");
-    uint32_t frames = getarg(10, "-f", "--frames");
+    uint32_t frames = getarg(5, "-f", "--frames");
     uint8_t enable_draw_dot = getarg(1, "-dd", "--draw_dot");
 
     if (help) {
@@ -202,15 +208,15 @@ void main(int argc, char **argv)
             draw_red_rectangle(&yuv_info, &rec_info);
 
             if (coord.getline(lines, 512)) {
-                cout << lines << endl;
+                //cout << lines << endl;
 
                 int match_cnt = sscanf_s(lines, "frame=%d, num=%d, idx=%d, left=%d, top=%d, right=%d, bottom=%d",
                                          &frame_cnt, &region_num, &region_idx, &left, &top, &right, &bottom);
                 if (match_cnt > 1) {
-                    cout << "match_cnt " << match_cnt << " frame_cnt " << frame_cnt
-                         << " region_num " << region_num << " region_idx " << region_idx
-                         << " left " << left << " top " << top
-                         << " right " << right << " bottom " << bottom << endl;
+                    //cout << "match_cnt " << match_cnt << " frame_cnt " << frame_cnt
+                    //     << " region_num " << region_num << " region_idx " << region_idx
+                    //     << " left " << left << " top " << top
+                    //     << " right " << right << " bottom " << bottom << endl;
                 }
             } else {
                 cout << "No MD info now, exit!" << endl;

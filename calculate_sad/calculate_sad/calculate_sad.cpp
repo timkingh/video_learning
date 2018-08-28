@@ -99,12 +99,12 @@ void main(int argc, char **argv)
     cout << "----------Test-------------" << endl;
     bool help = getarg(false, "-H", "--help", "-?");
     string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576.yuv", "-i", "--input");
-    string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576.sad", "-o", "--output");
+    string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576_150.sad", "-o", "--output");
     string coord_file = getarg("F:\\rkvenc_verify\\input_yuv\\out.md", "-c", "--coordinate");
     unsigned int width = getarg(720, "-w", "--width");
     unsigned int height = getarg(576, "-h", "--height");
     unsigned int cu_size = getarg(4, "-s", "--cu_size");
-    unsigned int threshold = getarg(100, "-t", "--threshold");
+    unsigned int threshold = getarg(150, "-t", "--threshold");
     unsigned int right = getarg(50, "-r", "--right");
     unsigned int bottom = getarg(80, "-b", "--bottom");
     unsigned int frames = getarg(5, "-f", "--frames");
