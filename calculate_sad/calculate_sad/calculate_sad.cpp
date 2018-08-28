@@ -154,6 +154,7 @@ void main(int argc, char **argv)
                     if (sad >= threshold) {
                         //ofs << setfill('0') << setw(3);
                         ofs << "frame=" << frame_read
+                            << " mb_size=" << mb_size
                             << " mb_width=" << mb_width
                             << " mb_height=" << mb_height
                             << " mb_x=" << x
