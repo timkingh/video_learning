@@ -98,13 +98,13 @@ void main(int argc, char **argv)
 {
     cout << "----------Test-------------" << endl;
     bool help = getarg(false, "-H", "--help", "-?");
-    string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\Bus_352x288_25.yuv", "-i", "--input");
-    string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\Bus_352x288_25.sad", "-o", "--output");
+    string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576.yuv", "-i", "--input");
+    string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576.sad", "-o", "--output");
     string coord_file = getarg("F:\\rkvenc_verify\\input_yuv\\out.md", "-c", "--coordinate");
-    unsigned int width = getarg(352, "-w", "--width");
-    unsigned int height = getarg(288, "-h", "--height");
-    unsigned int left = getarg(10, "-l", "--left");
-    unsigned int top = getarg(20, "-t", "--top");
+    unsigned int width = getarg(720, "-w", "--width");
+    unsigned int height = getarg(576, "-h", "--height");
+    unsigned int cu_size = getarg(4, "-s", "--cu_size");
+    unsigned int threshold = getarg(100, "-t", "--threshold");
     unsigned int right = getarg(50, "-r", "--right");
     unsigned int bottom = getarg(80, "-b", "--bottom");
     unsigned int frames = getarg(5, "-f", "--frames");
@@ -116,6 +116,7 @@ void main(int argc, char **argv)
              << endl;
     }
 
+    unsigned int frame_read = 0;
     unsigned int luma_size = width * height;
     unsigned int chroma_size = luma_size / 2;
     unsigned int frame_size = luma_size + chroma_size;
@@ -123,7 +124,6 @@ void main(int argc, char **argv)
     uint32_t buf_idx;
     buf[0] = new char[frame_size];
     buf[1] = new char[frame_size];
-    unsigned int idx = 0;
 
     cout << "input: " << in_file << endl;
     string in_path = in_file;
@@ -134,21 +134,15 @@ void main(int argc, char **argv)
     ofstream ofs;
     ofs.open(out_path.c_str(), ios::out);
 
-    unsigned int frame_cnt, region_num, region_idx;
-    unsigned int frame_read = 0;
-
     do {
         buf_idx = frame_read % 2;
         ifs->read(buf[buf_idx], frame_size);
 
         if (frame_read > 0) {
-            uint32_t mb_size = 8;
+            uint32_t mb_size = cu_size;
             uint32_t mb_width = width / mb_size;
             uint32_t mb_height = height / mb_size;
 
-            ofs << "frame " << frame_read
-                << " mb_width " << mb_width << " mb_height " << mb_height
-                << endl;
             for (uint32_t y = 0; y < mb_height; y++) {
                 for (uint32_t x = 0; x < mb_width; x++) {
                     uint32_t sad = 0;
@@ -156,9 +150,16 @@ void main(int argc, char **argv)
                     uint8_t *buf1 = (uint8_t *)buf[1] + x * mb_size + y * mb_size * width;
 
                     sad = calc_sad(buf0, width, buf1, width, mb_size);
-                    ofs << setw(6) << sad << " ";
+
+                    if (sad >= threshold) {
+                        //ofs << setfill('0') << setw(3);
+                        ofs << "frame=" << frame_read
+                            << " mb_width=" << mb_width
+                            << " mb_height=" << mb_height
+                            << " mb_x=" << x
+                            << " mb_y=" << y << endl;
+                    }
                 }
-                ofs << endl;
             }
         }
 
