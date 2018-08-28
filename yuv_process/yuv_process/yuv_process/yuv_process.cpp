@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <stdint.h>
 #include "getopt.hpp"
 
 using namespace std;
@@ -17,6 +18,14 @@ typedef struct {
     unsigned int right;
     unsigned int bottom;
 } RectangleInfo;
+
+typedef struct {
+    uint32_t frame_cnt;
+    uint32_t mb_width;
+    uint32_t mb_height;
+    uint32_t mb_x;
+    uint32_t mb_y;
+} SadInfo;
 
 static void draw_red_rectangle(YuvInfo *yuv, RectangleInfo *rec)
 {
@@ -79,20 +88,60 @@ static void draw_red_rectangle(YuvInfo *yuv, RectangleInfo *rec)
     }
 }
 
+static void draw_red_dot(YuvInfo *yuv, SadInfo *info)
+{
+    cout << "draw_red_dot" << endl;
+}
+
+static void rk_handle_md(YuvInfo *yuv, ifstream *sad, SadInfo *info, uint32_t frame_num)
+{
+    char lines[512];
+    if (frame_num == 1 && sad->getline(lines, 512)) {
+        cout << lines << endl;
+        int match_cnt = sscanf_s(lines, "frame=%d mb_width=%d mb_height=%d mb_x=%d mb_y=%d",
+                                 &info->frame_cnt, &info->mb_width, &info->mb_height, &info->mb_x, &info->mb_y);
+        if (match_cnt > 1) {
+            cout << "match_cnt " << match_cnt << " frame_cnt " << info->frame_cnt
+                 << " mb_width " << info->mb_width << " mb_height " << info->mb_height
+                 << " mb_x " << info->mb_x << " mb_y " << info->mb_y << endl;
+        }
+    }
+
+    while (info->frame_cnt == frame_num) {
+        draw_red_dot(yuv, info);
+
+        if (sad->getline(lines, 512)) {
+            cout << lines << endl;
+            int match_cnt = sscanf_s(lines, "frame=%d mb_width=%d mb_height=%d mb_x=%d mb_y=%d",
+                                     &info->frame_cnt, &info->mb_width, &info->mb_height, &info->mb_x, &info->mb_y);
+            if (match_cnt > 1) {
+                cout << "match_cnt " << match_cnt << " frame_cnt " << info->frame_cnt
+                     << " mb_width " << info->mb_width << " mb_height " << info->mb_height
+                     << " mb_x " << info->mb_x << " mb_y " << info->mb_y << endl;
+            }
+        } else {
+            cout << "No sad info now, exit!" << endl;
+            break;
+        }
+    }
+}
+
 void main(int argc, char **argv)
 {
     cout << "----------Test-------------" << endl;
     bool help = getarg(false, "-H", "--help", "-?");
-    string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\Bus_352x288_25.yuv", "-i", "--input");
-    string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\Red_352x288_25.yuv", "-o", "--output");
-    string coord_file = getarg("F:\\rkvenc_verify\\input_yuv\\out.md", "-c", "--coordinate");
-    unsigned int width = getarg(352, "-w", "--width");
-    unsigned int height = getarg(288, "-h", "--height");
-    unsigned int left = getarg(10, "-l", "--left");
-    unsigned int top = getarg(20, "-t", "--top");
-    unsigned int right = getarg(50, "-r", "--right");
-    unsigned int bottom = getarg(80, "-b", "--bottom");
-    unsigned int frames = getarg(10, "-f", "--frames");
+    string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576.yuv", "-i", "--input");
+    string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576_out.yuv", "-o", "--output");
+    string coord_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903.md", "-c", "--coordinate");
+    string sad_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576.sad", "-s", "--sad");
+    uint32_t width = getarg(720, "-w", "--width");
+    uint32_t height = getarg(576, "-h", "--height");
+    uint32_t left = getarg(10, "-l", "--left");
+    uint32_t top = getarg(20, "-t", "--top");
+    uint32_t right = getarg(50, "-r", "--right");
+    uint32_t bottom = getarg(80, "-b", "--bottom");
+    uint32_t frames = getarg(10, "-f", "--frames");
+    uint8_t enable_draw_dot = getarg(1, "-dd", "--draw_dot");
 
     if (help) {
         cout << "Usage:" << endl
@@ -132,9 +181,12 @@ void main(int argc, char **argv)
         }
     }
 
+    cout << "sad path: " << sad_file << endl;
+    ifstream sad_path(sad_file.c_str());
     unsigned int frame_read = 0;
     YuvInfo yuv_info;
     RectangleInfo rec_info;
+    SadInfo sad_info;
     ifs->read(buf, frame_size);
 
     do {
@@ -168,6 +220,10 @@ void main(int argc, char **argv)
                  << " region " << region_idx << endl;
         }
 
+        if (enable_draw_dot && frame_read > 0) {
+            rk_handle_md(&yuv_info, &sad_path, &sad_info, frame_read);
+        }
+
         ofs.write(buf, frame_size);
 
         ifs->read(buf, frame_size);
@@ -179,7 +235,9 @@ void main(int argc, char **argv)
     if (ifs && ifs != &cin)
         delete ifs;
     ofs.close();
-    delete [] buf;
+
+    if (buf)
+        delete [] buf;
 
     string str;
     cin >> str;
