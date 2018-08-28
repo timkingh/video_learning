@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <iomanip>
+#include <stdint.h>
 #include "getopt.hpp"
 
 using namespace std;
@@ -79,12 +81,27 @@ static void draw_red_rectangle(YuvInfo *yuv, RectangleInfo *rec)
 	}
 }
 
+static int calc_sad(uint8_t *pix1, int stride_pix1, uint8_t *pix2, int stride_pix2, int num)
+{
+	int sum = 0;
+	for (int y = 0; y < num; y++)
+	{
+		for (int x = 0; x < num; x++)
+		{
+			sum += abs(pix1[x] - pix2[x]);
+		}
+		pix1 += stride_pix1;
+		pix2 += stride_pix2;
+	}
+	return sum;
+}
+
 void main(int argc, char **argv)
 {
 	cout << "----------Test-------------" << endl;
 	bool help = getarg(false, "-H", "--help", "-?");
 	string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\Bus_352x288_25.yuv", "-i", "--input");
-	string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\Red_352x288_25.yuv", "-o", "--output");
+	string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\Bus_352x288_25.sad", "-o", "--output");
 	string coord_file = getarg("F:\\rkvenc_verify\\input_yuv\\out.md", "-c", "--coordinate");
 	unsigned int width = getarg(352, "-w", "--width");
 	unsigned int height = getarg(288, "-h", "--height");
@@ -92,7 +109,7 @@ void main(int argc, char **argv)
 	unsigned int top = getarg(20, "-t", "--top");
 	unsigned int right = getarg(50, "-r", "--right");
 	unsigned int bottom = getarg(80, "-b", "--bottom");
-	unsigned int frames = getarg(10, "-f", "--frames");
+	unsigned int frames = getarg(5, "-f", "--frames");
 
 	if (help) {
 		cout << "Usage:" << endl
@@ -104,7 +121,10 @@ void main(int argc, char **argv)
 	unsigned int luma_size = width * height;
 	unsigned int chroma_size = luma_size / 2;
 	unsigned int frame_size = luma_size + chroma_size;
-	char *buf = new char[frame_size];
+	char *buf[2] = {0};
+	uint32_t buf_idx;
+	buf[0] = new char[frame_size];
+	buf[1] = new char[frame_size];
 	unsigned int idx = 0;
 
 	cout << "input: " << in_file << endl;
@@ -114,64 +134,36 @@ void main(int argc, char **argv)
 	cout << "output: " << out_file << endl;
 	string out_path = out_file;
 	ofstream ofs;
-	ofs.open(out_path.c_str(), ios::binary | ios::out);
+	ofs.open(out_path.c_str(), ios::out);
 
 	unsigned int frame_cnt, region_num, region_idx;
-	ifstream coord(coord_file.c_str());
-	char lines[512];
-	if (coord.getline(lines, 512)) {
-		cout << lines << endl;
-
-		int match_cnt = sscanf_s(lines, "frame=%d, num=%d, idx=%d, left=%d, top=%d, right=%d, bottom=%d",
-			&frame_cnt, &region_num, &region_idx, &left, &top, &right, &bottom);
-		if (match_cnt > 1) {
-			cout << "match_cnt " << match_cnt << " frame_cnt " << frame_cnt
-				<< " region_num " << region_num << " region_idx " << region_idx
-				<< " left " << left << " top " << top
-				<< " right " << right << " bottom " << bottom << endl;
-		}
-	}
-
 	unsigned int frame_read = 0;
-	YuvInfo yuv_info;
-	RectangleInfo rec_info;
-	ifs->read(buf, frame_size);
 
 	do {
-		while (frame_read == frame_cnt) {
-			yuv_info.buf = buf;
-			yuv_info.width = width;
-			yuv_info.height = height;
-			rec_info.left = left;
-			rec_info.top = top;
-			rec_info.right = right;
-			rec_info.bottom = bottom;
+		buf_idx = frame_read % 2;
+		ifs->read(buf[buf_idx], frame_size);
 
-			draw_red_rectangle(&yuv_info, &rec_info);
+		if (frame_read > 0) {
+			uint32_t mb_size = 8;
+			uint32_t mb_width = width / mb_size;
+			uint32_t mb_height = height / mb_size;
 
-			if (coord.getline(lines, 512)) {
-				cout << lines << endl;
-
-				int match_cnt = sscanf_s(lines, "frame=%d, num=%d, idx=%d, left=%d, top=%d, right=%d, bottom=%d",
-					&frame_cnt, &region_num, &region_idx, &left, &top, &right, &bottom);
-				if (match_cnt > 1) {
-					cout << "match_cnt " << match_cnt << " frame_cnt " << frame_cnt
-						<< " region_num " << region_num << " region_idx " << region_idx
-						<< " left " << left << " top " << top
-						<< " right " << right << " bottom " << bottom << endl;
+			ofs << "frame " << frame_read 
+				<< " mb_width " << mb_width << " mb_height " << mb_height
+				<< endl;
+			for (uint32_t y = 0; y < mb_height; y++) {
+				for (uint32_t x = 0; x < mb_width; x++) {
+					uint32_t sad = 0;
+					uint8_t *buf0 = (uint8_t *)buf[0] + x * mb_size + y * mb_size * width;
+					uint8_t *buf1 = (uint8_t *)buf[1] + x * mb_size + y * mb_size * width;
+					
+					sad = calc_sad(buf0, width, buf1, width, mb_size);
+					ofs << setw(6) << sad << " ";
 				}
+				ofs << endl;
 			}
-			else {
-				cout << "No MD info now, exit!" << endl;
-				break;
-			}
-			cout << "finish frame " << frame_cnt
-				<< " region " << region_idx << endl;
 		}
 
-		ofs.write(buf, frame_size);
-
-		ifs->read(buf, frame_size);
 		frame_read++;
 	} while (frame_read < frames);
 
@@ -180,7 +172,11 @@ void main(int argc, char **argv)
 	if (ifs && ifs != &cin)
 		delete ifs;
 	ofs.close();
-	delete[] buf;
+	
+	if (buf[0])
+		delete[] buf[0];
+	if (buf[1])
+		delete[] buf[1];
 
 	string str;
 	cin >> str;

@@ -13,6 +13,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add directory="F:/CPP_Learning/scale_ffmpeg/include" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
