@@ -2,7 +2,9 @@
 #include <fstream>
 #include <string>
 #include <stdint.h>
+#include <vector>
 #include "getopt.hpp"
+#include "rectangle.h"
 
 using namespace std;
 
@@ -102,6 +104,8 @@ static void draw_red_dot(YuvInfo *yuv, SadInfo *info)
 
 static void rk_handle_md(YuvInfo *yuv, ifstream *sad, SadInfo *info, uint32_t frame_num)
 {
+    vector<Rect> rects;
+    Rect rect;
     char lines[512];
     if (frame_num == 1 && sad->getline(lines, 512)) {
         cout << lines << endl;
@@ -117,6 +121,12 @@ static void rk_handle_md(YuvInfo *yuv, ifstream *sad, SadInfo *info, uint32_t fr
     while (info->frame_cnt == frame_num) {
         draw_red_dot(yuv, info);
 
+        rect.left = info->mb_x * info->mb_size;
+        rect.top = info->mb_y * info->mb_size;
+        rect.right = rect.left + info->mb_size;
+        rect.bottom = rect.top + info->mb_size;
+        rects.push_back(rect);
+
         if (sad->getline(lines, 512)) {
             //cout << lines << endl;
             int match_cnt = sscanf_s(lines, "frame=%d mb_size=%d mb_width=%d mb_height=%d mb_x=%d mb_y=%d",
@@ -130,6 +140,13 @@ static void rk_handle_md(YuvInfo *yuv, ifstream *sad, SadInfo *info, uint32_t fr
             cout << "No sad info now, exit!" << endl;
             break;
         }
+    }
+
+    vector<Rect>::iterator iter;
+    cout << frame_num << " Vector Rect Number " << rects.size() << endl;
+    for (iter = rects.begin(); iter != rects.end(); iter++) {
+        cout << iter->left << " " << iter->top
+             << iter->right << " " << iter->bottom << endl;
     }
 }
 
