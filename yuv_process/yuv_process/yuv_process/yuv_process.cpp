@@ -142,12 +142,15 @@ static void rk_handle_md(YuvInfo *yuv, ifstream *sad, SadInfo *info, uint32_t fr
         }
     }
 
-    vector<Rect>::iterator iter;
-    cout << frame_num << " Vector Rect Number " << rects.size() << endl;
-    for (iter = rects.begin(); iter != rects.end(); iter++) {
-        cout << iter->left << " " << iter->top
-             << iter->right << " " << iter->bottom << endl;
-    }
+    cout << "frame_num " << frame_num << " Vector Rect Number " << rects.size() << endl;
+
+    /*  vector<Rect>::iterator iter;
+      for (iter = rects.begin(); iter != rects.end(); iter++) {
+          cout << iter->left << " " << iter->top << " "
+               << iter->right << " " << iter->bottom << endl;
+      }*/
+    merge_rect(rects);
+    cout << "frame_num " << frame_num << " finish merge" << endl;
 }
 
 void main(int argc, char **argv)
