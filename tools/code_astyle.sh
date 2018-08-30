@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-./astyle --quiet --options=astyle_x264 ../*.cpp ../*.c ../*.h
+./astyle --recursive --options=tim_astyle ../../*.cpp ../../*.c ../../*.h ../../*.hpp 
 
-set -e
-./astyle --quiet --options=astyle_jm ../*.cpp ../*.c ../*.h
+#set -e
+#./astyle --quiet --options=astyle_jm ../*.cpp ../*.c ../*.h
