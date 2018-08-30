@@ -198,8 +198,6 @@ int main(int argc, char **argv)
         frame_read++;
     } while (frame_read < frames);
 
-    cout << "----------End!-------------" << endl;
-
     if (ifs && ifs != &cin)
         delete ifs;
     ofs.close();
@@ -207,7 +205,8 @@ int main(int argc, char **argv)
     if (buf)
         delete [] buf;
 
-    string str;
-    cin >> str;
+    cout << "----------End!-------------" << endl;
+    //string str;
+    //cin >> str;
     return 0;
 }

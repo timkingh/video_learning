@@ -159,3 +159,4 @@ $RECYCLE.BIN/
 *.sln
 *.vcxproj
 *.filters
+*.o
