@@ -8,10 +8,10 @@
 
 using namespace std;
 
-#ifdef _MSC_VER // maybe check the specific version, too...
-    #define sscanf_s SSCANF
+#ifdef _WIN32
+#define SSCANF sscanf_s
 #else
-    #define SSCANF sscanf
+#define SSCANF sscanf
 #endif
 
 typedef struct {
@@ -45,7 +45,7 @@ static void rk_handle_md(YuvInfo *yuv, ifstream *sad, SadInfo *info, uint32_t fr
     if (frame_num == 1 && sad->getline(lines, 512)) {
         cout << lines << endl;
         int match_cnt = SSCANF(lines, "frame=%d mb_size=%d mb_width=%d mb_height=%d mb_x=%d mb_y=%d",
-                                 &info->frame_cnt, &info->mb_size, &info->mb_width, &info->mb_height, &info->mb_x, &info->mb_y);
+                               &info->frame_cnt, &info->mb_size, &info->mb_width, &info->mb_height, &info->mb_x, &info->mb_y);
         if (match_cnt > 1) {
             cout << "match_cnt " << match_cnt << " frame_cnt " << info->frame_cnt
                  << " mb_width " << info->mb_width << " mb_height " << info->mb_height
@@ -65,7 +65,7 @@ static void rk_handle_md(YuvInfo *yuv, ifstream *sad, SadInfo *info, uint32_t fr
         if (sad->getline(lines, 512)) {
             //cout << lines << endl;
             int match_cnt = SSCANF(lines, "frame=%d mb_size=%d mb_width=%d mb_height=%d mb_x=%d mb_y=%d",
-                                     &info->frame_cnt, &info->mb_size, &info->mb_width, &info->mb_height, &info->mb_x, &info->mb_y);
+                                   &info->frame_cnt, &info->mb_size, &info->mb_width, &info->mb_height, &info->mb_x, &info->mb_y);
             if (match_cnt > 1) {
                 //cout << "match_cnt " << match_cnt << " frame_cnt " << info->frame_cnt
                 //     << " mb_width " << info->mb_width << " mb_height " << info->mb_height
@@ -137,7 +137,7 @@ int main(int argc, char **argv)
         cout << lines << endl;
 
         int match_cnt = SSCANF(lines, "frame=%d, num=%d, idx=%d, left=%d, top=%d, right=%d, bottom=%d",
-                                 &frame_cnt, &region_num, &region_idx, &left, &top, &right, &bottom);
+                               &frame_cnt, &region_num, &region_idx, &left, &top, &right, &bottom);
         if (match_cnt > 1) {
             cout << "match_cnt " << match_cnt << " frame_cnt " << frame_cnt
                  << " region_num " << region_num << " region_idx " << region_idx
@@ -173,7 +173,7 @@ int main(int argc, char **argv)
                 //cout << lines << endl;
 
                 int match_cnt = SSCANF(lines, "frame=%d, num=%d, idx=%d, left=%d, top=%d, right=%d, bottom=%d",
-                                         &frame_cnt, &region_num, &region_idx, &left, &top, &right, &bottom);
+                                       &frame_cnt, &region_num, &region_idx, &left, &top, &right, &bottom);
                 if (match_cnt > 1) {
                     //cout << "match_cnt " << match_cnt << " frame_cnt " << frame_cnt
                     //     << " region_num " << region_num << " region_idx " << region_idx
