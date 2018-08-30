@@ -5,6 +5,7 @@
 #include <vector>
 #include "getopt.hpp"
 #include "rectangle.h"
+#include "common.h"
 
 using namespace std;
 
@@ -77,6 +78,9 @@ static void rk_handle_md(YuvInfo *yuv, ifstream *sad, SadInfo *info, uint32_t fr
         }
     }
 
+    int64_t start, end;
+    double duration;
+    start = time_usec();
     cout << "frame_num " << frame_num << " Vector Rect Number " << rects.size() << endl;
 
     /*  vector<Rect>::iterator iter;
@@ -85,7 +89,10 @@ static void rk_handle_md(YuvInfo *yuv, ifstream *sad, SadInfo *info, uint32_t fr
                << iter->right << " " << iter->bottom << endl;
       }*/
     merge_rect(rects);
-    cout << "frame_num " << frame_num << " finish merge" << endl;
+
+    end = time_usec();
+    duration = (double)((end - start) / 1000000);
+    cout << "frame_num " << frame_num << " finish merge, time " << duration << endl;
 
     draw_blue_rectangle(yuv, rects);
 
