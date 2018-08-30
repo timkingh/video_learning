@@ -1,10 +1,19 @@
 #include <iostream>
 #include <string>
+#include <algorithm>
 #include "rectangle.h"
 
 using namespace std;
 
 #define MB_SIZE    (4)
+
+inline bool Rect::operator == (const Rect &rect) const
+{
+    if (left == rect.left && top == rect.top &&
+        right == rect.right && bottom == rect.bottom)
+        return true;
+    return false;
+}
 
 /* judge whether two rects intersect */
 static bool is_intersect(Rect &rect1, Rect &rect2)
@@ -57,7 +66,7 @@ void merge_rect(vector<Rect> &rects)
     vector<Rect> rects_org = rects;
     Rect dst;
     uint32_t i, j;
-    uint32_t motion_rate = 1, motion_rate_thresh = 80;
+    uint32_t motion_rate = 1, motion_rate_thresh = 50;
 
 run_again:
     for (i = 0; i < rects.size() - 1; i++) {
@@ -66,8 +75,14 @@ run_again:
 
             motion_rate = calc_motion_rate(rects_org, dst);
             if (motion_rate >= motion_rate_thresh) {
-                rects.erase(rects.begin() + i);
-                rects.erase(rects.begin() + j);
+                Rect a = rects.at(i);
+                Rect b = rects.at(j);
+
+                vector<Rect>::iterator iter;
+                iter = find(rects.begin(), rects.end(), a);
+                rects.erase(iter);
+                iter = find(rects.begin(), rects.end(), b);
+                rects.erase(iter);
                 rects.push_back(dst);
 
                 goto run_again;
