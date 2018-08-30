@@ -66,7 +66,7 @@ void merge_rect(vector<Rect> &rects)
     vector<Rect> rects_org = rects;
     Rect dst;
     uint32_t i, j;
-    uint32_t motion_rate = 1, motion_rate_thresh = 50;
+    uint32_t motion_rate = 1, motion_rate_thresh = 30;
 
 run_again:
     for (i = 0; i < rects.size() - 1; i++) {
@@ -94,7 +94,86 @@ run_again:
     cout << "After merge, vector rect number " << rects.size() << endl;
 }
 
+void draw_rectangle(YuvInfo *yuv, RectangleInfo *rec)
+{
+    unsigned int idx;
+    unsigned int x0, y0, x1, y1;
+    unsigned int width = yuv->width;
+    unsigned int height = yuv->height;
+    char *buf_y = yuv->buf;
+    char *buf_u = yuv->buf + width * height;
+    char *buf_v = buf_u + width * height / 4;
+    x0 = rec->left;
+    y0 = rec->top;
+    x1 = rec->right;
+    y1 = rec->bottom;
 
+    /* Y */
+    char *buf_top = buf_y + x0 + y0 * width;
+    char *buf_bottom = buf_y + x0 + y1 * width;
+    for (idx = 0; idx < x1 - x0 + 1; idx++) {
+        buf_top[idx] = buf_bottom[idx] = rec->y_pixel;
+    }
+
+    char *buf_left = buf_top;
+    char *buf_right = buf_left + (x1 - x0);
+    for (idx = 0; idx < y1 - y0 + 1; idx++) {
+        buf_left[idx * width] = buf_right[idx * width] = rec->y_pixel;
+    }
+
+    unsigned int c_x0, c_y0, c_x1, c_y1;
+    unsigned int chroma_width = width / 2;
+    c_x0 = x0 / 2;
+    c_y0 = y0 / 2;
+    c_x1 = x1 / 2;
+    c_y1 = y1 / 2;
+
+    /* U */
+    buf_top = buf_u + c_x0 + c_y0 * chroma_width;
+    buf_bottom = buf_u + c_x0 + c_y1 * chroma_width;
+    for (idx = 0; idx < c_x1 - c_x0 + 1; idx++) {
+        buf_top[idx] = buf_bottom[idx] = rec->u_pixel;
+    }
+
+    buf_left = buf_top;
+    buf_right = buf_left + (c_x1 - c_x0);
+    for (idx = 0; idx < c_y1 - c_y0 + 1; idx++) {
+        buf_left[idx * chroma_width] = buf_right[idx * chroma_width] = rec->u_pixel;
+    }
+
+    /* V */
+    buf_top = buf_v + c_x0 + c_y0 * chroma_width;
+    buf_bottom = buf_v + c_x0 + c_y1 * chroma_width;
+    for (idx = 0; idx < c_x1 - c_x0 + 1; idx++) {
+        buf_top[idx] = buf_bottom[idx] = rec->v_pixel;
+    }
+
+    buf_left = buf_top;
+    buf_right = buf_left + (c_x1 - c_x0);
+    for (idx = 0; idx < c_y1 - c_y0 + 1; idx++) {
+        buf_left[idx * chroma_width] = buf_right[idx * chroma_width] = rec->v_pixel;
+    }
+}
+
+void draw_blue_rectangle(YuvInfo *yuv, vector<Rect> &rects)
+{
+    uint32_t idx = 0;
+    RectangleInfo rec_info;
+    rec_info.y_pixel = 29; /* Blue */
+    rec_info.u_pixel = 255;
+    rec_info.v_pixel = 107;
+
+    for (idx = 0; idx < rects.size(); idx++) {
+        Rect &rect = rects.back();
+        rec_info.left = rect.left;
+        rec_info.top = rect.top;
+        rec_info.right = rect.right;
+        rec_info.bottom = rect.bottom;
+
+        draw_rectangle(yuv, &rec_info);
+        rects.pop_back();
+    }
+}
 
 
 

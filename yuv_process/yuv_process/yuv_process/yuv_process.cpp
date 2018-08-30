@@ -9,19 +9,6 @@
 using namespace std;
 
 typedef struct {
-    char *buf;
-    unsigned int width;
-    unsigned int height;
-} YuvInfo;
-
-typedef struct {
-    unsigned int left;
-    unsigned int top;
-    unsigned int right;
-    unsigned int bottom;
-} RectangleInfo;
-
-typedef struct {
     uint32_t frame_cnt;
     uint32_t mb_size;
     uint32_t mb_width;
@@ -30,67 +17,6 @@ typedef struct {
     uint32_t mb_y;
 } SadInfo;
 
-static void draw_red_rectangle(YuvInfo *yuv, RectangleInfo *rec)
-{
-    unsigned int idx;
-    unsigned int x0, y0, x1, y1;
-    unsigned int width = yuv->width;
-    unsigned int height = yuv->height;
-    char *buf_y = yuv->buf;
-    char *buf_u = yuv->buf + width * height;
-    char *buf_v = buf_u + width * height / 4;
-    x0 = rec->left;
-    y0 = rec->top;
-    x1 = rec->right;
-    y1 = rec->bottom;
-
-    /* Y */
-    char *buf_top = buf_y + x0 + y0 * width;
-    char *buf_bottom = buf_y + x0 + y1 * width;
-    for (idx = 0; idx < x1 - x0 + 1; idx++) {
-        buf_top[idx] = buf_bottom[idx] = 76;
-    }
-
-    char *buf_left = buf_top;
-    char *buf_right = buf_left + (x1 - x0);
-    for (idx = 0; idx < y1 - y0 + 1; idx++) {
-        buf_left[idx * width] = buf_right[idx * width] = 76;
-    }
-
-    unsigned int c_x0, c_y0, c_x1, c_y1;
-    unsigned int chroma_width = width / 2;
-    c_x0 = x0 / 2;
-    c_y0 = y0 / 2;
-    c_x1 = x1 / 2;
-    c_y1 = y1 / 2;
-
-    /* U */
-    buf_top = buf_u + c_x0 + c_y0 * chroma_width;
-    buf_bottom = buf_u + c_x0 + c_y1 * chroma_width;
-    for (idx = 0; idx < c_x1 - c_x0 + 1; idx++) {
-        buf_top[idx] = buf_bottom[idx] = 84;
-    }
-
-    buf_left = buf_top;
-    buf_right = buf_left + (c_x1 - c_x0);
-    for (idx = 0; idx < c_y1 - c_y0 + 1; idx++) {
-        buf_left[idx * chroma_width] = buf_right[idx * chroma_width] = 84;
-    }
-
-    /* V */
-    buf_top = buf_v + c_x0 + c_y0 * chroma_width;
-    buf_bottom = buf_v + c_x0 + c_y1 * chroma_width;
-    for (idx = 0; idx < c_x1 - c_x0 + 1; idx++) {
-        buf_top[idx] = buf_bottom[idx] = 255;
-    }
-
-    buf_left = buf_top;
-    buf_right = buf_left + (c_x1 - c_x0);
-    for (idx = 0; idx < c_y1 - c_y0 + 1; idx++) {
-        buf_left[idx * chroma_width] = buf_right[idx * chroma_width] = 255;
-    }
-}
-
 static void draw_red_dot(YuvInfo *yuv, SadInfo *info)
 {
     RectangleInfo rec_info;
@@ -98,8 +24,11 @@ static void draw_red_dot(YuvInfo *yuv, SadInfo *info)
     rec_info.top = info->mb_y * info->mb_size;
     rec_info.right = info->mb_x * info->mb_size + 1;
     rec_info.bottom = info->mb_y * info->mb_size + 1;
+    rec_info.y_pixel = 76; /* Red */
+    rec_info.u_pixel = 84;
+    rec_info.v_pixel = 255;
 
-    draw_red_rectangle(yuv, &rec_info);
+    draw_rectangle(yuv, &rec_info);
 }
 
 static void rk_handle_md(YuvInfo *yuv, ifstream *sad, SadInfo *info, uint32_t frame_num)
@@ -151,6 +80,9 @@ static void rk_handle_md(YuvInfo *yuv, ifstream *sad, SadInfo *info, uint32_t fr
       }*/
     merge_rect(rects);
     cout << "frame_num " << frame_num << " finish merge" << endl;
+
+    draw_blue_rectangle(yuv, rects);
+
 }
 
 void main(int argc, char **argv)
@@ -167,7 +99,7 @@ void main(int argc, char **argv)
     uint32_t top = getarg(20, "-t", "--top");
     uint32_t right = getarg(50, "-r", "--right");
     uint32_t bottom = getarg(80, "-b", "--bottom");
-    uint32_t frames = getarg(5, "-f", "--frames");
+    uint32_t frames = getarg(2, "-f", "--frames");
     uint8_t enable_draw_dot = getarg(1, "-dd", "--draw_dot");
 
     if (help) {
@@ -225,8 +157,11 @@ void main(int argc, char **argv)
             rec_info.top = top;
             rec_info.right = right;
             rec_info.bottom = bottom;
+            rec_info.y_pixel = 76; /* Red */
+            rec_info.u_pixel = 84;
+            rec_info.v_pixel = 255;
 
-            draw_red_rectangle(&yuv_info, &rec_info);
+            draw_rectangle(&yuv_info, &rec_info);
 
             if (coord.getline(lines, 512)) {
                 //cout << lines << endl;
