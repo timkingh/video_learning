@@ -8,6 +8,12 @@
 
 using namespace std;
 
+#ifdef _MSC_VER // maybe check the specific version, too...
+    #define sscanf_s SSCANF
+#else
+    #define SSCANF sscanf
+#endif
+
 typedef struct {
     uint32_t frame_cnt;
     uint32_t mb_size;
@@ -38,7 +44,7 @@ static void rk_handle_md(YuvInfo *yuv, ifstream *sad, SadInfo *info, uint32_t fr
     char lines[512];
     if (frame_num == 1 && sad->getline(lines, 512)) {
         cout << lines << endl;
-        int match_cnt = sscanf_s(lines, "frame=%d mb_size=%d mb_width=%d mb_height=%d mb_x=%d mb_y=%d",
+        int match_cnt = SSCANF(lines, "frame=%d mb_size=%d mb_width=%d mb_height=%d mb_x=%d mb_y=%d",
                                  &info->frame_cnt, &info->mb_size, &info->mb_width, &info->mb_height, &info->mb_x, &info->mb_y);
         if (match_cnt > 1) {
             cout << "match_cnt " << match_cnt << " frame_cnt " << info->frame_cnt
@@ -58,7 +64,7 @@ static void rk_handle_md(YuvInfo *yuv, ifstream *sad, SadInfo *info, uint32_t fr
 
         if (sad->getline(lines, 512)) {
             //cout << lines << endl;
-            int match_cnt = sscanf_s(lines, "frame=%d mb_size=%d mb_width=%d mb_height=%d mb_x=%d mb_y=%d",
+            int match_cnt = SSCANF(lines, "frame=%d mb_size=%d mb_width=%d mb_height=%d mb_x=%d mb_y=%d",
                                      &info->frame_cnt, &info->mb_size, &info->mb_width, &info->mb_height, &info->mb_x, &info->mb_y);
             if (match_cnt > 1) {
                 //cout << "match_cnt " << match_cnt << " frame_cnt " << info->frame_cnt
@@ -85,7 +91,7 @@ static void rk_handle_md(YuvInfo *yuv, ifstream *sad, SadInfo *info, uint32_t fr
 
 }
 
-void main(int argc, char **argv)
+int main(int argc, char **argv)
 {
     cout << "----------Test-------------" << endl;
     bool help = getarg(false, "-H", "--help", "-?");
@@ -130,7 +136,7 @@ void main(int argc, char **argv)
     if (coord.getline(lines, 512)) {
         cout << lines << endl;
 
-        int match_cnt = sscanf_s(lines, "frame=%d, num=%d, idx=%d, left=%d, top=%d, right=%d, bottom=%d",
+        int match_cnt = SSCANF(lines, "frame=%d, num=%d, idx=%d, left=%d, top=%d, right=%d, bottom=%d",
                                  &frame_cnt, &region_num, &region_idx, &left, &top, &right, &bottom);
         if (match_cnt > 1) {
             cout << "match_cnt " << match_cnt << " frame_cnt " << frame_cnt
@@ -166,7 +172,7 @@ void main(int argc, char **argv)
             if (coord.getline(lines, 512)) {
                 //cout << lines << endl;
 
-                int match_cnt = sscanf_s(lines, "frame=%d, num=%d, idx=%d, left=%d, top=%d, right=%d, bottom=%d",
+                int match_cnt = SSCANF(lines, "frame=%d, num=%d, idx=%d, left=%d, top=%d, right=%d, bottom=%d",
                                          &frame_cnt, &region_num, &region_idx, &left, &top, &right, &bottom);
                 if (match_cnt > 1) {
                     //cout << "match_cnt " << match_cnt << " frame_cnt " << frame_cnt
@@ -203,5 +209,5 @@ void main(int argc, char **argv)
 
     string str;
     cin >> str;
-    return;
+    return 0;
 }
