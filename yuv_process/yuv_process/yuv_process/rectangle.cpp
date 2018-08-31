@@ -61,7 +61,7 @@ static uint32_t calc_motion_rate(vector<Rect> &rects, Rect &dst)
     return rate;
 }
 
-void merge_rect(vector<Rect> &rects)
+void merge_rect(ProcCtx *ctx, vector<Rect> &rects)
 {
     vector<Rect> rects_org = rects;
     Rect dst;

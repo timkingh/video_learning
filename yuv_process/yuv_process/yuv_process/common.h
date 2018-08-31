@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+typedef struct ProcCtx ProcCtx;
+
 
 int64_t time_usec(void);
 

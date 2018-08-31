@@ -79,7 +79,9 @@ static void rk_handle_md(YuvInfo *yuv, ifstream *sad, SadInfo *info, uint32_t fr
           cout << iter->left << " " << iter->top << " "
                << iter->right << " " << iter->bottom << endl;
       }*/
-    merge_rect(rects);
+    ProcCtx proc_ctx;
+    ProcCtx *ctx = &proc_ctx;
+    merge_rect(ctx, rects);
 
     end = time_usec();
     duration = (double)(end - start) / 1000000;
