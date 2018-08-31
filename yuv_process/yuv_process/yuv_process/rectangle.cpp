@@ -68,7 +68,8 @@ void merge_rect(void *proc_ctx, vector<Rect> &rects)
     vector<Rect> rects_org = rects;
     Rect dst;
     uint32_t i, j;
-    uint32_t motion_rate = 1, motion_rate_thresh = 30;
+    uint32_t motion_rate = 1;
+    uint32_t motion_rate_thresh = ctx->motion_rate_thresh;
 
 run_again:
     for (i = 0; i < rects.size() - 1; i++) {

@@ -13,7 +13,11 @@ typedef struct {
 
 typedef struct ProcCtx {
     uint32_t frames;
+    uint32_t frame_read;
+    uint32_t motion_rate_thresh;
+    uint8_t  enable_draw_dot;
     YuvInfo yuv_info;
+    SadInfo sad_info;
 } ProcCtx;
 
 

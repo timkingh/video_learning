@@ -29,9 +29,11 @@ static void draw_red_dot(YuvInfo *yuv, SadInfo *info)
     draw_rectangle(yuv, &rec_info);
 }
 
-static void rk_handle_md(ProcCtx *ctx, ifstream *sad, SadInfo *info, uint32_t frame_num)
+static void rk_handle_md(ProcCtx *ctx, ifstream *sad)
 {
     YuvInfo *yuv = &ctx->yuv_info;
+    SadInfo *info = &ctx->sad_info;
+    uint32_t frame_num = ctx->frame_read;
     vector<Rect> rects;
     Rect rect;
     char lines[512];
@@ -95,6 +97,7 @@ int main(int argc, char **argv)
 {
     ProcCtx proc_ctx;
     ProcCtx *ctx = &proc_ctx;
+    memset(ctx, 0, sizeof(ProcCtx));
 
     cout << "----------Test-------------" << endl;
     bool help = getarg(false, "-H", "--help", "-?");
@@ -108,8 +111,9 @@ int main(int argc, char **argv)
     uint32_t top = getarg(20, "-t", "--top");
     uint32_t right = getarg(50, "-r", "--right");
     uint32_t bottom = getarg(80, "-b", "--bottom");
-    uint32_t frames = getarg(2, "-f", "--frames");
-    uint8_t enable_draw_dot = getarg(1, "-dd", "--draw_dot");
+    ctx->frames = getarg(2, "-f", "--frames");
+    ctx->motion_rate_thresh = getarg(30, "-m", "--motion_thresh");
+    ctx->enable_draw_dot = getarg(1, "-dd", "--draw_dot");
 
     if (help) {
         cout << "Usage:" << endl
@@ -152,14 +156,12 @@ int main(int argc, char **argv)
 
     cout << "sad path: " << sad_file << endl;
     ifstream sad_path(sad_file.c_str());
-    unsigned int frame_read = 0;
     YuvInfo *yuv_info = &ctx->yuv_info;
     RectangleInfo rec_info;
-    SadInfo sad_info;
     ifs->read(buf, frame_size);
 
     do {
-        while (frame_read == frame_cnt) {
+        while (ctx->frame_read == frame_cnt) {
             yuv_info->buf = buf;
             yuv_info->width = width;
             yuv_info->height = height;
@@ -192,15 +194,15 @@ int main(int argc, char **argv)
                  << " region " << region_idx << endl;
         }
 
-        if (enable_draw_dot && frame_read > 0) {
-            rk_handle_md(ctx, &sad_path, &sad_info, frame_read);
+        if (ctx->enable_draw_dot && ctx->frame_read > 0) {
+            rk_handle_md(ctx, &sad_path);
         }
 
         ofs.write(buf, frame_size);
 
         ifs->read(buf, frame_size);
-        frame_read++;
-    } while (frame_read < frames);
+        ctx->frame_read++;
+    } while (ctx->frame_read < ctx->frames);
 
     if (ifs && ifs != &cin)
         delete ifs;
