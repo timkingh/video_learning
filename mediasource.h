@@ -3,13 +3,13 @@
 
 #include "media.h"
 
-class MediaSource:public Medium
+class MediaSource: public Medium
 {
 public:
-	MediaSource(int id);
-	~MediaSource();
+    MediaSource(int id);
+    ~MediaSource();
 
-	virtual void Print();
+    virtual void Print();
 };
 
 

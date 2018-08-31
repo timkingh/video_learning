@@ -109,7 +109,7 @@ inline size_t split(std::vector<std::string> &tokens, const std::string &self, c
 {
     std::string str;
     tokens.clear();
-    for (auto &ch : self) {
+    for (auto & ch : self) {
         if (delimiters.find_first_of(ch) != std::string::npos) {
             if (str.size()) tokens.push_back(str), str = "";
             tokens.push_back(std::string() + ch);
@@ -160,15 +160,14 @@ inline std::vector<std::string> cmdline()
 struct getopt : public std::map< std::string, std::string > {
     using super = std::map< std::string, std::string >;
 
-    getopt(int argc, const char **argv) : super()
-    {
+    getopt(int argc, const char **argv) : super() {
         // reconstruct vector
         std::vector<std::string> args(argc, std::string());
         for (int i = 0; i < argc; ++i) {
             args[ i ] = argv[ i ];
         }
         // create key=value and key= args as well
-        for (auto &it : args) {
+        for (auto & it : args) {
             std::vector<std::string> tokens;
             auto size = getopt_utils::split(tokens, it, "=");
 
@@ -185,40 +184,35 @@ struct getopt : public std::map< std::string, std::string > {
         }
     }
 
-    getopt(const std::vector<std::string> &args) : super()
-    {
+    getopt(const std::vector<std::string> &args) : super() {
         std::vector<const char *> argv;
-        for (auto &it : args) {
+        for (auto & it : args) {
             argv.push_back(it.c_str());
         }
         *this = getopt(argv.size(), argv.data());
     }
 
-    size_t size() const
-    {
+    size_t size() const {
         unsigned i = 0;
         while (has(std::to_string(i))) ++i;
         return i;
     }
 
-    bool has(const std::string &op) const
-    {
+    bool has(const std::string &op) const {
         return this->find(op) != this->end();
     }
 
-    std::string str() const
-    {
+    std::string str() const {
         std::stringstream ss;
         std::string sep;
-        for (auto &it : *this) {
+        for (auto & it : *this) {
             ss << sep << it.first << "=" << it.second;
             sep = ',';
         }
         return ss.str();
     }
 
-    std::string cmdline() const
-    {
+    std::string cmdline() const {
         std::stringstream cmd;
         std::string sep;
         // concatenate args

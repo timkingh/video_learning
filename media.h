@@ -5,13 +5,13 @@
 class Medium
 {
 public:
-	Medium(int id);
-	virtual ~Medium();
+    Medium(int id);
+    virtual ~Medium();
 
-	virtual void Print();
+    virtual void Print();
 
 protected:
-	int m_identifier;
+    int m_identifier;
 };
 
 
