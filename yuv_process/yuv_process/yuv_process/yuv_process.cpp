@@ -91,8 +91,8 @@ static void rk_handle_md(YuvInfo *yuv, ifstream *sad, SadInfo *info, uint32_t fr
     merge_rect(rects);
 
     end = time_usec();
-    duration = (double)((end - start) / 1000000);
-    cout << "frame_num " << frame_num << " finish merge, time " << duration << endl;
+    duration = (double)(end - start) / 1000000;
+    cout << "frame_num " << frame_num << " finish merge, " << duration << " seconds"<< endl;
 
     draw_blue_rectangle(yuv, rects);
 
@@ -117,9 +117,10 @@ int main(int argc, char **argv)
 
     if (help) {
         cout << "Usage:" << endl
-             << "yuv_process.exe -i=in.yuv -o=out.yuv "
-             << "-w width -h height"
+             << "./yuv_process -i=3903_720x576.yuv -o=3903_720x576_hi_rk.yuv "
+             << "-c=3903.md -s=3903_720x576_150.sad -f=2"
              << endl;
+        return 0;
     }
 
     unsigned int luma_size = width * height;
