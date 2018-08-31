@@ -70,7 +70,7 @@ static void fill_samples(double *dst, int nb_samples, int nb_channels, int sampl
 
     /* generate sin tone with 440Hz frequency and duplicated channels */
     for (i = 0; i < nb_samples; i++) {
-        *dstp = sin(c * *t);
+        *dstp = sin(c **t);
         for (j = 1; j < nb_channels; j++)
             dstp[j] = dstp[0];
         dstp += nb_channels;

@@ -50,8 +50,8 @@ typedef struct AVExpr AVExpr;
  */
 int av_expr_parse_and_eval(double *res, const char *s,
                            const char * const *const_names, const double *const_values,
-                           const char * const *func1_names, double (* const *funcs1)(void *, double),
-                           const char * const *func2_names, double (* const *funcs2)(void *, double, double),
+                           const char * const *func1_names, double(* const *funcs1)(void *, double),
+                           const char * const *func2_names, double(* const *funcs2)(void *, double, double),
                            void *opaque, int log_offset, void *log_ctx);
 
 /**
@@ -73,8 +73,8 @@ int av_expr_parse_and_eval(double *res, const char *s,
  */
 int av_expr_parse(AVExpr **expr, const char *s,
                   const char * const *const_names,
-                  const char * const *func1_names, double (* const *funcs1)(void *, double),
-                  const char * const *func2_names, double (* const *funcs2)(void *, double, double),
+                  const char * const *func1_names, double(* const *funcs1)(void *, double),
+                  const char * const *func2_names, double(* const *funcs2)(void *, double, double),
                   int log_offset, void *log_ctx);
 
 /**

@@ -418,7 +418,7 @@ static av_always_inline av_const int av_parity_c(uint32_t v)
             val += (hi<<10) + 0x10000;\
         }\
     }\
-
+ 
 /**
  * @def PUT_UTF8(val, tmp, PUT_BYTE)
  * Convert a 32-bit Unicode character to its UTF-8 encoded form (up to 4 bytes long).
@@ -482,7 +482,7 @@ static av_always_inline av_const int av_parity_c(uint32_t v)
             PUT_16BIT\
         }\
     }\
-
+ 
 
 
 #include "mem.h"

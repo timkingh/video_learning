@@ -241,7 +241,7 @@ typedef struct AVIOContext {
     int max_packet_size;
     unsigned long checksum;
     unsigned char *checksum_ptr;
-    unsigned long (*update_checksum)(unsigned long checksum, const uint8_t *buf, unsigned int size);
+    unsigned long(*update_checksum)(unsigned long checksum, const uint8_t *buf, unsigned int size);
     int error;              /**< contains the error code or 0 if no error happened */
     /**
      * Pause or resume playback for network streaming protocols - e.g. MMS.
