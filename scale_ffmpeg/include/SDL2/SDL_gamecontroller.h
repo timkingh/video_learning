@@ -56,8 +56,7 @@ struct _SDL_GameController;
 typedef struct _SDL_GameController SDL_GameController;
 
 
-typedef enum
-{
+typedef enum {
     SDL_CONTROLLER_BINDTYPE_NONE = 0,
     SDL_CONTROLLER_BINDTYPE_BUTTON,
     SDL_CONTROLLER_BINDTYPE_AXIS,
@@ -67,11 +66,9 @@ typedef enum
 /**
  *  Get the SDL joystick layer binding for this controller button/axis mapping
  */
-typedef struct SDL_GameControllerButtonBind
-{
+typedef struct SDL_GameControllerButtonBind {
     SDL_GameControllerBindType bindType;
-    union
-    {
+    union {
         int button;
         int axis;
         struct {
@@ -114,10 +111,10 @@ typedef struct SDL_GameControllerButtonBind
  *  A community sourced database of controllers is available at https://raw.github.com/gabomdq/SDL_GameControllerDB/master/gamecontrollerdb.txt
  *
  *  If \c freerw is non-zero, the stream will be closed after being read.
- * 
+ *
  * \return number of mappings added, -1 on error
  */
-extern DECLSPEC int SDLCALL SDL_GameControllerAddMappingsFromRW( SDL_RWops * rw, int freerw );
+extern DECLSPEC int SDLCALL SDL_GameControllerAddMappingsFromRW(SDL_RWops * rw, int freerw);
 
 /**
  *  Load a set of mappings from a file, filtered by the current SDL_GetPlatform()
@@ -131,21 +128,21 @@ extern DECLSPEC int SDLCALL SDL_GameControllerAddMappingsFromRW( SDL_RWops * rw,
  *
  * \return 1 if mapping is added, 0 if updated, -1 on error
  */
-extern DECLSPEC int SDLCALL SDL_GameControllerAddMapping( const char* mappingString );
+extern DECLSPEC int SDLCALL SDL_GameControllerAddMapping(const char* mappingString);
 
 /**
  *  Get a mapping string for a GUID
  *
  *  \return the mapping string.  Must be freed with SDL_free.  Returns NULL if no mapping is available
  */
-extern DECLSPEC char * SDLCALL SDL_GameControllerMappingForGUID( SDL_JoystickGUID guid );
+extern DECLSPEC char * SDLCALL SDL_GameControllerMappingForGUID(SDL_JoystickGUID guid);
 
 /**
  *  Get a mapping string for an open GameController
  *
  *  \return the mapping string.  Must be freed with SDL_free.  Returns NULL if no mapping is available
  */
-extern DECLSPEC char * SDLCALL SDL_GameControllerMapping( SDL_GameController * gamecontroller );
+extern DECLSPEC char * SDLCALL SDL_GameControllerMapping(SDL_GameController * gamecontroller);
 
 /**
  *  Is the joystick on this index supported by the game controller interface?
@@ -209,8 +206,7 @@ extern DECLSPEC void SDLCALL SDL_GameControllerUpdate(void);
 /**
  *  The list of axes available from a controller
  */
-typedef enum
-{
+typedef enum {
     SDL_CONTROLLER_AXIS_INVALID = -1,
     SDL_CONTROLLER_AXIS_LEFTX,
     SDL_CONTROLLER_AXIS_LEFTY,
@@ -252,8 +248,7 @@ SDL_GameControllerGetAxis(SDL_GameController *gamecontroller,
 /**
  *  The list of buttons available from a controller
  */
-typedef enum
-{
+typedef enum {
     SDL_CONTROLLER_BUTTON_INVALID = -1,
     SDL_CONTROLLER_BUTTON_A,
     SDL_CONTROLLER_BUTTON_B,

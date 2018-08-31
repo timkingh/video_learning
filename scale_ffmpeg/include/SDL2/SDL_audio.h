@@ -156,14 +156,13 @@ typedef Uint16 SDL_AudioFormat;
  *  Once the callback returns, the buffer will no longer be valid.
  *  Stereo samples are stored in a LRLRLR ordering.
  */
-typedef void (SDLCALL * SDL_AudioCallback) (void *userdata, Uint8 * stream,
-                                            int len);
+typedef void (SDLCALL * SDL_AudioCallback)(void *userdata, Uint8 * stream,
+                                           int len);
 
 /**
  *  The calculated values in this structure are calculated by SDL_OpenAudio().
  */
-typedef struct SDL_AudioSpec
-{
+typedef struct SDL_AudioSpec {
     int freq;                   /**< DSP frequency -- samples per second */
     SDL_AudioFormat format;     /**< Audio data format */
     Uint8 channels;             /**< Number of channels: 1 mono, 2 stereo */
@@ -177,8 +176,8 @@ typedef struct SDL_AudioSpec
 
 
 struct SDL_AudioCVT;
-typedef void (SDLCALL * SDL_AudioFilter) (struct SDL_AudioCVT * cvt,
-                                          SDL_AudioFormat format);
+typedef void (SDLCALL * SDL_AudioFilter)(struct SDL_AudioCVT * cvt,
+                                         SDL_AudioFormat format);
 
 /**
  *  A structure to hold a set of audio conversion filters and buffers.
@@ -194,8 +193,7 @@ typedef void (SDLCALL * SDL_AudioFilter) (struct SDL_AudioCVT * cvt,
 #define SDL_AUDIOCVT_PACKED
 #endif
 /* */
-typedef struct SDL_AudioCVT
-{
+typedef struct SDL_AudioCVT {
     int needed;                 /**< Set to 1 if conversion possible */
     SDL_AudioFormat src_format; /**< Source audio format */
     SDL_AudioFormat dst_format; /**< Target audio format */
@@ -360,8 +358,7 @@ extern DECLSPEC SDL_AudioDeviceID SDLCALL SDL_OpenAudioDevice(const char
  *  Get the current audio state.
  */
 /* @{ */
-typedef enum
-{
+typedef enum {
     SDL_AUDIO_STOPPED = 0,
     SDL_AUDIO_PLAYING,
     SDL_AUDIO_PAUSED

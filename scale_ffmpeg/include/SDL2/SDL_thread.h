@@ -66,7 +66,7 @@ typedef enum {
  *  The function passed to SDL_CreateThread().
  *  It is passed a void* user context parameter and returns an int.
  */
-typedef int (SDLCALL * SDL_ThreadFunction) (void *data);
+typedef int (SDLCALL * SDL_ThreadFunction)(void *data);
 
 #if defined(__WIN32__) && !defined(HAVE_LIBC)
 /**
@@ -92,13 +92,13 @@ typedef int (SDLCALL * SDL_ThreadFunction) (void *data);
 #define SDL_PASSED_BEGINTHREAD_ENDTHREAD
 #include <process.h>            /* This has _beginthread() and _endthread() defined! */
 
-typedef uintptr_t(__cdecl * pfnSDL_CurrentBeginThread) (void *, unsigned,
-                                                        unsigned (__stdcall *
-                                                                  func) (void
-                                                                         *),
-                                                        void *arg, unsigned,
-                                                        unsigned *threadID);
-typedef void (__cdecl * pfnSDL_CurrentEndThread) (unsigned code);
+typedef uintptr_t(__cdecl * pfnSDL_CurrentBeginThread)(void *, unsigned,
+                                                       unsigned(__stdcall *
+                                                                func)(void
+                                                                      *),
+                                                       void *arg, unsigned,
+                                                       unsigned *threadID);
+typedef void (__cdecl * pfnSDL_CurrentEndThread)(unsigned code);
 
 /**
  *  Create a thread.
@@ -225,7 +225,7 @@ extern DECLSPEC void SDLCALL SDL_DetachThread(SDL_Thread * thread);
  *  \code
  *  static SDL_SpinLock tls_lock;
  *  static SDL_TLSID thread_local_storage;
- * 
+ *
  *  void SetMyThreadData(void *value)
  *  {
  *      if (!thread_local_storage) {
@@ -237,7 +237,7 @@ extern DECLSPEC void SDLCALL SDL_DetachThread(SDL_Thread * thread);
  *      }
  *      SDL_TLSSet(thread_local_storage, value);
  *  }
- *  
+ *
  *  void *GetMyThreadData(void)
  *  {
  *      return SDL_TLSGet(thread_local_storage);

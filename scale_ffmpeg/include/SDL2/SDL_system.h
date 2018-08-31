@@ -47,7 +47,7 @@ extern "C" {
    This adapter index can be passed to IDirect3D9::CreateDevice and controls
    on which monitor a full screen application will appear.
 */
-extern DECLSPEC int SDLCALL SDL_Direct3D9GetAdapterIndex( int displayIndex );
+extern DECLSPEC int SDLCALL SDL_Direct3D9GetAdapterIndex(int displayIndex);
 
 /* Returns the D3D device associated with a renderer, or NULL if it's not a D3D renderer.
    Once you are done using the device, you should release it to avoid a resource leak.
@@ -55,11 +55,11 @@ extern DECLSPEC int SDLCALL SDL_Direct3D9GetAdapterIndex( int displayIndex );
 typedef struct IDirect3DDevice9 IDirect3DDevice9;
 extern DECLSPEC IDirect3DDevice9* SDLCALL SDL_RenderGetD3D9Device(SDL_Renderer * renderer);
 
-/* Returns the DXGI Adapter and Output indices for the specified display index. 
+/* Returns the DXGI Adapter and Output indices for the specified display index.
    These can be passed to EnumAdapters and EnumOutputs respectively to get the objects
    required to create a DX10 or DX11 device and swap chain.
  */
-extern DECLSPEC void SDLCALL SDL_DXGIGetOutputInfo( int displayIndex, int *adapterIndex, int *outputIndex );
+extern DECLSPEC void SDLCALL SDL_DXGIGetOutputInfo(int displayIndex, int *adapterIndex, int *outputIndex);
 
 #endif /* __WIN32__ */
 
@@ -122,8 +122,7 @@ extern DECLSPEC const char * SDLCALL SDL_AndroidGetExternalStoragePath();
 /**
  *  \brief WinRT / Windows Phone path types
  */
-typedef enum
-{
+typedef enum {
     /** \brief The installed app's root directory.
         Files here are likely to be read-only. */
     SDL_WINRT_PATH_INSTALLED_LOCATION,

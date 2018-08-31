@@ -66,14 +66,14 @@
 /* Manifest definitions identifying the flag bits, controlling activation
  * of MinGW features, as specified by the user in __MINGW_FEATURES__.
  */
-#define __MINGW_ANSI_STDIO__		0x0000000000000001ULL
+#define __MINGW_ANSI_STDIO__        0x0000000000000001ULL
 /*
  * The following three are not yet formally supported; they are
  * included here, to document anticipated future usage.
  */
-#define __MINGW_LC_EXTENSIONS__ 	0x0000000000000050ULL
-#define __MINGW_LC_MESSAGES__		0x0000000000000010ULL
-#define __MINGW_LC_ENVVARS__		0x0000000000000040ULL
+#define __MINGW_LC_EXTENSIONS__     0x0000000000000050ULL
+#define __MINGW_LC_MESSAGES__       0x0000000000000010ULL
+#define __MINGW_LC_ENVVARS__        0x0000000000000040ULL
 
 /* Try to avoid problems with outdated checks for GCC __attribute__ support.  */
 #undef __attribute__
@@ -86,7 +86,7 @@
 # ifndef _CRTIMP
 #  define _CRTIMP
 # endif
-# ifndef __cdecl 
+# ifndef __cdecl
 #  define __cdecl  _Pragma("cdecl")
 # endif
 # ifndef __stdcall
@@ -120,8 +120,8 @@
 #elif defined(__GNUC__)
 # ifdef __declspec
 #  ifndef __MINGW_IMPORT
-   /* Note the extern. This is needed to work around GCC's
-      limitations in handling dllimport attribute.  */
+/* Note the extern. This is needed to work around GCC's
+   limitations in handling dllimport attribute.  */
 #   define __MINGW_IMPORT  extern __attribute__ ((__dllimport__))
 #  endif
 #  ifndef _CRTIMP
@@ -142,9 +142,9 @@
 /*
  * The next two defines can cause problems if user code adds the
  * __cdecl attribute like so:
- * void __attribute__ ((__cdecl)) foo(void); 
+ * void __attribute__ ((__cdecl)) foo(void);
  */
-# ifndef __cdecl 
+# ifndef __cdecl
 #  define __cdecl  __attribute__ ((__cdecl__))
 # endif
 # ifndef __stdcall
@@ -243,7 +243,7 @@
 #else
 #define __MINGW_ATTRIB_DEPRECATED
 #endif /* GNUC >= 3.1 */
- 
+
 #if  __MINGW_GNUC_PREREQ (3, 3)
 #define __MINGW_NOTHROW __attribute__ ((__nothrow__))
 #else
@@ -270,15 +270,15 @@ allow GCC to optimize away some EH unwind code, at least in DW2 case.  */
    ||  defined _XOPEN_SOURCE    ||  defined _XOPEN_SOURCE_EXTENDED \
    ||  defined _GNU_SOURCE      ||  defined _BSD_SOURCE \
    ||  defined _SVID_SOURCE
-   /*
-    * but where any of these source code qualifiers are specified,
-    * then assume ANSI I/O standards are preferred over Microsoft's...
-    */
+/*
+ * but where any of these source code qualifiers are specified,
+ * then assume ANSI I/O standards are preferred over Microsoft's...
+ */
 #  define __USE_MINGW_ANSI_STDIO    1
 # else
-   /*
-    * otherwise use whatever __MINGW_FEATURES__ specifies...
-    */
+/*
+ * otherwise use whatever __MINGW_FEATURES__ specifies...
+ */
 #  define __USE_MINGW_ANSI_STDIO    (__MINGW_FEATURES__ & __MINGW_ANSI_STDIO__)
 # endif
 #endif

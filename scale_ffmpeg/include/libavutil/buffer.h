@@ -246,7 +246,7 @@ typedef struct AVBufferPool AVBufferPool;
  * (av_buffer_alloc()).
  * @return newly created buffer pool on success, NULL on error.
  */
-AVBufferPool *av_buffer_pool_init(int size, AVBufferRef* (*alloc)(int size));
+AVBufferPool *av_buffer_pool_init(int size, AVBufferRef * (*alloc)(int size));
 
 /**
  * Mark the pool as being available for freeing. It will actually be freed only

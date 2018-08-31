@@ -98,7 +98,7 @@ typedef struct AVIOContext {
     int max_packet_size;
     unsigned long checksum;
     unsigned char *checksum_ptr;
-    unsigned long (*update_checksum)(unsigned long checksum, const uint8_t *buf, unsigned int size);
+    unsigned long(*update_checksum)(unsigned long checksum, const uint8_t *buf, unsigned int size);
     int error;              /**< contains the error code or 0 if no error happened */
     /**
      * Pause or resume playback for network streaming protocols - e.g. MMS.
@@ -199,13 +199,13 @@ int avio_check(const char *url, int flags);
  * @return Allocated AVIOContext or NULL on failure.
  */
 AVIOContext *avio_alloc_context(
-                  unsigned char *buffer,
-                  int buffer_size,
-                  int write_flag,
-                  void *opaque,
-                  int (*read_packet)(void *opaque, uint8_t *buf, int buf_size),
-                  int (*write_packet)(void *opaque, uint8_t *buf, int buf_size),
-                  int64_t (*seek)(void *opaque, int64_t offset, int whence));
+    unsigned char *buffer,
+    int buffer_size,
+    int write_flag,
+    void *opaque,
+    int (*read_packet)(void *opaque, uint8_t *buf, int buf_size),
+    int (*write_packet)(void *opaque, uint8_t *buf, int buf_size),
+    int64_t (*seek)(void *opaque, int64_t offset, int whence));
 
 void avio_w8(AVIOContext *s, int b);
 void avio_write(AVIOContext *s, const unsigned char *buf, int size);
@@ -302,7 +302,7 @@ int avio_read(AVIOContext *s, unsigned char *buf, int size);
  * @note return 0 if EOF, so you cannot use it if EOF handling is
  *       necessary
  */
-int          avio_r8  (AVIOContext *s);
+int          avio_r8(AVIOContext *s);
 unsigned int avio_rl16(AVIOContext *s);
 unsigned int avio_rl24(AVIOContext *s);
 unsigned int avio_rl32(AVIOContext *s);

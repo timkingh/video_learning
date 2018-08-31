@@ -66,17 +66,16 @@ typedef enum
     SDL_RENDERER_SOFTWARE = 0x00000001,         /**< The renderer is a software fallback */
     SDL_RENDERER_ACCELERATED = 0x00000002,      /**< The renderer uses hardware
                                                      acceleration */
-    SDL_RENDERER_PRESENTVSYNC = 0x00000004,     /**< Present is synchronized
+                               SDL_RENDERER_PRESENTVSYNC = 0x00000004,     /**< Present is synchronized
                                                      with the refresh rate */
-    SDL_RENDERER_TARGETTEXTURE = 0x00000008     /**< The renderer supports
+                                                           SDL_RENDERER_TARGETTEXTURE = 0x00000008     /**< The renderer supports
                                                      rendering to texture */
 } SDL_RendererFlags;
 
 /**
  *  \brief Information on the capabilities of a render driver or context.
  */
-typedef struct SDL_RendererInfo
-{
+typedef struct SDL_RendererInfo {
     const char *name;           /**< The name of the renderer */
     Uint32 flags;               /**< Supported ::SDL_RendererFlags */
     Uint32 num_texture_formats; /**< The number of available texture formats */
@@ -88,8 +87,7 @@ typedef struct SDL_RendererInfo
 /**
  *  \brief The access pattern allowed for a texture.
  */
-typedef enum
-{
+typedef enum {
     SDL_TEXTUREACCESS_STATIC,    /**< Changes rarely, not lockable */
     SDL_TEXTUREACCESS_STREAMING, /**< Changes frequently, lockable */
     SDL_TEXTUREACCESS_TARGET     /**< Texture can be used as a render target */
@@ -98,8 +96,7 @@ typedef enum
 /**
  *  \brief The texture channel modulation used in SDL_RenderCopy().
  */
-typedef enum
-{
+typedef enum {
     SDL_TEXTUREMODULATE_NONE = 0x00000000,     /**< No modulation */
     SDL_TEXTUREMODULATE_COLOR = 0x00000001,    /**< srcC = srcC * color */
     SDL_TEXTUREMODULATE_ALPHA = 0x00000002     /**< srcA = srcA * alpha */
@@ -108,8 +105,7 @@ typedef enum
 /**
  *  \brief Flip constants for SDL_RenderCopyEx
  */
-typedef enum
-{
+typedef enum {
     SDL_FLIP_NONE = 0x00000000,     /**< Do not flip */
     SDL_FLIP_HORIZONTAL = 0x00000001,    /**< flip horizontally */
     SDL_FLIP_VERTICAL = 0x00000002     /**< flip vertically */
@@ -170,8 +166,8 @@ extern DECLSPEC int SDLCALL SDL_GetRenderDriverInfo(int index,
  *  \return 0 on success, or -1 on error
  */
 extern DECLSPEC int SDLCALL SDL_CreateWindowAndRenderer(
-                                int width, int height, Uint32 window_flags,
-                                SDL_Window **window, SDL_Renderer **renderer);
+    int width, int height, Uint32 window_flags,
+    SDL_Window **window, SDL_Renderer **renderer);
 
 
 /**
@@ -189,7 +185,7 @@ extern DECLSPEC int SDLCALL SDL_CreateWindowAndRenderer(
  *  \sa SDL_DestroyRenderer()
  */
 extern DECLSPEC SDL_Renderer * SDLCALL SDL_CreateRenderer(SDL_Window * window,
-                                               int index, Uint32 flags);
+                                                          int index, Uint32 flags);
 
 /**
  *  \brief Create a 2D software rendering context for a surface.
@@ -582,7 +578,7 @@ extern DECLSPEC int SDLCALL SDL_RenderSetScale(SDL_Renderer * renderer,
  *  \sa SDL_RenderSetScale()
  */
 extern DECLSPEC void SDLCALL SDL_RenderGetScale(SDL_Renderer * renderer,
-                                               float *scaleX, float *scaleY);
+                                                float *scaleX, float *scaleY);
 
 /**
  *  \brief Set the color used for drawing operations (Rect, Line and Clear).
@@ -597,8 +593,8 @@ extern DECLSPEC void SDLCALL SDL_RenderGetScale(SDL_Renderer * renderer,
  *  \return 0 on success, or -1 on error
  */
 extern DECLSPEC int SDLCALL SDL_SetRenderDrawColor(SDL_Renderer * renderer,
-                                           Uint8 r, Uint8 g, Uint8 b,
-                                           Uint8 a);
+                                                   Uint8 r, Uint8 g, Uint8 b,
+                                                   Uint8 a);
 
 /**
  *  \brief Get the color used for drawing operations (Rect, Line and Clear).
@@ -613,8 +609,8 @@ extern DECLSPEC int SDLCALL SDL_SetRenderDrawColor(SDL_Renderer * renderer,
  *  \return 0 on success, or -1 on error
  */
 extern DECLSPEC int SDLCALL SDL_GetRenderDrawColor(SDL_Renderer * renderer,
-                                           Uint8 * r, Uint8 * g, Uint8 * b,
-                                           Uint8 * a);
+                                                   Uint8 * r, Uint8 * g, Uint8 * b,
+                                                   Uint8 * a);
 
 /**
  *  \brief Set the blend mode used for drawing operations (Fill and Line).
@@ -788,12 +784,12 @@ extern DECLSPEC int SDLCALL SDL_RenderCopy(SDL_Renderer * renderer,
  *  \return 0 on success, or -1 on error
  */
 extern DECLSPEC int SDLCALL SDL_RenderCopyEx(SDL_Renderer * renderer,
-                                           SDL_Texture * texture,
-                                           const SDL_Rect * srcrect,
-                                           const SDL_Rect * dstrect,
-                                           const double angle,
-                                           const SDL_Point *center,
-                                           const SDL_RendererFlip flip);
+                                             SDL_Texture * texture,
+                                             const SDL_Rect * srcrect,
+                                             const SDL_Rect * dstrect,
+                                             const double angle,
+                                             const SDL_Point *center,
+                                             const SDL_RendererFlip flip);
 
 /**
  *  \brief Read pixels from the current rendering target.

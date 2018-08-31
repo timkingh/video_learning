@@ -44,7 +44,7 @@ typedef enum {
     AV_CLASS_CATEGORY_DEVICE_OUTPUT,
     AV_CLASS_CATEGORY_DEVICE_INPUT,
     AV_CLASS_CATEGORY_NB, ///< not part of ABI/API
-}AVClassCategory;
+} AVClassCategory;
 
 struct AVOptionRanges;
 
@@ -122,7 +122,7 @@ typedef struct AVClass {
      * Callback to return the category.
      * available since version (51 << 16 | 59 << 8 | 100)
      */
-    AVClassCategory (*get_category)(void* ctx);
+    AVClassCategory(*get_category)(void* ctx);
 
     /**
      * Callback to return the supported/allowed ranges.

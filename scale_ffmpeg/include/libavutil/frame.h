@@ -36,7 +36,7 @@
 #include "version.h"
 
 
-enum AVColorSpace{
+enum AVColorSpace {
     AVCOL_SPC_RGB         =  0,
     AVCOL_SPC_BT709       =  1, ///< also ITU-R BT1361 / IEC 61966-2-4 xvYCC709 / SMPTE RP177 Annex B
     AVCOL_SPC_UNSPECIFIED =  2,
@@ -51,7 +51,7 @@ enum AVColorSpace{
 };
 #define AVCOL_SPC_YCGCO AVCOL_SPC_YCOCG
 
-enum AVColorRange{
+enum AVColorRange {
     AVCOL_RANGE_UNSPECIFIED = 0,
     AVCOL_RANGE_MPEG        = 1, ///< the normal 219*2^(n-8) "MPEG" YUV ranges
     AVCOL_RANGE_JPEG        = 2, ///< the normal     2^n-1   "JPEG" YUV ranges
@@ -425,20 +425,20 @@ typedef struct AVFrame {
     AVFrameSideData **side_data;
     int            nb_side_data;
 
-/**
- * @defgroup lavu_frame_flags AV_FRAME_FLAGS
- * Flags describing additional frame properties.
- *
- * @{
- */
+    /**
+     * @defgroup lavu_frame_flags AV_FRAME_FLAGS
+     * Flags describing additional frame properties.
+     *
+     * @{
+     */
 
-/**
- * The frame data may be corrupted, e.g. due to decoding errors.
- */
+    /**
+     * The frame data may be corrupted, e.g. due to decoding errors.
+     */
 #define AV_FRAME_FLAG_CORRUPT       (1 << 0)
-/**
- * @}
- */
+    /**
+     * @}
+     */
 
     /**
      * Frame flags, a combination of @ref lavu_frame_flags
@@ -546,20 +546,20 @@ typedef struct AVFrame {
  */
 int64_t av_frame_get_best_effort_timestamp(const AVFrame *frame);
 void    av_frame_set_best_effort_timestamp(AVFrame *frame, int64_t val);
-int64_t av_frame_get_pkt_duration         (const AVFrame *frame);
-void    av_frame_set_pkt_duration         (AVFrame *frame, int64_t val);
-int64_t av_frame_get_pkt_pos              (const AVFrame *frame);
-void    av_frame_set_pkt_pos              (AVFrame *frame, int64_t val);
-int64_t av_frame_get_channel_layout       (const AVFrame *frame);
-void    av_frame_set_channel_layout       (AVFrame *frame, int64_t val);
-int     av_frame_get_channels             (const AVFrame *frame);
-void    av_frame_set_channels             (AVFrame *frame, int     val);
-int     av_frame_get_sample_rate          (const AVFrame *frame);
-void    av_frame_set_sample_rate          (AVFrame *frame, int     val);
-AVDictionary *av_frame_get_metadata       (const AVFrame *frame);
-void          av_frame_set_metadata       (AVFrame *frame, AVDictionary *val);
-int     av_frame_get_decode_error_flags   (const AVFrame *frame);
-void    av_frame_set_decode_error_flags   (AVFrame *frame, int     val);
+int64_t av_frame_get_pkt_duration(const AVFrame *frame);
+void    av_frame_set_pkt_duration(AVFrame *frame, int64_t val);
+int64_t av_frame_get_pkt_pos(const AVFrame *frame);
+void    av_frame_set_pkt_pos(AVFrame *frame, int64_t val);
+int64_t av_frame_get_channel_layout(const AVFrame *frame);
+void    av_frame_set_channel_layout(AVFrame *frame, int64_t val);
+int     av_frame_get_channels(const AVFrame *frame);
+void    av_frame_set_channels(AVFrame *frame, int     val);
+int     av_frame_get_sample_rate(const AVFrame *frame);
+void    av_frame_set_sample_rate(AVFrame *frame, int     val);
+AVDictionary *av_frame_get_metadata(const AVFrame *frame);
+void          av_frame_set_metadata(AVFrame *frame, AVDictionary *val);
+int     av_frame_get_decode_error_flags(const AVFrame *frame);
+void    av_frame_set_decode_error_flags(AVFrame *frame, int     val);
 int     av_frame_get_pkt_size(const AVFrame *frame);
 void    av_frame_set_pkt_size(AVFrame *frame, int val);
 AVDictionary **avpriv_frame_get_metadatap(AVFrame *frame);

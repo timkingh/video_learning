@@ -127,12 +127,12 @@ typedef struct AVVDPAUContext {
     attribute_deprecated
     int bitstream_buffers_used;
 
-   /**
-     * Table of bitstream buffers.
-     * The user is responsible for freeing this buffer using av_freep().
-     *
-     * Set by libavcodec.
-     */
+    /**
+      * Table of bitstream buffers.
+      * The user is responsible for freeing this buffer using av_freep().
+      *
+      * Set by libavcodec.
+      */
     attribute_deprecated
     VdpBitstreamBuffer *bitstream_buffers;
 #endif

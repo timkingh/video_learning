@@ -217,7 +217,7 @@
  * before the file is actually opened.
  */
 
-enum AVOptionType{
+enum AVOptionType {
     AV_OPT_TYPE_FLAGS,
     AV_OPT_TYPE_INT,
     AV_OPT_TYPE_INT64,
@@ -227,13 +227,13 @@ enum AVOptionType{
     AV_OPT_TYPE_RATIONAL,
     AV_OPT_TYPE_BINARY,  ///< offset must point to a pointer immediately followed by an int for the length
     AV_OPT_TYPE_CONST = 128,
-    AV_OPT_TYPE_IMAGE_SIZE = MKBETAG('S','I','Z','E'), ///< offset must point to two consecutive integers
-    AV_OPT_TYPE_PIXEL_FMT  = MKBETAG('P','F','M','T'),
-    AV_OPT_TYPE_SAMPLE_FMT = MKBETAG('S','F','M','T'),
-    AV_OPT_TYPE_VIDEO_RATE = MKBETAG('V','R','A','T'), ///< offset must point to AVRational
-    AV_OPT_TYPE_DURATION   = MKBETAG('D','U','R',' '),
-    AV_OPT_TYPE_COLOR      = MKBETAG('C','O','L','R'),
-    AV_OPT_TYPE_CHANNEL_LAYOUT = MKBETAG('C','H','L','A'),
+    AV_OPT_TYPE_IMAGE_SIZE = MKBETAG('S', 'I', 'Z', 'E'), ///< offset must point to two consecutive integers
+    AV_OPT_TYPE_PIXEL_FMT  = MKBETAG('P', 'F', 'M', 'T'),
+    AV_OPT_TYPE_SAMPLE_FMT = MKBETAG('S', 'F', 'M', 'T'),
+    AV_OPT_TYPE_VIDEO_RATE = MKBETAG('V', 'R', 'A', 'T'), ///< offset must point to AVRational
+    AV_OPT_TYPE_DURATION   = MKBETAG('D', 'U', 'R', ' '),
+    AV_OPT_TYPE_COLOR      = MKBETAG('C', 'O', 'L', 'R'),
+    AV_OPT_TYPE_CHANNEL_LAYOUT = MKBETAG('C', 'H', 'L', 'A'),
 #if FF_API_OLD_AVOPTIONS
     FF_OPT_TYPE_FLAGS = 0,
     FF_OPT_TYPE_INT,
@@ -243,7 +243,7 @@ enum AVOptionType{
     FF_OPT_TYPE_STRING,
     FF_OPT_TYPE_RATIONAL,
     FF_OPT_TYPE_BINARY,  ///< offset must point to a pointer immediately followed by an int for the length
-    FF_OPT_TYPE_CONST=128,
+    FF_OPT_TYPE_CONST = 128,
 #endif
 };
 
@@ -288,14 +288,14 @@ typedef struct AVOption {
 #define AV_OPT_FLAG_AUDIO_PARAM     8
 #define AV_OPT_FLAG_VIDEO_PARAM     16
 #define AV_OPT_FLAG_SUBTITLE_PARAM  32
-/**
- * The option is inteded for exporting values to the caller.
- */
+    /**
+     * The option is inteded for exporting values to the caller.
+     */
 #define AV_OPT_FLAG_EXPORT          64
-/**
- * The option may not be set through the AVOptions API, only read.
- * This flag only makes sense when AV_OPT_FLAG_EXPORT is also set.
- */
+    /**
+     * The option may not be set through the AVOptions API, only read.
+     * This flag only makes sense when AV_OPT_FLAG_EXPORT is also set.
+     */
 #define AV_OPT_FLAG_READONLY        128
 #define AV_OPT_FLAG_FILTERING_PARAM (1<<16) ///< a generic parameter which can be set by the user for filtering
 //FIXME think about enc-audio, ... style flags
@@ -606,12 +606,12 @@ enum {
  *
  * @return 0 on success, a negative number on failure.
  */
-int av_opt_eval_flags (void *obj, const AVOption *o, const char *val, int        *flags_out);
-int av_opt_eval_int   (void *obj, const AVOption *o, const char *val, int        *int_out);
-int av_opt_eval_int64 (void *obj, const AVOption *o, const char *val, int64_t    *int64_out);
-int av_opt_eval_float (void *obj, const AVOption *o, const char *val, float      *float_out);
+int av_opt_eval_flags(void *obj, const AVOption *o, const char *val, int        *flags_out);
+int av_opt_eval_int(void *obj, const AVOption *o, const char *val, int        *int_out);
+int av_opt_eval_int64(void *obj, const AVOption *o, const char *val, int64_t    *int64_out);
+int av_opt_eval_float(void *obj, const AVOption *o, const char *val, float      *float_out);
 int av_opt_eval_double(void *obj, const AVOption *o, const char *val, double     *double_out);
-int av_opt_eval_q     (void *obj, const AVOption *o, const char *val, AVRational *q_out);
+int av_opt_eval_q(void *obj, const AVOption *o, const char *val, AVRational *q_out);
 /**
  * @}
  */
@@ -735,13 +735,13 @@ const AVClass *av_opt_child_class_next(const AVClass *parent, const AVClass *pre
  * AVERROR(ERANGE) if the value is out of range
  * AVERROR(EINVAL) if the value is not valid
  */
-int av_opt_set       (void *obj, const char *name, const char *val, int search_flags);
-int av_opt_set_int   (void *obj, const char *name, int64_t     val, int search_flags);
+int av_opt_set(void *obj, const char *name, const char *val, int search_flags);
+int av_opt_set_int(void *obj, const char *name, int64_t     val, int search_flags);
 int av_opt_set_double(void *obj, const char *name, double      val, int search_flags);
-int av_opt_set_q     (void *obj, const char *name, AVRational  val, int search_flags);
-int av_opt_set_bin   (void *obj, const char *name, const uint8_t *val, int size, int search_flags);
+int av_opt_set_q(void *obj, const char *name, AVRational  val, int search_flags);
+int av_opt_set_bin(void *obj, const char *name, const uint8_t *val, int size, int search_flags);
 int av_opt_set_image_size(void *obj, const char *name, int w, int h, int search_flags);
-int av_opt_set_pixel_fmt (void *obj, const char *name, enum AVPixelFormat fmt, int search_flags);
+int av_opt_set_pixel_fmt(void *obj, const char *name, enum AVPixelFormat fmt, int search_flags);
 int av_opt_set_sample_fmt(void *obj, const char *name, enum AVSampleFormat fmt, int search_flags);
 int av_opt_set_video_rate(void *obj, const char *name, AVRational val, int search_flags);
 int av_opt_set_channel_layout(void *obj, const char *name, int64_t ch_layout, int search_flags);
@@ -780,12 +780,12 @@ int av_opt_set_channel_layout(void *obj, const char *name, int64_t ch_layout, in
 /**
  * @note the returned string will be av_malloc()ed and must be av_free()ed by the caller
  */
-int av_opt_get       (void *obj, const char *name, int search_flags, uint8_t   **out_val);
-int av_opt_get_int   (void *obj, const char *name, int search_flags, int64_t    *out_val);
+int av_opt_get(void *obj, const char *name, int search_flags, uint8_t   **out_val);
+int av_opt_get_int(void *obj, const char *name, int search_flags, int64_t    *out_val);
 int av_opt_get_double(void *obj, const char *name, int search_flags, double     *out_val);
-int av_opt_get_q     (void *obj, const char *name, int search_flags, AVRational *out_val);
+int av_opt_get_q(void *obj, const char *name, int search_flags, AVRational *out_val);
 int av_opt_get_image_size(void *obj, const char *name, int search_flags, int *w_out, int *h_out);
-int av_opt_get_pixel_fmt (void *obj, const char *name, int search_flags, enum AVPixelFormat *out_fmt);
+int av_opt_get_pixel_fmt(void *obj, const char *name, int search_flags, enum AVPixelFormat *out_fmt);
 int av_opt_get_sample_fmt(void *obj, const char *name, int search_flags, enum AVSampleFormat *out_fmt);
 int av_opt_get_video_rate(void *obj, const char *name, int search_flags, AVRational *out_val);
 int av_opt_get_channel_layout(void *obj, const char *name, int search_flags, int64_t *ch_layout);

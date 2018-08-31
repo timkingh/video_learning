@@ -423,9 +423,9 @@ typedef struct AVProbeData {
 #else
 #define AVFMT_TS_NONSTRICT 0x20000
 #endif
-                                   /**< Format does not require strictly
-                                        increasing timestamps, but they must
-                                        still be monotonic */
+/**< Format does not require strictly
+     increasing timestamps, but they must
+     still be monotonic */
 #define AVFMT_TS_NEGATIVE  0x40000 /**< Format allows muxing negative
                                         timestamps. If not set the timestamp
                                         will be shifted in av_write_frame and
@@ -699,7 +699,7 @@ enum AVStreamParseType {
     AVSTREAM_PARSE_HEADERS,    /**< Only parse headers, do not repack. */
     AVSTREAM_PARSE_TIMESTAMPS, /**< full parsing and interpolation of timestamps for frames not starting on a packet boundary */
     AVSTREAM_PARSE_FULL_ONCE,  /**< full parsing and repack of the first frame only, only implemented for H.264 currently */
-    AVSTREAM_PARSE_FULL_RAW=MKTAG(0,'R','A','W'),       /**< full parsing and repack with timestamp and position generation by parser for raw
+    AVSTREAM_PARSE_FULL_RAW = MKTAG(0, 'R', 'A', 'W'),       /**< full parsing and repack with timestamp and position generation by parser for raw
                                                              this assumes that each packet in the file contains no demuxer level headers and
                                                              just codec level data, otherwise position generation would fail */
 };
@@ -713,8 +713,8 @@ typedef struct AVIndexEntry {
                                * is known
                                */
 #define AVINDEX_KEYFRAME 0x0001
-    int flags:2;
-    int size:30; //Yeah, trying to keep the size of this small to reduce memory requirements (it is 24 vs. 32 bytes due to possible 8-byte alignment).
+    int flags: 2;
+    int size: 30; //Yeah, trying to keep the size of this small to reduce memory requirements (it is 24 vs. 32 bytes due to possible 8-byte alignment).
     int min_distance;         /**< Minimum distance between this and the previous keyframe, used to avoid unneeded searching. */
 } AVIndexEntry;
 
@@ -888,7 +888,7 @@ typedef struct AVStream {
         int64_t duration_gcd;
         int duration_count;
         int64_t rfps_duration_sum;
-        double (*duration_error)[2][MAX_STD_TIMEBASES];
+        double(*duration_error)[2][MAX_STD_TIMEBASES];
         int64_t codec_info_duration;
         int64_t codec_info_duration_fields;
 
@@ -952,7 +952,7 @@ typedef struct AVStream {
     struct AVPacketList *last_in_packet_buffer;
     AVProbeData probe_data;
 #define MAX_REORDER_DELAY 16
-    int64_t pts_buffer[MAX_REORDER_DELAY+1];
+    int64_t pts_buffer[MAX_REORDER_DELAY + 1];
 
     AVIndexEntry *index_entries; /**< Only used if the format does not
                                     support seeking natively. */
@@ -1038,8 +1038,8 @@ typedef struct AVStream {
     /**
      * Internal data to generate dts from pts
      */
-    int64_t pts_reorder_error[MAX_REORDER_DELAY+1];
-    uint8_t pts_reorder_error_count[MAX_REORDER_DELAY+1];
+    int64_t pts_reorder_error[MAX_REORDER_DELAY + 1];
+    uint8_t pts_reorder_error_count[MAX_REORDER_DELAY + 1];
 
     /**
      * Internal data to analyze DTS and detect faulty mpeg streams
@@ -2271,8 +2271,8 @@ AVOutputFormat *av_guess_format(const char *short_name,
  * Guess the codec ID based upon muxer and filename.
  */
 enum AVCodecID av_guess_codec(AVOutputFormat *fmt, const char *short_name,
-                            const char *filename, const char *mime_type,
-                            enum AVMediaType type);
+                              const char *filename, const char *mime_type,
+                              enum AVMediaType type);
 
 /**
  * Get timing information for the data currently output.

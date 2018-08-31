@@ -8,19 +8,19 @@
 #define __need_wchar_t
 #include <stddef.h>
 
-#ifdef	__cplusplus
-extern	"C"	{
+#ifdef  __cplusplus
+extern  "C" {
 #endif
 
 typedef struct {
-	intmax_t quot;
-	intmax_t rem;
-	} imaxdiv_t;
+    intmax_t quot;
+    intmax_t rem;
+} imaxdiv_t;
 
 #if !defined(__cplusplus) || defined(__STDC_FORMAT_MACROS)
 
 /* 7.8.1 Macros for format specifiers
- * 
+ *
  * MS runtime does not yet understand C9x standard "ll"
  * length specifier. It appears to treat "ll" as "l".
  * The non-standard I64 length specifier causes warning in GCC,
@@ -227,7 +227,7 @@ typedef struct {
 #if defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 /*
  * no length modifier for char types prior to C9x
- * MS runtime  scanf appears to treat "hh" as "h" 
+ * MS runtime  scanf appears to treat "hh" as "h"
  */
 
 /* signed char */
@@ -253,28 +253,28 @@ typedef struct {
 #define SCNuFAST8 "hhu"
 #endif /* __STDC_VERSION__ >= 199901 */
 
-#endif	/* !defined(__cplusplus) || defined(__STDC_FORMAT_MACROS) */
+#endif  /* !defined(__cplusplus) || defined(__STDC_FORMAT_MACROS) */
 
-intmax_t __cdecl __MINGW_NOTHROW imaxabs (intmax_t j);
+intmax_t __cdecl __MINGW_NOTHROW imaxabs(intmax_t j);
 #ifndef __NO_INLINE__
-__CRT_INLINE intmax_t __cdecl __MINGW_NOTHROW imaxabs (intmax_t j)
-	{return	(j >= 0 ? j : -j);}
+__CRT_INLINE intmax_t __cdecl __MINGW_NOTHROW imaxabs(intmax_t j)
+{return (j >= 0 ? j : -j);}
 #endif
-imaxdiv_t __cdecl __MINGW_NOTHROW imaxdiv (intmax_t numer, intmax_t denom);
+imaxdiv_t __cdecl __MINGW_NOTHROW imaxdiv(intmax_t numer, intmax_t denom);
 
 /* 7.8.2 Conversion functions for greatest-width integer types */
 
-intmax_t __cdecl __MINGW_NOTHROW strtoimax (const char* __restrict__ nptr,
-                            char** __restrict__ endptr, int base);
-uintmax_t __cdecl __MINGW_NOTHROW strtoumax (const char* __restrict__ nptr,
-			     char** __restrict__ endptr, int base);
+intmax_t __cdecl __MINGW_NOTHROW strtoimax(const char* __restrict__ nptr,
+                                           char** __restrict__ endptr, int base);
+uintmax_t __cdecl __MINGW_NOTHROW strtoumax(const char* __restrict__ nptr,
+                                            char** __restrict__ endptr, int base);
 
-intmax_t __cdecl __MINGW_NOTHROW wcstoimax (const wchar_t* __restrict__ nptr,
-                            wchar_t** __restrict__ endptr, int base);
-uintmax_t __cdecl __MINGW_NOTHROW wcstoumax (const wchar_t* __restrict__ nptr,
-			     wchar_t** __restrict__ endptr, int base);
+intmax_t __cdecl __MINGW_NOTHROW wcstoimax(const wchar_t* __restrict__ nptr,
+                                           wchar_t** __restrict__ endptr, int base);
+uintmax_t __cdecl __MINGW_NOTHROW wcstoumax(const wchar_t* __restrict__ nptr,
+                                            wchar_t** __restrict__ endptr, int base);
 
-#ifdef	__cplusplus
+#ifdef  __cplusplus
 }
 #endif
 

@@ -66,8 +66,7 @@ extern "C" {
  * \note  This structure should be treated as read-only, except for \c pixels,
  *        which, if not NULL, contains the raw pixel data for the surface.
  */
-typedef struct SDL_Surface
-{
+typedef struct SDL_Surface {
     Uint32 flags;               /**< Read-only */
     SDL_PixelFormat *format;    /**< Read-only */
     int w, h;                   /**< Read-only */
@@ -94,8 +93,8 @@ typedef struct SDL_Surface
 /**
  * \brief The type of function used for surface blitting functions.
  */
-typedef int (*SDL_blit) (struct SDL_Surface * src, SDL_Rect * srcrect,
-                         struct SDL_Surface * dst, SDL_Rect * dstrect);
+typedef int (*SDL_blit)(struct SDL_Surface * src, SDL_Rect * srcrect,
+                        struct SDL_Surface * dst, SDL_Rect * dstrect);
 
 /**
  *  Allocate and free an RGB surface.
@@ -116,8 +115,8 @@ typedef int (*SDL_blit) (struct SDL_Surface * src, SDL_Rect * srcrect,
  *  \param Amask The alpha mask of the surface to create.
  */
 extern DECLSPEC SDL_Surface *SDLCALL SDL_CreateRGBSurface
-    (Uint32 flags, int width, int height, int depth,
-     Uint32 Rmask, Uint32 Gmask, Uint32 Bmask, Uint32 Amask);
+(Uint32 flags, int width, int height, int depth,
+ Uint32 Rmask, Uint32 Gmask, Uint32 Bmask, Uint32 Amask);
 extern DECLSPEC SDL_Surface *SDLCALL SDL_CreateRGBSurfaceFrom(void *pixels,
                                                               int width,
                                                               int height,
@@ -189,7 +188,7 @@ extern DECLSPEC SDL_Surface *SDLCALL SDL_LoadBMP_RW(SDL_RWops * src,
  *  \return 0 if successful or -1 if there was an error.
  */
 extern DECLSPEC int SDLCALL SDL_SaveBMP_RW
-    (SDL_Surface * surface, SDL_RWops * dst, int freedst);
+(SDL_Surface * surface, SDL_RWops * dst, int freedst);
 
 /**
  *  Save a surface to a file.
@@ -357,9 +356,9 @@ extern DECLSPEC void SDLCALL SDL_GetClipRect(SDL_Surface * surface,
  *  surface.
  */
 extern DECLSPEC SDL_Surface *SDLCALL SDL_ConvertSurface
-    (SDL_Surface * src, const SDL_PixelFormat * fmt, Uint32 flags);
+(SDL_Surface * src, const SDL_PixelFormat * fmt, Uint32 flags);
 extern DECLSPEC SDL_Surface *SDLCALL SDL_ConvertSurfaceFormat
-    (SDL_Surface * src, Uint32 pixel_format, Uint32 flags);
+(SDL_Surface * src, Uint32 pixel_format, Uint32 flags);
 
 /**
  * \brief Copy a block of pixels of one format to another format
@@ -383,9 +382,9 @@ extern DECLSPEC int SDLCALL SDL_ConvertPixels(int width, int height,
  *  \return 0 on success, or -1 on error.
  */
 extern DECLSPEC int SDLCALL SDL_FillRect
-    (SDL_Surface * dst, const SDL_Rect * rect, Uint32 color);
+(SDL_Surface * dst, const SDL_Rect * rect, Uint32 color);
 extern DECLSPEC int SDLCALL SDL_FillRects
-    (SDL_Surface * dst, const SDL_Rect * rects, int count, Uint32 color);
+(SDL_Surface * dst, const SDL_Rect * rects, int count, Uint32 color);
 
 /**
  *  Performs a fast blit from the source surface to the destination surface.
@@ -451,16 +450,16 @@ extern DECLSPEC int SDLCALL SDL_FillRects
  *  rectangle validation and clipping before passing it to SDL_LowerBlit()
  */
 extern DECLSPEC int SDLCALL SDL_UpperBlit
-    (SDL_Surface * src, const SDL_Rect * srcrect,
-     SDL_Surface * dst, SDL_Rect * dstrect);
+(SDL_Surface * src, const SDL_Rect * srcrect,
+ SDL_Surface * dst, SDL_Rect * dstrect);
 
 /**
  *  This is a semi-private blit function and it performs low-level surface
  *  blitting only.
  */
 extern DECLSPEC int SDLCALL SDL_LowerBlit
-    (SDL_Surface * src, SDL_Rect * srcrect,
-     SDL_Surface * dst, SDL_Rect * dstrect);
+(SDL_Surface * src, SDL_Rect * srcrect,
+ SDL_Surface * dst, SDL_Rect * dstrect);
 
 /**
  *  \brief Perform a fast, low quality, stretch blit between two surfaces of the
@@ -480,16 +479,16 @@ extern DECLSPEC int SDLCALL SDL_SoftStretch(SDL_Surface * src,
  *  rectangle validation and clipping before passing it to SDL_LowerBlitScaled()
  */
 extern DECLSPEC int SDLCALL SDL_UpperBlitScaled
-    (SDL_Surface * src, const SDL_Rect * srcrect,
-    SDL_Surface * dst, SDL_Rect * dstrect);
+(SDL_Surface * src, const SDL_Rect * srcrect,
+ SDL_Surface * dst, SDL_Rect * dstrect);
 
 /**
  *  This is a semi-private blit function and it performs low-level surface
  *  scaled blitting only.
  */
 extern DECLSPEC int SDLCALL SDL_LowerBlitScaled
-    (SDL_Surface * src, SDL_Rect * srcrect,
-    SDL_Surface * dst, SDL_Rect * dstrect);
+(SDL_Surface * src, SDL_Rect * srcrect,
+ SDL_Surface * dst, SDL_Rect * dstrect);
 
 
 /* Ends C function definitions when using C++ */

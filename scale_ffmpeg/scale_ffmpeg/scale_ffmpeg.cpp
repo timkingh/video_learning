@@ -64,7 +64,7 @@ int main()
     while (frame_cnt++ < frames) {
         ifs->read(buf, frame_size);
 
-        sws_scale(img_convert_ctx, (const unsigned char* const*)in_data,
+        sws_scale(img_convert_ctx, (const unsigned char * const*)in_data,
                   src_linesize, 0, height,
                   pFrameYUV->data, pFrameYUV->linesize);
         cout << "frame_cnt " << frame_cnt << endl;
