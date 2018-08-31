@@ -160,3 +160,7 @@ $RECYCLE.BIN/
 *.vcxproj
 *.filters
 *.o
+yuv_process/yuv_process/yuv_process/*.yuv
+yuv_process/yuv_process/yuv_process/exec0/*.yuv
+yuv_process/yuv_process/yuv_process/exec0/*.md
+yuv_process/yuv_process/yuv_process/exec0/*.sad
