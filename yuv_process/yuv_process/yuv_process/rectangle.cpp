@@ -2,6 +2,7 @@
 #include <string>
 #include <algorithm>
 #include "rectangle.h"
+#include "yuv_process.h"
 
 using namespace std;
 
@@ -61,8 +62,9 @@ static uint32_t calc_motion_rate(vector<Rect> &rects, Rect &dst)
     return rate;
 }
 
-void merge_rect(ProcCtx *ctx, vector<Rect> &rects)
+void merge_rect(void *proc_ctx, vector<Rect> &rects)
 {
+    ProcCtx *ctx = (ProcCtx *)proc_ctx;
     vector<Rect> rects_org = rects;
     Rect dst;
     uint32_t i, j;

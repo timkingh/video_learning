@@ -11,10 +11,10 @@ typedef struct {
     uint32_t mb_y;
 } SadInfo;
 
-struct ProcCtx{
+typedef struct ProcCtx {
     uint32_t frames;
     YuvInfo yuv_info;
-};
+} ProcCtx;
 
 
 

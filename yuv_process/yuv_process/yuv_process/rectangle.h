@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 #include <vector>
-#include "common.h"
 
 typedef struct {
     char *buf;
@@ -31,7 +30,7 @@ public:
     inline bool operator == (const Rect &rect1) const;
 };
 
-void merge_rect(ProcCtx *ctx, std::vector<Rect> &rects);
+void merge_rect(void *proc_ctx, std::vector<Rect> &rects);
 void draw_blue_rectangle(YuvInfo *yuv, std::vector<Rect> &rects);
 void draw_rectangle(YuvInfo *yuv, RectangleInfo *rec);
 

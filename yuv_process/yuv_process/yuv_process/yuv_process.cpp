@@ -29,8 +29,9 @@ static void draw_red_dot(YuvInfo *yuv, SadInfo *info)
     draw_rectangle(yuv, &rec_info);
 }
 
-static void rk_handle_md(YuvInfo *yuv, ifstream *sad, SadInfo *info, uint32_t frame_num)
+static void rk_handle_md(ProcCtx *ctx, ifstream *sad, SadInfo *info, uint32_t frame_num)
 {
+    YuvInfo *yuv = &ctx->yuv_info;
     vector<Rect> rects;
     Rect rect;
     char lines[512];
@@ -79,9 +80,8 @@ static void rk_handle_md(YuvInfo *yuv, ifstream *sad, SadInfo *info, uint32_t fr
           cout << iter->left << " " << iter->top << " "
                << iter->right << " " << iter->bottom << endl;
       }*/
-    ProcCtx proc_ctx;
-    ProcCtx *ctx = &proc_ctx;
-    merge_rect(ctx, rects);
+
+    merge_rect((void *)ctx, rects);
 
     end = time_usec();
     duration = (double)(end - start) / 1000000;
@@ -93,6 +93,8 @@ static void rk_handle_md(YuvInfo *yuv, ifstream *sad, SadInfo *info, uint32_t fr
 
 int main(int argc, char **argv)
 {
+    ProcCtx proc_ctx;
+    ProcCtx *ctx = &proc_ctx;
 
     cout << "----------Test-------------" << endl;
     bool help = getarg(false, "-H", "--help", "-?");
@@ -151,16 +153,16 @@ int main(int argc, char **argv)
     cout << "sad path: " << sad_file << endl;
     ifstream sad_path(sad_file.c_str());
     unsigned int frame_read = 0;
-    YuvInfo yuv_info;
+    YuvInfo *yuv_info = &ctx->yuv_info;
     RectangleInfo rec_info;
     SadInfo sad_info;
     ifs->read(buf, frame_size);
 
     do {
         while (frame_read == frame_cnt) {
-            yuv_info.buf = buf;
-            yuv_info.width = width;
-            yuv_info.height = height;
+            yuv_info->buf = buf;
+            yuv_info->width = width;
+            yuv_info->height = height;
             rec_info.left = left;
             rec_info.top = top;
             rec_info.right = right;
@@ -169,7 +171,7 @@ int main(int argc, char **argv)
             rec_info.u_pixel = 84;
             rec_info.v_pixel = 255;
 
-            draw_rectangle(&yuv_info, &rec_info);
+            draw_rectangle(yuv_info, &rec_info);
 
             if (coord.getline(lines, 512)) {
                 //cout << lines << endl;
@@ -191,7 +193,7 @@ int main(int argc, char **argv)
         }
 
         if (enable_draw_dot && frame_read > 0) {
-            rk_handle_md(&yuv_info, &sad_path, &sad_info, frame_read);
+            rk_handle_md(ctx, &sad_path, &sad_info, frame_read);
         }
 
         ofs.write(buf, frame_size);
