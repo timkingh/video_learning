@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <string.h>
 #include "getopt.hpp"
 #include "common.h"
 #include "rectangle.h"
@@ -87,7 +88,7 @@ static void rk_handle_md(ProcCtx *ctx, ifstream *sad)
 
     end = time_usec();
     duration = (double)(end - start) / 1000000;
-    cout << "frame_num " << frame_num << " finish merge, " << duration << " seconds"<< endl;
+    cout << "frame_num " << frame_num << " finish merge, " << duration << " seconds" << endl;
 
     draw_blue_rectangle(yuv, rects);
 

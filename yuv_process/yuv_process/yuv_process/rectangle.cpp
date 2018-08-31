@@ -11,7 +11,7 @@ using namespace std;
 inline bool Rect::operator == (const Rect &rect) const
 {
     if (left == rect.left && top == rect.top &&
-            right == rect.right && bottom == rect.bottom)
+        right == rect.right && bottom == rect.bottom)
         return true;
     return false;
 }
