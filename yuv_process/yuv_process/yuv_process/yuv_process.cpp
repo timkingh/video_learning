@@ -1,11 +1,11 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <stdint.h>
 #include <vector>
 #include "getopt.hpp"
-#include "rectangle.h"
 #include "common.h"
+#include "rectangle.h"
+#include "yuv_process.h"
 
 using namespace std;
 
@@ -14,15 +14,6 @@ using namespace std;
 #else
 #define SSCANF sscanf
 #endif
-
-typedef struct {
-    uint32_t frame_cnt;
-    uint32_t mb_size;
-    uint32_t mb_width;
-    uint32_t mb_height;
-    uint32_t mb_x;
-    uint32_t mb_y;
-} SadInfo;
 
 static void draw_red_dot(YuvInfo *yuv, SadInfo *info)
 {
@@ -100,6 +91,7 @@ static void rk_handle_md(YuvInfo *yuv, ifstream *sad, SadInfo *info, uint32_t fr
 
 int main(int argc, char **argv)
 {
+
     cout << "----------Test-------------" << endl;
     bool help = getarg(false, "-H", "--help", "-?");
     string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576.yuv", "-i", "--input");
