@@ -19,12 +19,12 @@ int main()
     std::istream_iterator<string> begin(cin); // Stream iterator
     std::istream_iterator<string> end;        // End stream iterator
 
-    while(begin != end )                      // Iterate over words in the stream
+    while (begin != end)                      // Iterate over words in the stream
         words[*begin++]++;                      // Increment and store a word count
 
     // Output the words and their counts
     cout << endl << "Here are the word counts for the text you entered:" << endl;
-    for(auto iter = words.begin() ; iter != words.end() ; ++iter)
+    for (auto iter = words.begin() ; iter != words.end() ; ++iter)
         cout << std::setw(5) << iter->second << " " << iter->first << endl;
 
     return 0;

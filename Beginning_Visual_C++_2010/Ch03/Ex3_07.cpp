@@ -13,7 +13,7 @@ int main()
 
 loop:
     sum += i;             // Add current value of i to sum
-    if(++i <= max)
+    if (++i <= max)
         goto loop;         // Go back to loop until i = 11
 
     cout << endl

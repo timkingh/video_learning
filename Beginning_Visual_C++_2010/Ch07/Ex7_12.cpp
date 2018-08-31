@@ -10,8 +10,7 @@ public:
     static int objectCount;            // Count of objects in existence
 
     // Constructor definition
-    explicit CBox(double lv, double bv = 1.0, double hv = 1.0)
-    {
+    explicit CBox(double lv, double bv = 1.0, double hv = 1.0) {
         cout << endl << "Constructor called.";
         m_Length = lv;                   // Set values of
         m_Width = bv;                    // data members
@@ -19,8 +18,7 @@ public:
         objectCount++;
     }
 
-    CBox()                             // Default constructor
-    {
+    CBox() {                           // Default constructor
         cout << endl
              << "Default constructor called.";
         m_Length = m_Width = m_Height = 1.0;
@@ -28,9 +26,8 @@ public:
     }
 
     // Function to calculate the volume of a box
-    double Volume() const
-    {
-        return m_Length*m_Width*m_Height;
+    double Volume() const {
+        return m_Length * m_Width * m_Height;
     }
 
 private:

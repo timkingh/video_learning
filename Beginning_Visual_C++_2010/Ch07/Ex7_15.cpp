@@ -9,22 +9,19 @@ ref class Box
 {
 public:
     // No-arg constructor supplying default field values
-    Box(): Length(1.0), Width(1.0), Height(1.0)
-    {
+    Box(): Length(1.0), Width(1.0), Height(1.0) {
         Console::WriteLine(L"No-arg constructor called.");
     }
 
     // Constructor definition using an initialisation list
     Box(double lv, double bv, double hv):
-        Length(lv), Width(bv), Height(hv)
-    {
+        Length(lv), Width(bv), Height(hv) {
         Console::WriteLine(L"Constructor called.");
     }
 
     // Function to calculate the volume of a box
-    double Volume()
-    {
-        return Length*Width*Height;
+    double Volume() {
+        return Length * Width * Height;
     }
 
 private:

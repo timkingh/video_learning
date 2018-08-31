@@ -27,9 +27,9 @@ Name::Name(const char* pFirst, const char* pSecond)
     // Trace constructor calls
     cout << "\nName constructor called.";
 #endif
-    pFirstname = new char[strlen(pFirst)+1];
+    pFirstname = new char[strlen(pFirst) + 1];
     strcpy(pFirstname, pFirst);
-    pSurname = new char[strlen(pSecond)+1];
+    pSurname = new char[strlen(pSecond) + 1];
     strcpy(pSurname, pSecond);
 }
 
@@ -58,16 +58,16 @@ size_t Name::getNameLength() const
     // Trace function calls
     cout << '\n' << __FUNCTION__ << " called.";
 #endif
-    return strlen(pFirstname)+strlen(pSurname)+1;
+    return strlen(pFirstname) + strlen(pSurname) + 1;
 }
 
 // Less than operator
 bool Name::operator<(const Name& name) const
 {
     int result = strcmp(pSurname, name.pSurname);
-    if(result < 0)
+    if (result < 0)
         return true;
-    if(result == 0 && strcmp(pFirstname, name.pFirstname) < 0)
+    if (result == 0 && strcmp(pFirstname, name.pFirstname) < 0)
         return true;
     else
         return false;
@@ -82,8 +82,8 @@ bool Name::operator>(const Name& name) const
 // Equal to operator
 bool Name::operator==(const Name& name) const
 {
-    if(strcmp(pSurname, name.pSurname) == 0 &&
-            strcmp(pFirstname, name.pFirstname) == 0)
+    if (strcmp(pSurname, name.pSurname) == 0 &&
+        strcmp(pFirstname, name.pFirstname) == 0)
         return true;
     else
         return false;

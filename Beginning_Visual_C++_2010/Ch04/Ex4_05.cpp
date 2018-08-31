@@ -18,7 +18,7 @@ int main()
          << "   &number1 = " << hex << pnumber;
 
     pnumber = &number2;             // Change pointer to address of number2
-    number1 = *pnumber*10;          // 10 times number2
+    number1 = *pnumber * 10;        // 10 times number2
 
     cout << endl
          << "number1 = " << dec << number1

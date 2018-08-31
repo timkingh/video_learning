@@ -16,17 +16,14 @@ using std::string;
 string* sort(string* strings, size_t count)
 {
     bool swapped(false);
-    while(true)
-    {
-        for(size_t i = 0 ; i < count-1 ; i++)
-        {
-            if(strings[i] > strings[i+1])
-            {
+    while (true) {
+        for (size_t i = 0 ; i < count - 1 ; i++) {
+            if (strings[i] > strings[i + 1]) {
                 swapped = true;
-                strings[i].swap(strings[i+1]);
+                strings[i].swap(strings[i + 1]);
             }
         }
-        if(!swapped)
+        if (!swapped)
             break;
         swapped = false;
     }
@@ -48,36 +45,33 @@ int main()
     getline(cin, text, '*');
 
     size_t start(0), end(0), offset(0);   // Record start & end of word & offset
-    while(true)
-    {
+    while (true) {
         // Find first character of a word
         start = text.find_first_not_of(separators, offset);  // Find non-separator
-        if(string::npos == start)           // If we did not find it, we are done
+        if (string::npos == start)          // If we did not find it, we are done
             break;
         offset = start + 1;                 // Move past character found
 
 
         // Find first separator past end of current word
-        end = text.find_first_of(separators,offset);         // Find separator
-        if(string::npos == end)             // If it's the end of the string
-        {   // current word is last in string
+        end = text.find_first_of(separators, offset);        // Find separator
+        if (string::npos == end) {          // If it's the end of the string
+            // current word is last in string
             offset = end;                     // We use offset to end loop later
             end = text.length();              // Set end as 1 past last character
-        }
-        else
+        } else
             offset = end + 1;                 // Move past character found
 
-        words[nwords] = text.substr(start, end-start);       // Extract the word
+        words[nwords] = text.substr(start, end - start);     // Extract the word
 
         // Keep track of longest word
-        if(maxwidth < words[nwords].length())
+        if (maxwidth < words[nwords].length())
             maxwidth = words[nwords].length();
 
-        if(string::npos == offset)          // If we reached the end of the string
+        if (string::npos == offset)         // If we reached the end of the string
             break;                            // We are done
 
-        if(++nwords == maxwords)            // Check for array full
-        {
+        if (++nwords == maxwords) {         // Check for array full
             cout << endl << "Maximum number of words reached."
                  << endl << "Processing what we have." << endl;
             break;
@@ -92,17 +86,15 @@ int main()
 
     size_t count(0);                               // Count of duplicate words
     // Output words and number of occurrences
-    for(size_t i = 0 ; i<nwords ; i++)
-    {
-        if(0 == count)
+    for (size_t i = 0 ; i < nwords ; i++) {
+        if (0 == count)
             count = 1;
-        if(i < nwords-2 && words[i] == words[i+1])
-        {
+        if (i < nwords - 2 && words[i] == words[i + 1]) {
             ++count;
             continue;
         }
         cout << setiosflags(ios::left)               // Output word left-justified
-             << setw(maxwidth+2) << words[i];
+             << setw(maxwidth + 2) << words[i];
         cout << resetiosflags(ios::right)            // and word count right-justified
              << setw(5) << count << endl;
         count = 0;

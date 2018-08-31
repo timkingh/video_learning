@@ -17,20 +17,20 @@ int main(array<System::String ^> ^args)
                                      };
 
     Console::WriteLine(L"The array of containers have the following volumes:");
-    for each(IContainer^ container in containers)
+    for each(IContainer ^ container in containers)
         container->ShowVolume();           // Output the volume of a box
 
     Console::WriteLine(L"\nNow pushing the containers on the stack...");
 
     Stack^ stack = gcnew Stack;          // Create the stack
-    for each(IContainer^ container in containers)
+    for each(IContainer ^ container in containers)
         stack->Push(container);
 
 
     Console::WriteLine(
         L"Popping the containers off the stack presents them in reverse order:");
     Object^ item;
-    while((item = stack->Pop()) != nullptr)
+    while ((item = stack->Pop()) != nullptr)
         safe_cast<IContainer^>(item)->ShowVolume();
 
     Console::WriteLine();

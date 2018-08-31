@@ -8,28 +8,24 @@ class CBox                     // Class definition at global scope
 {
 public:
     // Destructor definition
-    ~CBox()
-    {
+    ~CBox() {
         cout << "Destructor called." << endl;
     }
 
     // Constructor definition
     explicit CBox(double lv = 1.0, double wv = 1.0, double hv = 1.0):
-        m_Length(lv), m_Width(wv), m_Height(hv)
-    {
+        m_Length(lv), m_Width(wv), m_Height(hv) {
         cout << endl << "Constructor called.";
     }
 
     // Function to calculate the volume of a box
-    double Volume() const
-    {
-        return m_Length*m_Width*m_Height;
+    double Volume() const {
+        return m_Length * m_Width * m_Height;
     }
 
     // Function to compare two boxes which returns true
     // if the first is greater that the second, and false otherwise
-    bool compare(CBox* pBox) const
-    {
+    bool compare(CBox* pBox) const {
         return this->Volume() > pBox->Volume();
     }
 

@@ -16,8 +16,7 @@ int main()
     int count(0);                           // Loop counter
     char indicator('y');                    // Input indicator
 
-    while( ('y' == indicator || 'Y' == indicator) && count < MAX )
-    {
+    while (('y' == indicator || 'Y' == indicator) && count < MAX) {
         cout << endl << "Enter gas quantity: ";
         cin >> gas[count];                   // Read gas quantity
         cout << "Enter odometer reading: ";
@@ -28,20 +27,19 @@ int main()
         cin >> indicator;
     }
 
-    if(count <= 1)                     // count = 1 after 1 entry completed
-    {   // ... we need at least 2
+    if (count <= 1) {                  // count = 1 after 1 entry completed
+        // ... we need at least 2
         cout << endl << "Sorry - at least two readings are necessary.";
         return 0;
     }
 
     // Output results from 2nd entry to last entry
-    for(int i = 1; i < count; i++)
-    {
+    for (int i = 1; i < count; i++) {
         cout << endl
              << setw(2) << i << "."             // Output sequence number
              << "Gas purchased = " << gas[i] << " gallons" // Output gas
              << " resulted in "                 // Output miles per gallon
-             << (miles[i] - miles[i - 1])/gas[i] << " miles per gallon.";
+             << (miles[i] - miles[i - 1]) / gas[i] << " miles per gallon.";
     }
 
     cout << endl;

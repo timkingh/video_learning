@@ -9,7 +9,7 @@ long product(long a, long b);          // Function prototype
 
 int main(void)
 {
-    long (*pdo_it)(long, long);          // Pointer to function declaration
+    long(*pdo_it)(long, long);           // Pointer to function declaration
 
     pdo_it = product;
     cout << endl
@@ -27,7 +27,7 @@ int main(void)
 // Function to multiply two values
 long product(long a, long b)
 {
-    return a*b;
+    return a * b;
 }
 
 // Function to add two values

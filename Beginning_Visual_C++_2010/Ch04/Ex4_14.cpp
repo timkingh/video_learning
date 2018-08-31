@@ -10,8 +10,8 @@ int main(array<System::String ^> ^args)
     array<String^>^ names = { "Jill", "Ted", "Mary", "Eve", "Bill", "Al"};
     array<int>^ weights = { 103, 168, 128, 115, 180, 176};
 
-    Array::Sort( names,weights);                   // Sort the arrays
-    for each(String^ name in names)                // Output the names
+    Array::Sort(names, weights);                   // Sort the arrays
+    for each(String ^ name in names)               // Output the names
         Console::Write(L"{0, 10}", name);
     Console::WriteLine();
 

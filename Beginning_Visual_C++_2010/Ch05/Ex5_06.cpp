@@ -13,7 +13,7 @@ int main(void)
         { 9.0, 10.0, 11.0, 12.0 }
     };
 
-    cout << endl << "Yield = " << yield(beans, sizeof beans/sizeof beans[0])
+    cout << endl << "Yield = " << yield(beans, sizeof beans / sizeof beans[0])
          << endl;
     return 0;
 }
@@ -22,8 +22,8 @@ int main(void)
 double yield(double beans[][4], int count)
 {
     double sum(0.0);
-    for(int i = 0; i < count; i++)      // Loop through number of rows
-        for(int j = 0; j < 4; j++)       // Loop through elements in a row
+    for (int i = 0; i < count; i++)     // Loop through number of rows
+        for (int j = 0; j < 4; j++)      // Loop through elements in a row
             sum += beans[i][j];
     return sum;
 }

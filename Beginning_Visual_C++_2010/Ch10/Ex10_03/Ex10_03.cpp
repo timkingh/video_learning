@@ -16,11 +16,10 @@ int main()
     const size_t maxlength(50);
     char firstname[maxlength];
     char secondname[maxlength];
-    while(true)
-    {
+    while (true) {
         cout << "Enter a first name or press Enter to end: ";
         cin.getline(firstname, maxlength, '\n');
-        if(strlen(firstname) == 0)
+        if (strlen(firstname) == 0)
             break;
         cout << "Enter the second name: ";
         cin.getline(secondname, maxlength, '\n');
@@ -30,12 +29,12 @@ int main()
     // Output the contents of the vector
     cout << endl;
     auto iter(people.begin());
-    while(iter != people.end())
+    while (iter != people.end())
         (*(iter++))->showPerson();
 
     // Release memory for the people
     iter = people.begin();
-    while(iter != people.end())
+    while (iter != people.end())
         delete *(iter++);
 
     // Pointers in the vector are now invalid

@@ -45,25 +45,24 @@ BOOL CPenDialog::OnInitDialog()
     CDialog::OnInitDialog();
 
     // Check the radio button corresponding to the pen width
-    switch(m_PenWidth)
-    {
+    switch (m_PenWidth) {
     case 1:
-        CheckDlgButton(IDC_PENWIDTH1,1);
+        CheckDlgButton(IDC_PENWIDTH1, 1);
         break;
     case 2:
-        CheckDlgButton(IDC_PENWIDTH2,1);
+        CheckDlgButton(IDC_PENWIDTH2, 1);
         break;
     case 3:
-        CheckDlgButton(IDC_PENWIDTH3,1);
+        CheckDlgButton(IDC_PENWIDTH3, 1);
         break;
     case 4:
-        CheckDlgButton(IDC_PENWIDTH4,1);
+        CheckDlgButton(IDC_PENWIDTH4, 1);
         break;
     case 5:
-        CheckDlgButton(IDC_PENWIDTH5,1);
+        CheckDlgButton(IDC_PENWIDTH5, 1);
         break;
     default:
-        CheckDlgButton(IDC_PENWIDTH0,1);
+        CheckDlgButton(IDC_PENWIDTH0, 1);
     }
 
     return TRUE;  // return TRUE unless you set the focus to a control

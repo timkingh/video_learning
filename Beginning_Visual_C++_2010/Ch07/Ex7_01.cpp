@@ -5,8 +5,7 @@ using std::cout;
 using std::endl;
 
 // Definition of a struct to represent rectangles
-struct RECTANGLE
-{
+struct RECTANGLE {
     int Left;                            // Top-left point
     int Top;                             // coordinate pair
 
@@ -54,7 +53,7 @@ int main(void)
 // Function to calculate the area of a rectangle
 long Area(const RECTANGLE& aRect)
 {
-    return (aRect.Right - aRect.Left)*(aRect.Bottom - aRect.Top);
+    return (aRect.Right - aRect.Left) * (aRect.Bottom - aRect.Top);
 }
 
 // Function to Move a Rectangle

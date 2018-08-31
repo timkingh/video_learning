@@ -17,8 +17,7 @@ DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
     // Remove this if you use lpReserved
     UNREFERENCED_PARAMETER(lpReserved);
 
-    if (dwReason == DLL_PROCESS_ATTACH)
-    {
+    if (dwReason == DLL_PROCESS_ATTACH) {
         TRACE0("ExtDLLExample.DLL Initializing!\n");
 
         // Extension DLL one-time initialization
@@ -39,9 +38,7 @@ DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 
         new CDynLinkLibrary(ExtDLLExampleDLL);
 
-    }
-    else if (dwReason == DLL_PROCESS_DETACH)
-    {
+    } else if (dwReason == DLL_PROCESS_DETACH) {
         TRACE0("ExtDLLExample.DLL Terminating!\n");
 
         // Terminate the library before destructors are called

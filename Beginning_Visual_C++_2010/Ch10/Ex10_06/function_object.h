@@ -5,9 +5,8 @@
 
 template <class T> class is_negative: public std::unary_function<T, bool>
 {
-  public:
-  result_type operator()(T& value)
-  {
-    return value<0;
-  }
+public:
+    result_type operator()(T& value) {
+        return value < 0;
+    }
 };

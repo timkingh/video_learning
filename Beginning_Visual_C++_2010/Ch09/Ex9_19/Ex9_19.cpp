@@ -15,8 +15,7 @@ public:
     event DoorHandler^ Knock;
 
     // Function to trigger events
-    void TriggerEvents()
-    {
+    void TriggerEvents() {
         Knock(L"Fred");
         Knock(L"Jane");
     }
@@ -26,14 +25,12 @@ public:
 public ref class AnswerDoor
 {
 public:
-    void ImIn(String^ name)
-    {
-        Console::WriteLine(L"Come in {0}, it's open.",name);
+    void ImIn(String^ name) {
+        Console::WriteLine(L"Come in {0}, it's open.", name);
     }
 
-    void ImOut(String^ name)
-    {
-        Console::WriteLine(L"Go away {0}, I'm out.",name);
+    void ImOut(String^ name) {
+        Console::WriteLine(L"Go away {0}, I'm out.", name);
     }
 };
 

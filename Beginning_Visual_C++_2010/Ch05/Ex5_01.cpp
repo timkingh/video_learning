@@ -29,9 +29,10 @@ int main(void)
 // Function to compute positive integral powers of a double value
 // First argument is value, second argument is power index
 double power(double x, int n)
-{   // Function body starts here...
+{
+    // Function body starts here...
     double result(1.0);            // Result stored here
-    for(int i = 1; i <= n; i++)
+    for (int i = 1; i <= n; i++)
         result *= x;
     return result;
 }                                 // ...and ends here

@@ -51,7 +51,7 @@ CSketcherDoc::CSketcherDoc() :
     m_Element(LINE)
     ,  m_Color(BLACK)
     ,  m_PenWidth(0)
-    , m_DocSize(CSize(3000,3000))
+    , m_DocSize(CSize(3000, 3000))
 
 {
     // TODO: add one-time construction code here
@@ -61,7 +61,7 @@ CSketcherDoc::CSketcherDoc() :
 CSketcherDoc::~CSketcherDoc()
 {
     // Delete the element pointed to by each list entry
-    for(auto iter = m_ElementList.begin() ; iter != m_ElementList.end() ; ++iter)
+    for (auto iter = m_ElementList.begin() ; iter != m_ElementList.end() ; ++iter)
         delete *iter;
 
     m_ElementList.clear();   // Finally delete all pointers
@@ -85,8 +85,7 @@ BOOL CSketcherDoc::OnNewDocument()
 
 void CSketcherDoc::Serialize(CArchive& ar)
 {
-    if (ar.IsStoring())
-    {
+    if (ar.IsStoring()) {
         ar << m_Color                      // Store the current color
            << static_cast<int>(m_Element)  // the current element type as an integer
            << m_PenWidth                   // and the current pen width
@@ -95,11 +94,9 @@ void CSketcherDoc::Serialize(CArchive& ar)
         ar << m_ElementList.size();        // Store the number of elements in the list
 
         // Now store the elements from the list
-        for(auto iter =  m_ElementList.begin() ; iter != m_ElementList.end() ; ++iter)
+        for (auto iter =  m_ElementList.begin() ; iter != m_ElementList.end() ; ++iter)
             ar << *iter;                     // Store the element
-    }
-    else
-    {
+    } else {
         int elementType(0);                // Stores element type
         ar >> m_Color                      // Retrieve the current color
            >> elementType                  // the current element type as an integer
@@ -112,8 +109,7 @@ void CSketcherDoc::Serialize(CArchive& ar)
         CElement* pElement(nullptr);       // Element pointer
         ar >> elementCount;                // retrieve the element count
         // Now retrieve all the elements and store in the list
-        for(size_t i = 0 ; i < elementCount ; ++i)
-        {
+        for (size_t i = 0 ; i < elementCount ; ++i) {
             ar >> pElement;
             m_ElementList.push_back(pElement);
         }
@@ -156,16 +152,12 @@ void CSketcherDoc::InitializeSearchContent()
 
 void CSketcherDoc::SetSearchContent(const CString& value)
 {
-    if (value.IsEmpty())
-    {
+    if (value.IsEmpty()) {
         RemoveChunk(PKEY_Search_Contents.fmtid, PKEY_Search_Contents.pid);
-    }
-    else
-    {
+    } else {
         CMFCFilterChunkValueImpl *pChunk = NULL;
         ATLTRY(pChunk = new CMFCFilterChunkValueImpl);
-        if (pChunk != NULL)
-        {
+        if (pChunk != NULL) {
             pChunk->SetTextValue(PKEY_Search_Contents, value, CHUNK_TEXT);
             SetChunkValue(pChunk);
         }
@@ -244,65 +236,64 @@ void CSketcherDoc::OnElementCurve()
 void CSketcherDoc::OnUpdateColorBlack(CCmdUI *pCmdUI)
 {
     // Set menu item Checked if the current color is black
-    pCmdUI->SetCheck(m_Color==BLACK);
+    pCmdUI->SetCheck(m_Color == BLACK);
 }
 
 
 void CSketcherDoc::OnUpdateColorRed(CCmdUI *pCmdUI)
 {
     // Set menu item Checked if the current color is red
-    pCmdUI->SetCheck(m_Color==RED);
+    pCmdUI->SetCheck(m_Color == RED);
 }
 
 
 void CSketcherDoc::OnUpdateColorGreen(CCmdUI *pCmdUI)
 {
     // Set menu item Checked if the current color is green
-    pCmdUI->SetCheck(m_Color==GREEN);
+    pCmdUI->SetCheck(m_Color == GREEN);
 }
 
 
 void CSketcherDoc::OnUpdateColorBlue(CCmdUI *pCmdUI)
 {
     // Set menu item Checked if the current color is blue
-    pCmdUI->SetCheck(m_Color==BLUE);
+    pCmdUI->SetCheck(m_Color == BLUE);
 }
 
 
 void CSketcherDoc::OnUpdateElementLine(CCmdUI *pCmdUI)
 {
     // Set Checked if the current element is a line
-    pCmdUI->SetCheck(m_Element==LINE);
+    pCmdUI->SetCheck(m_Element == LINE);
 }
 
 
 void CSketcherDoc::OnUpdateElementRectangle(CCmdUI *pCmdUI)
 {
     // Set Checked if the current element is a rectangle
-    pCmdUI->SetCheck(m_Element==RECTANGLE);
+    pCmdUI->SetCheck(m_Element == RECTANGLE);
 }
 
 
 void CSketcherDoc::OnUpdateElementCircle(CCmdUI *pCmdUI)
 {
     // Set Checked if the current element is a circle
-    pCmdUI->SetCheck(m_Element==CIRCLE);
+    pCmdUI->SetCheck(m_Element == CIRCLE);
 }
 
 
 void CSketcherDoc::OnUpdateElementCurve(CCmdUI *pCmdUI)
 {
     // Set Checked if the current element is a curve
-    pCmdUI->SetCheck(m_Element==CURVE);
+    pCmdUI->SetCheck(m_Element == CURVE);
 }
 
 
 // Finds the element under the point
 CElement* CSketcherDoc::FindElement(const CPoint point) const
 {
-    for(auto rIter = m_ElementList.rbegin() ; rIter != m_ElementList.rend() ; ++rIter)
-    {
-        if((*rIter)->GetBoundRect().PtInRect(point))
+    for (auto rIter = m_ElementList.rbegin() ; rIter != m_ElementList.rend() ; ++rIter) {
+        if ((*rIter)->GetBoundRect().PtInRect(point))
             return *rIter;
     }
     return NULL;
@@ -311,8 +302,7 @@ CElement* CSketcherDoc::FindElement(const CPoint point) const
 // Delete an element from the sketch
 void CSketcherDoc::DeleteElement(CElement* pElement)
 {
-    if(pElement)
-    {
+    if (pElement) {
         m_ElementList.remove(pElement);    // Remove the pointer from the list
         SetModifiedFlag();                 // Set the modified flag
         delete pElement;                   // Delete the element from the heap
@@ -322,8 +312,7 @@ void CSketcherDoc::DeleteElement(CElement* pElement)
 // Move the element to the beginning of the list
 void CSketcherDoc::SendToBack(CElement* pElement)
 {
-    if(pElement)
-    {
+    if (pElement) {
         m_ElementList.remove(pElement);     // Remove the element from the list
         m_ElementList.push_front(pElement);  // Put it back at the beginning of the list
     }
@@ -339,8 +328,7 @@ void CSketcherDoc::OnPenWidth()
 
     // Display the dialog as modal
     // When closed with OK, get the pen width
-    if(aDlg.DoModal() == IDOK)
-    {
+    if (aDlg.DoModal() == IDOK) {
         m_PenWidth = aDlg.m_PenWidth;
     }
 }
@@ -361,8 +349,8 @@ void CSketcherDoc::OnUpdateElementText(CCmdUI *pCmdUI)
 // Get the rectangle enclosing the entire document
 CRect CSketcherDoc::GetDocExtent()
 {
-    CRect docExtent(0,0,1,1);            // Initial document extent
-    for(auto iter = m_ElementList.begin() ; iter != m_ElementList.end() ; ++iter)
+    CRect docExtent(0, 0, 1, 1);         // Initial document extent
+    for (auto iter = m_ElementList.begin() ; iter != m_ElementList.end() ; ++iter)
         docExtent.UnionRect(docExtent, (*iter)->GetBoundRect());
 
     docExtent.NormalizeRect();

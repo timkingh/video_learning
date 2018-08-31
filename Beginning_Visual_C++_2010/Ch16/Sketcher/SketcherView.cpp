@@ -36,8 +36,8 @@ END_MESSAGE_MAP()
 // CSketcherView construction/destruction
 
 CSketcherView::CSketcherView()
-    : m_FirstPoint(CPoint(0,0))
-    , m_SecondPoint(CPoint(0,0))
+    : m_FirstPoint(CPoint(0, 0))
+    , m_SecondPoint(CPoint(0, 0))
     , m_pTempElement(nullptr)
 {
     // TODO: add construction code here
@@ -134,12 +134,11 @@ CSketcherDoc* CSketcherView::GetDocument() const // non-debug version is inline
 
 void CSketcherView::OnLButtonUp(UINT nFlags, CPoint point)
 {
-    if(this == GetCapture())
+    if (this == GetCapture())
         ReleaseCapture();        // Stop capturing mouse messages
 
     // Make sure there is an element
-    if(m_pTempElement)
-    {
+    if (m_pTempElement) {
         // Call a document class function to store the element
         // pointed to by m_pTempElement in the document object
 
@@ -162,13 +161,11 @@ void CSketcherView::OnMouseMove(UINT nFlags, CPoint point)
 {
     // Define a Device Context object for the view
     CClientDC aDC(this);                 // DC is for this view
-    if((nFlags & MK_LBUTTON) && (this == GetCapture()))
-    {
+    if ((nFlags & MK_LBUTTON) && (this == GetCapture())) {
         m_SecondPoint = point;             // Save the current cursor position
-        if(m_pTempElement)
-        {
-            if(CURVE == GetDocument()->GetElementType())   // Is it a curve?
-            {   // We are drawing a curve so add a segment to the existing curve
+        if (m_pTempElement) {
+            if (CURVE == GetDocument()->GetElementType()) { // Is it a curve?
+                // We are drawing a curve so add a segment to the existing curve
                 static_cast<CCurve*>(m_pTempElement)->AddSegment(m_SecondPoint);
                 m_pTempElement->Draw(&aDC);   // Now draw it
                 return;                       // We are done
@@ -197,8 +194,7 @@ CElement* CSketcherView::CreateElement(void) const
     ASSERT_VALID(pDoc);                 // Verify the pointer is good
 
     // Now select the element using the type stored in the document
-    switch(pDoc->GetElementType())
-    {
+    switch (pDoc->GetElementType()) {
     case RECTANGLE:
         return new CRectangle(m_FirstPoint, m_SecondPoint,
                               pDoc->GetElementColor());

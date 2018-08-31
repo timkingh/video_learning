@@ -24,18 +24,18 @@ int main()
     box1.m_Width = 24.0;                 // the object box1
 
     box2.m_Height = box1.m_Height - 10;  // Define box2
-    box2.m_Length = box1.m_Length/2.0;   // members in
-    box2.m_Width = 0.25*box1.m_Length;   // terms of box1
+    box2.m_Length = box1.m_Length / 2.0; // members in
+    box2.m_Width = 0.25 * box1.m_Length; // terms of box1
 
     // Calculate volume of box1
-    boxVolume = box1.m_Height*box1.m_Length*box1.m_Width;
+    boxVolume = box1.m_Height * box1.m_Length * box1.m_Width;
 
     cout << endl
          << "Volume of box1 = " << boxVolume;
 
     cout << endl
          << "box2 has sides which total "
-         << box2.m_Height+ box2.m_Length+ box2.m_Width
+         << box2.m_Height + box2.m_Length + box2.m_Width
          << " inches.";
 
     cout << endl                         // Display the size of a box in memory

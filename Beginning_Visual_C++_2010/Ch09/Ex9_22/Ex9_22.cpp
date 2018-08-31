@@ -10,9 +10,9 @@ using namespace System::Collections::Generic;    // For generic collections
 ref class Name
 {
 public:
-    Name(String^ name1, String^ name2) : First(name1),Second(name2) {}
+    Name(String^ name1, String^ name2) : First(name1), Second(name2) {}
     virtual String^ ToString() override {
-        return First +L" "+Second;
+        return First + L" " + Second;
     }
 private:
     String^ First;
@@ -24,10 +24,9 @@ ref class PhoneNumber
 {
 public:
     PhoneNumber(int area, int local, int number):
-        Area(area),Local(local), Number(number) {}
-    virtual String^ ToString() override
-    {
-        return Area +L" "+Local+L" "+Number;
+        Area(area), Local(local), Number(number) {}
+    virtual String^ ToString() override {
+        return Area + L" " + Local + L" " + Number;
     }
 
 private:
@@ -42,20 +41,20 @@ int main(array<System::String ^> ^args)
     // Using List<T>
     Console::WriteLine(L"Creating a List<T> of integers:");
     List<int>^ numbers = gcnew List<int>;
-    for(int i = 0 ; i<1000 ; i++)
-        numbers->Add(2*i+1);
+    for (int i = 0 ; i < 1000 ; i++)
+        numbers->Add(2 * i + 1);
 
     // Sum the contents of the list
     int sum = 0;
-    for(int i = 0 ; i<numbers->Count ; i++)
+    for (int i = 0 ; i < numbers->Count ; i++)
         sum += numbers[i];
     Console::WriteLine(L"Total = {0}", sum);
 
     // Using LinkedList<T>
     Console::WriteLine(L"\nCreating a LinkedList<T> of double values:");
     LinkedList<double>^ values = gcnew LinkedList<double>;
-    for(int i = 0 ; i<1000 ; i++)
-        values->AddLast(2.5*i);
+    for (int i = 0 ; i < 1000 ; i++)
+        values->AddLast(2.5 * i);
 
     double sumd = 0.0;
     for each(double v in values)
@@ -82,17 +81,17 @@ int main(array<System::String ^> ^args)
     Name^ name = gcnew Name("Jim", "Jones");
     PhoneNumber^ number = gcnew PhoneNumber(914, 316, 2233);
     phonebook->Add(name, number);
-    phonebook->Add(gcnew Name("Fred","Fong"), gcnew PhoneNumber(123,234,3456));
-    phonebook->Add(gcnew Name("Janet","Smith"), gcnew PhoneNumber(515,224,6864));
+    phonebook->Add(gcnew Name("Fred", "Fong"), gcnew PhoneNumber(123, 234, 3456));
+    phonebook->Add(gcnew Name("Janet", "Smith"), gcnew PhoneNumber(515, 224, 6864));
 
     // List all numbers
     Console::WriteLine(L"List all the numbers:");
-    for each(PhoneNumber^ number in phonebook->Values)
+    for each(PhoneNumber ^ number in phonebook->Values)
         Console::WriteLine(number);
 
     // List names and numbers
     Console::WriteLine(L"Access the keys to list all name/number pairs:");
-    for each(Name^ name in phonebook->Keys)
+    for each(Name ^ name in phonebook->Keys)
         Console::WriteLine(L"{0} : {1}", name, phonebook[name]);
 
     return 0;

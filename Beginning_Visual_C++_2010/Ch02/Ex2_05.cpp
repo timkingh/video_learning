@@ -12,7 +12,7 @@ int main()
     double perimeter = 0.0;                         // Room perimeter
 
     const double rollWidth = 21.0;                  // Standard roll width
-    const double rollLength = 12.0*33.0;            // Standard roll length(33ft.)
+    const double rollLength = 12.0 * 33.0;          // Standard roll length(33ft.)
 
     int strips_per_roll = 0;                        // Number of strips in a roll
     int strips_reqd = 0;                            // Number of strips needed
@@ -27,7 +27,7 @@ int main()
     cin >> length >> width;
 
     strips_per_roll = rollLength / height;          // Get number of strips per roll
-    perimeter = 2.0*(length + width);               // Calculate room perimeter
+    perimeter = 2.0 * (length + width);             // Calculate room perimeter
     strips_reqd = perimeter / rollWidth;            // Get total strips required
     nrolls = strips_reqd / strips_per_roll;         // Calculate number of rolls
 

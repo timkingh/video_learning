@@ -15,14 +15,13 @@ int main(array<System::String ^> ^args)
                           };
     array<String^>^ toBeFound = {"Bill", "Eve", "Al", "Fred"};
 
-    Array::Sort( names, weights);                  // Sort the arrays
+    Array::Sort(names, weights);                   // Sort the arrays
 
     int result(0);                                 // Stores search result
-    for each(String^ name in toBeFound)            // Search to find weights
-    {
+    for each(String ^ name in toBeFound) {         // Search to find weights
         result = Array::BinarySearch(names, name);   // Search names array
 
-        if(result<0)                                 // Check the result
+        if (result < 0)                              // Check the result
             Console::WriteLine(L"{0} was not found.", name);
         else
             Console::WriteLine(L"{0} weighs {1} lbs.", name, weights[result]);

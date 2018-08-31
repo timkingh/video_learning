@@ -10,39 +10,35 @@ using std::string;
 class Person
 {
 public:
-  Person(string first, string second)
-  {
-    firstname = first;
-    secondname = second;
-  }
+    Person(string first, string second) {
+        firstname = first;
+        secondname = second;
+    }
 
-  // No-arg constructor
-  Person(){}
+    // No-arg constructor
+    Person() {}
 
-  // Copy constructor
-  Person(const Person& p)
-  {
-    firstname = p.firstname;
-    secondname = p.secondname;
-  }
+    // Copy constructor
+    Person(const Person& p) {
+        firstname = p.firstname;
+        secondname = p.secondname;
+    }
 
-  // Less-than operator
-  bool operator<(const Person& p)const
-  {
-    if(secondname < p.secondname ||
-      ((secondname == p.secondname) && (firstname < p.firstname)))
-      return true;
+    // Less-than operator
+    bool operator<(const Person& p)const {
+        if (secondname < p.secondname ||
+            ((secondname == p.secondname) && (firstname < p.firstname)))
+            return true;
 
-    return false;
-  }
+        return false;
+    }
 
-  // Output a person
-  void showPerson() const
-  {
-    cout << firstname << " " << secondname << endl;
-  }
+    // Output a person
+    void showPerson() const {
+        cout << firstname << " " << secondname << endl;
+    }
 
 private:
-  string firstname;
-  string secondname;
+    string firstname;
+    string secondname;
 };

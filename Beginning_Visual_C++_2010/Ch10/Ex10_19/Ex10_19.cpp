@@ -30,8 +30,8 @@ void addEntry(map<Person^, String^>^ book)
     number = Console::ReadLine()->Trim();
 
     entry = book->make_value(person, number);
-    map<Person^,String^>::pair_iter_bool pr = book->insert(entry);
-    if(pr.second)
+    map<Person^, String^>::pair_iter_bool pr = book->insert(entry);
+    if (pr.second)
         Console::WriteLine(L"Entry successful.");
     else
         Console::WriteLine(L"Entry exists for {0}. The number is {1}",
@@ -41,13 +41,12 @@ void addEntry(map<Person^, String^>^ book)
 // List the contents of a phone book
 void listEntries(map<Person^, String^>^ book)
 {
-    if(book->empty())
-    {
+    if (book->empty()) {
         Console::WriteLine(L"The phone book is empty.");
         return;
     }
     map<Person^, String^>::iterator iter;
-    for(iter = book->begin() ; iter != book->end() ; iter++)
+    for (iter = book->begin() ; iter != book->end() ; iter++)
         Console::WriteLine(L"{0, -30}{1,-12}",
                            iter->first, iter->second);
 }
@@ -57,7 +56,7 @@ void getEntry(map<Person^, String^>^ book)
 {
     Person^ person = getPerson();
     map<Person^, String^>::const_iterator iter = book->find(person);
-    if(book->end() == iter)
+    if (book->end() == iter)
         Console::WriteLine(L"No entry found for {0}", person);
     else
         Console::WriteLine(L"The number for {0} is {1}",
@@ -69,10 +68,9 @@ void deleteEntry(map<Person^, String^>^ book)
 {
     Person^ person = getPerson();
     map<Person^, String^>::iterator iter = book->find(person);
-    if(book->end() == iter)
+    if (book->end() == iter)
         Console::WriteLine(L"No entry found for {0}", person);
-    else
-    {
+    else {
         book->erase(iter);
         Console::WriteLine(L"{0} erased.", person);
     }
@@ -83,31 +81,27 @@ int main(array<System::String ^> ^args)
     map<Person^, String^>^ phonebook = gcnew map<Person^, String^>();
     String^ answer;
 
-    while(true)
-    {
+    while (true) {
         Console::Write(L"Do you want to enter a phone book entry(Y or N): ") ;
         answer = Console::ReadLine()->Trim();
-        if(Char::ToUpper(answer[0]) == L'N')
+        if (Char::ToUpper(answer[0]) == L'N')
             break;
         addEntry(phonebook);
     }
 
     // Query the phonebook
-    while(true)
-    {
+    while (true) {
         Console::WriteLine(L"\nChoose from the following options:");
         Console::WriteLine(L"A  Add an entry   D Delete an entry   G  Get an entry");
         Console::WriteLine(L"L  List entries   Q  Quit");
-        while(true)
-        {
+        while (true) {
             answer = Console::ReadLine()->Trim();
-            if(answer->Length)
+            if (answer->Length)
                 break;
             Console::WriteLine(L"\nYou must enter something - try again.");
         }
 
-        switch(Char::ToUpper(answer[0]))
-        {
+        switch (Char::ToUpper(answer[0])) {
         case L'A':
             addEntry(phonebook);
             break;

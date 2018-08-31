@@ -21,7 +21,7 @@ int main(void)
        cout << endl << "incr10(value) = " << result
             << endl << "value = " << value;
     */
-    result = incr10(value+num);                        // Increment an expression
+    result = incr10(value + num);                      // Increment an expression
     cout << endl << "incr10(value+num) = " << result
          << endl << "value = " << value;
 

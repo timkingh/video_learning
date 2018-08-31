@@ -20,18 +20,18 @@ int main()
     cout << "Enter a few lines of text. Just press Enter to end:"
          << endl;
     string sentence;
-    while(getline(cin, sentence, '\n'), !sentence.empty())
+    while (getline(cin, sentence, '\n'), !sentence.empty())
         text.push_front(sentence);
 
     // Output the data using an iterator
     cout << endl << "Here is the text you entered:" << endl;
-    for(iter = text.begin() ; iter != text.end() ; iter++)
+    for (iter = text.begin() ; iter != text.end() ; iter++)
         cout << *iter << endl;
 
     // Sort the data in ascending sequence
     cout << endl << "In ascending sequence the sentences you entered are:" << endl;
     text.sort();
-    for(iter = text.begin() ; iter != text.end() ; iter++)
+    for (iter = text.begin() ; iter != text.end() ; iter++)
         cout << *iter << endl;
 
     return 0;

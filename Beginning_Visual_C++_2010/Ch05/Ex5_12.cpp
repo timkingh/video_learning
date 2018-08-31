@@ -12,7 +12,7 @@ int main(void)
 
     ptr = treble(num);
 
-    cout << endl << "Three times num = " << 3.0*num;
+    cout << endl << "Three times num = " << 3.0 * num;
 
     cout << endl << "Result = " << *ptr;   // Display 3*num
 
@@ -24,6 +24,6 @@ int main(void)
 double* treble(double data)
 {
     double result(0.0);
-    result = 3.0*data;
+    result = 3.0 * data;
     return &result;
 }

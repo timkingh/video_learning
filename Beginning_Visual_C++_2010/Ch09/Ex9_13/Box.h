@@ -7,27 +7,26 @@ using std::endl;
 
 class CBox: public CContainer          // Derived class
 {
-  public:
+public:
     // Destructor
     ~CBox()
     { cout << "CBox destructor called" << endl; }
 
     // Function to show the volume of an object
-    virtual void ShowVolume() const
-    {
-      cout << endl
-           << "CBox usable volume is " << Volume(); 
+    virtual void ShowVolume() const {
+        cout << endl
+             << "CBox usable volume is " << Volume();
     }
 
     // Function to calculate the volume of a CBox object
     virtual double Volume() const
-    { return m_Length*m_Width*m_Height; }
+    { return m_Length * m_Width * m_Height; }
 
     // Constructor
     CBox(double lv = 1.0, double wv = 1.0, double hv = 1.0)
-                             :m_Length(lv), m_Width(wv), m_Height(hv){}
+        : m_Length(lv), m_Width(wv), m_Height(hv) {}
 
-  protected:
+protected:
     double m_Length;
     double m_Width;
     double m_Height;

@@ -3,11 +3,11 @@
 
 class CBox
 {
-  public:
+public:
     double m_Length;
     double m_Width;
     double m_Height;
 
     CBox(double lv = 1.0, double wv = 1.0, double hv = 1.0):
-                                m_Length(lv), m_Width(wv), m_Height(hv){}
+        m_Length(lv), m_Width(wv), m_Height(hv) {}
 };

@@ -9,7 +9,7 @@ using std::endl;
 
 class CContainer        // Generic base class for specific containers
 {
-  public:
+public:
     // Destructor
     /* virtual */ ~CContainer()
     { cout << "CContainer destructor called" << endl; }
@@ -19,9 +19,8 @@ class CContainer        // Generic base class for specific containers
     virtual double Volume() const = 0;
 
     // Function to display a volume
-    virtual void ShowVolume() const
-    {
-      cout << endl
-           << "Volume is " << Volume();
+    virtual void ShowVolume() const {
+        cout << endl
+             << "Volume is " << Volume();
     }
 };

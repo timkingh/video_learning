@@ -51,7 +51,7 @@ CSketcherDoc::CSketcherDoc() :
     m_Element(LINE)
     ,  m_Color(BLACK)
     ,  m_PenWidth(0)
-    , m_DocSize(CSize(3000,3000))
+    , m_DocSize(CSize(3000, 3000))
 
 {
     // TODO: add one-time construction code here
@@ -61,7 +61,7 @@ CSketcherDoc::CSketcherDoc() :
 CSketcherDoc::~CSketcherDoc()
 {
     // Delete the element pointed to by each list entry
-    for(auto iter = m_ElementList.begin() ; iter != m_ElementList.end() ; ++iter)
+    for (auto iter = m_ElementList.begin() ; iter != m_ElementList.end() ; ++iter)
         delete *iter;
 
     m_ElementList.clear();   // Finally delete all pointers
@@ -85,12 +85,9 @@ BOOL CSketcherDoc::OnNewDocument()
 
 void CSketcherDoc::Serialize(CArchive& ar)
 {
-    if (ar.IsStoring())
-    {
+    if (ar.IsStoring()) {
         // TODO: add storing code here
-    }
-    else
-    {
+    } else {
         // TODO: add loading code here
     }
 }
@@ -131,16 +128,12 @@ void CSketcherDoc::InitializeSearchContent()
 
 void CSketcherDoc::SetSearchContent(const CString& value)
 {
-    if (value.IsEmpty())
-    {
+    if (value.IsEmpty()) {
         RemoveChunk(PKEY_Search_Contents.fmtid, PKEY_Search_Contents.pid);
-    }
-    else
-    {
+    } else {
         CMFCFilterChunkValueImpl *pChunk = NULL;
         ATLTRY(pChunk = new CMFCFilterChunkValueImpl);
-        if (pChunk != NULL)
-        {
+        if (pChunk != NULL) {
             pChunk->SetTextValue(PKEY_Search_Contents, value, CHUNK_TEXT);
             SetChunkValue(pChunk);
         }
@@ -219,65 +212,64 @@ void CSketcherDoc::OnElementCurve()
 void CSketcherDoc::OnUpdateColorBlack(CCmdUI *pCmdUI)
 {
     // Set menu item Checked if the current color is black
-    pCmdUI->SetCheck(m_Color==BLACK);
+    pCmdUI->SetCheck(m_Color == BLACK);
 }
 
 
 void CSketcherDoc::OnUpdateColorRed(CCmdUI *pCmdUI)
 {
     // Set menu item Checked if the current color is red
-    pCmdUI->SetCheck(m_Color==RED);
+    pCmdUI->SetCheck(m_Color == RED);
 }
 
 
 void CSketcherDoc::OnUpdateColorGreen(CCmdUI *pCmdUI)
 {
     // Set menu item Checked if the current color is green
-    pCmdUI->SetCheck(m_Color==GREEN);
+    pCmdUI->SetCheck(m_Color == GREEN);
 }
 
 
 void CSketcherDoc::OnUpdateColorBlue(CCmdUI *pCmdUI)
 {
     // Set menu item Checked if the current color is blue
-    pCmdUI->SetCheck(m_Color==BLUE);
+    pCmdUI->SetCheck(m_Color == BLUE);
 }
 
 
 void CSketcherDoc::OnUpdateElementLine(CCmdUI *pCmdUI)
 {
     // Set Checked if the current element is a line
-    pCmdUI->SetCheck(m_Element==LINE);
+    pCmdUI->SetCheck(m_Element == LINE);
 }
 
 
 void CSketcherDoc::OnUpdateElementRectangle(CCmdUI *pCmdUI)
 {
     // Set Checked if the current element is a rectangle
-    pCmdUI->SetCheck(m_Element==RECTANGLE);
+    pCmdUI->SetCheck(m_Element == RECTANGLE);
 }
 
 
 void CSketcherDoc::OnUpdateElementCircle(CCmdUI *pCmdUI)
 {
     // Set Checked if the current element is a circle
-    pCmdUI->SetCheck(m_Element==CIRCLE);
+    pCmdUI->SetCheck(m_Element == CIRCLE);
 }
 
 
 void CSketcherDoc::OnUpdateElementCurve(CCmdUI *pCmdUI)
 {
     // Set Checked if the current element is a curve
-    pCmdUI->SetCheck(m_Element==CURVE);
+    pCmdUI->SetCheck(m_Element == CURVE);
 }
 
 
 // Finds the element under the point
 CElement* CSketcherDoc::FindElement(const CPoint& point) const
 {
-    for(auto rIter = m_ElementList.rbegin() ; rIter != m_ElementList.rend() ; ++rIter)
-    {
-        if((*rIter)->GetBoundRect().PtInRect(point))
+    for (auto rIter = m_ElementList.rbegin() ; rIter != m_ElementList.rend() ; ++rIter) {
+        if ((*rIter)->GetBoundRect().PtInRect(point))
             return *rIter;
     }
     return NULL;
@@ -286,8 +278,7 @@ CElement* CSketcherDoc::FindElement(const CPoint& point) const
 // Delete an element from the sketch
 void CSketcherDoc::DeleteElement(CElement* pElement)
 {
-    if(pElement)
-    {
+    if (pElement) {
         m_ElementList.remove(pElement);    // Remove the pointer from the list
         delete pElement;                   // Delete the element from the heap
     }
@@ -296,8 +287,7 @@ void CSketcherDoc::DeleteElement(CElement* pElement)
 // Move the element to the beginning of the list
 void CSketcherDoc::SendToBack(CElement* pElement)
 {
-    if(pElement)
-    {
+    if (pElement) {
         m_ElementList.remove(pElement);     // Remove the element from the list
         m_ElementList.push_front(pElement);  // Put it back at the beginning of the list
     }
@@ -313,8 +303,7 @@ void CSketcherDoc::OnPenWidth()
 
     // Display the dialog as modal
     // When closed with OK, get the pen width
-    if(aDlg.DoModal() == IDOK)
-    {
+    if (aDlg.DoModal() == IDOK) {
         m_PenWidth = aDlg.m_PenWidth;
     }
 }

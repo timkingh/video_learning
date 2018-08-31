@@ -12,7 +12,7 @@ int main()
 {
     const int max(10);
 
-    for(long i = 0L, power = 1L ; i <= max ; i++, power += power)
+    for (long i = 0L, power = 1L ; i <= max ; i++, power += power)
         cout << endl
              << setw(10) << i << setw(10) << power;     // Loop statement
 

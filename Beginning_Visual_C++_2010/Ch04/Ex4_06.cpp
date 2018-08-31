@@ -11,7 +11,7 @@ int main()
     char* pstr2("Hopalong Cassidy");
     char* pstr3("Lassie");
     char* pstr4("Slim Pickens");
-    char* pstr5 ("Boris Karloff");
+    char* pstr5("Boris Karloff");
     char* pstr6("Oliver Hardy");
     char* pstr("Your lucky star is ");
 
@@ -23,8 +23,7 @@ int main()
     cin >> dice;
 
     cout << endl;
-    switch(dice)
-    {
+    switch (dice) {
     case 1:
         cout << pstr << pstr1;
         break;

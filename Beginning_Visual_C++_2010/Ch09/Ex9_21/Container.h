@@ -3,17 +3,16 @@
 using namespace System;
 
 // Abstract base class for specific containers
-ref class Container abstract      
+ref class Container abstract
 {
-  public:
+public:
     // Function for calculating a volume - no content
     // This is defined as an 'abstract' virtual function,
     // indicated by the 'abstract' keyword
-     virtual double Volume() abstract;
+    virtual double Volume() abstract;
 
     // Function to display a volume
-    virtual void ShowVolume() 
-    {
-      Console::WriteLine(L"Volume is {0}", Volume());
+    virtual void ShowVolume() {
+        Console::WriteLine(L"Volume is {0}", Volume());
     }
 };

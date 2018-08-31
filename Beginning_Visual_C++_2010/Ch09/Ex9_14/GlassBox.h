@@ -4,12 +4,12 @@
 
 ref class GlassBox : Box               // Derived class
 {
-  public:
-   // Function to calculate volume of a GlassBox
-   // allowing 15% for packing
-   virtual double Volume() override 
-   { return 0.85*m_Length*m_Width*m_Height; }
+public:
+    // Function to calculate volume of a GlassBox
+    // allowing 15% for packing
+    virtual double Volume() override
+    { return 0.85 * m_Length * m_Width * m_Height; }
 
     // Constructor
-    GlassBox(double lv, double wv, double hv): Box(lv, wv, hv){}
+    GlassBox(double lv, double wv, double hv): Box(lv, wv, hv) {}
 };

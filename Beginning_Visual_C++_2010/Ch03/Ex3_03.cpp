@@ -14,8 +14,8 @@ int main()
          << "Enter a character: ";
     cin >> letter;
 
-    if(((letter >= 'A') && (letter <= 'Z')) ||
-            ((letter >= 'a') && (letter <= 'z')))         // Test for alphabetic
+    if (((letter >= 'A') && (letter <= 'Z')) ||
+        ((letter >= 'a') && (letter <= 'z')))         // Test for alphabetic
         cout << endl
              << "You entered a letter." << endl;
     else

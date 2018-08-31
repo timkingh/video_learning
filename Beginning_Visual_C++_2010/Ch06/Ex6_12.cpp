@@ -19,14 +19,13 @@ int main(array<System::String ^> ^args)
     Console::WriteLine(L"Welcome to your friendly calculator.");
     Console::WriteLine(L"Enter an expression, or an empty line to quit.");
 
-    for(;;)
-    {
+    for (;;) {
         buffer = eatspaces(Console::ReadLine());         // Read an input line
 
-        if(String::IsNullOrEmpty(buffer))                // Empty line ends calculator
+        if (String::IsNullOrEmpty(buffer))               // Empty line ends calculator
             return 0;
 
-        Console::WriteLine(L"  = {0}\n\n",expr(buffer)); // Output value of expression
+        Console::WriteLine(L"  = {0}\n\n", expr(buffer)); // Output value of expression
     }
     return 0;
 }
@@ -44,10 +43,8 @@ double expr(String^ str)
 
     double value(term(str, index));      // Get first term
 
-    while(*index < str->Length)
-    {
-        switch(str[*index])                // Choose action based on current character
-        {
+    while (*index < str->Length) {
+        switch (str[*index]) {             // Choose action based on current character
         case '+':                        // + found so
             ++(*index);                   // increment index and add
             value += term(str, index);    // the next term
@@ -72,19 +69,14 @@ double term(String^ str, int^ index)
     double value(number(str, index));         // Get the first number in the term
 
     // Loop as long as we have characters and a good operator
-    while(*index < str->Length)
-    {
-        if(L'*' == str[*index])                 // If it's multiply,
-        {
+    while (*index < str->Length) {
+        if (L'*' == str[*index]) {              // If it's multiply,
             ++(*index);                           // increment index and
             value *= number(str, index);          // multiply by next number
-        }
-        else if(L'/' == str[*index])            // If it's divide
-        {
+        } else if (L'/' == str[*index]) {       // If it's divide
             ++(*index);                           // increment index and
             value /= number(str, index);          // divide by next number
-        }
-        else
+        } else
             break;                                // Exit the loop
     }
     // We've finished, so return what we've got
@@ -97,39 +89,35 @@ double number(String^ str, int^ index)
     double value(0.0);                        // Store for the resulting value
 
     // Check for expression between parentheses
-    if(L'(' == str[*index])                   // Start of parentheses
-    {
+    if (L'(' == str[*index]) {                // Start of parentheses
         ++(*index);
         String^ substr(extract(str, index));    // Extract substring in brackets
         return expr(substr);                    // Return substring value
     }
 
     // There must be at least one digit...
-    if(!Char::IsDigit(str, *index))
-    {
+    if (!Char::IsDigit(str, *index)) {
         Console::WriteLine(L"Arrrgh!*#!! There's an error.\n");
         exit(1);
     }
 
     // Loop accumulating leading digits
-    while((*index < str->Length) && Char::IsDigit(str, *index))
-    {
-        value = 10.0*value + Char::GetNumericValue(str[(*index)]);
+    while ((*index < str->Length) && Char::IsDigit(str, *index)) {
+        value = 10.0 * value + Char::GetNumericValue(str[(*index)]);
         ++(*index);
     }
 
     // Not a digit when we get to here
-    if((*index == str->Length) || str[*index] != '.')   // so check for decimal point
+    if ((*index == str->Length) || str[*index] != '.')  // so check for decimal point
         return value;                                     // and if not, return value
 
     double factor(1.0);                  // Factor for decimal places
     ++(*index);                          // Move to digit
 
     // Loop as long as we have digits
-    while((*index < str->Length) && Char::IsDigit(str, *index))
-    {
+    while ((*index < str->Length) && Char::IsDigit(str, *index)) {
         factor *= 0.1;                     // Decrease factor by factor of 10
-        value = value + Char::GetNumericValue(str[*index])*factor; // Add decimal place
+        value = value + Char::GetNumericValue(str[*index]) * factor; // Add decimal place
         ++(*index);
     }
 
@@ -142,12 +130,10 @@ String^ extract(String^ str, int^ index)
     int numL(0);
     int bufindex(*index);
 
-    while(*index < str->Length)
-    {
-        switch(str[*index])
-        {
+    while (*index < str->Length) {
+        switch (str[*index]) {
         case ')':
-            if(0 == numL)
+            if (0 == numL)
                 return str->Substring(bufindex, (*index)++ - bufindex);
             else
                 numL--;

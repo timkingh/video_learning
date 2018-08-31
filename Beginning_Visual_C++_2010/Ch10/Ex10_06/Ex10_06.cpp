@@ -16,7 +16,7 @@ using std::greater;
 template <class T>
 void listlist(list<T>& data)
 {
-    for(list<T>::iterator iter = data.begin() ; iter != data.end() ; iter++)
+    for (list<T>::iterator iter = data.begin() ; iter != data.end() ; iter++)
         cout << *iter << "  ";
     cout << endl;
 }
@@ -26,7 +26,7 @@ template<class T>
 void loadlist(list<T>& data)
 {
     T value = T();
-    while(cin >> value , value != T())  //Read non-zero values
+    while (cin >> value , value != T()) //Read non-zero values
         data.push_back(value);
 }
 

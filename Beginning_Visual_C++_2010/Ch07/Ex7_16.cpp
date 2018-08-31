@@ -14,12 +14,11 @@ private:
     int inches;
 
     literal int inchesPerFoot = 12;
-    literal double inchesToMeters = 2.54/100;
+    literal double inchesToMeters = 2.54 / 100;
 
 public:
     // Create a height from inches value
-    Height(int ins)
-    {
+    Height(int ins) {
         feet = ins / inchesPerFoot;
         inches = ins % inchesPerFoot;
     }
@@ -28,21 +27,18 @@ public:
     Height(int ft, int ins) : feet(ft), inches(ins) {}
 
     // The height in meters
-    property double meters                         // Scalar property
-    {
+    property double meters {                       // Scalar property
         // Returns the property value
-        double get()
-        {
-            return inchesToMeters*(feet*inchesPerFoot+inches);
+        double get() {
+            return inchesToMeters * (feet * inchesPerFoot + inches);
         }
 
         // You would define the set() function for the property here...
     }
 
     // Create a string representation of the object
-    virtual  String^ ToString() override
-    {
-        return feet + L" feet "+ inches + L" inches";
+    virtual  String^ ToString() override {
+        return feet + L" feet " + inches + L" inches";
     }
 };
 
@@ -54,17 +50,15 @@ private:
     int oz;
 
     literal int ouncesPerPound = 16;
-    literal double lbsToKg = 1.0/2.2;
+    literal double lbsToKg = 1.0 / 2.2;
 
 public:
-    Weight(int pounds, int ounces)
-    {
+    Weight(int pounds, int ounces) {
         lbs = pounds;
         oz = ounces;
     }
 
-    property int pounds                            // Scalar property
-    {
+    property int pounds {                          // Scalar property
         int get() {
             return lbs;
         }
@@ -73,8 +67,7 @@ public:
         }
     }
 
-    property int ounces                            // Scalar property
-    {
+    property int ounces {                          // Scalar property
         int get() {
             return oz;
         }
@@ -83,15 +76,13 @@ public:
         }
     }
 
-    property double kilograms                      // Scalar property
-    {
+    property double kilograms {                    // Scalar property
         double get() {
-            return lbsToKg*(lbs + oz/ouncesPerPound);
+            return lbsToKg * (lbs + oz / ouncesPerPound);
         }
     }
 
-    virtual String^ ToString() override
-    {
+    virtual String^ ToString() override {
         return lbs + L" pounds " + oz + L" ounces";
     }
 };
@@ -105,20 +96,17 @@ private:
 
 public:
     property String^ Name;                         // Trivial scalar property
-    Person(String^ name, Height h, Weight w) : ht(h), wt(w)
-    {
+    Person(String^ name, Height h, Weight w) : ht(h), wt(w) {
         Name = name;
     }
 
-    property Height height
-    {
+    property Height height {
         Height get() {
             return ht;
         }
     }
 
-    property Weight weight
-    {
+    property Weight weight {
         Weight get() {
             return wt;
         }
@@ -139,11 +127,11 @@ int main(array<System::String ^> ^args)
     Console::WriteLine(L"Her weight is {0:F2} kilograms.",
                        her->weight.kilograms);
     Console::WriteLine(L"Her height is {0} which is {1:F2} meters.",
-                       her->height,her->height.meters);
+                       her->height, her->height.meters);
 
     Console::WriteLine(L"He is {0}", him->Name);
     Console::WriteLine(L"His weight is {0}.", him->weight);
     Console::WriteLine(L"His height is {0} which is {1:F2} meters.",
-                       him->height,him->height.meters);
+                       him->height, him->height.meters);
     return 0;
 }

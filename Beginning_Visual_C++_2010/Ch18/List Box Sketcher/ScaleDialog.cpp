@@ -42,8 +42,7 @@ BOOL CScaleDialog::OnInitDialog()
 
     CListBox* pListBox = static_cast<CListBox*>(GetDlgItem(IDC_SCALE_LIST));
     CString scaleStr;
-    for(int i = 1 ; i <= 8 ; ++i)
-    {
+    for (int i = 1 ; i <= 8 ; ++i) {
         scaleStr.Format(_T("Scale %d"), i);
         pListBox->AddString(scaleStr);
     }

@@ -9,10 +9,9 @@ using namespace System::Diagnostics;
 public ref class TraceTest
 {
 public:
-    TraceTest(int n):value(n) {}
+    TraceTest(int n): value(n) {}
 
-    property TraceLevel Level
-    {
+    property TraceLevel Level {
         void set(TraceLevel level) {
             sw->Level = level;
         }
@@ -21,34 +20,31 @@ public:
         }
     }
 
-    void FunA()
-    {
+    void FunA() {
         ++value;
         Trace::Indent();
         Trace::WriteLine(L"Starting FunA");
-        if(sw->TraceInfo)
+        if (sw->TraceInfo)
             Debug::WriteLine(L"FunA working...");
         FunB();
         Trace::WriteLine(L"Ending FunA");
         Trace::Unindent();
     }
 
-    void FunB()
-    {
+    void FunB() {
         Trace::Indent();
         Trace::WriteLine(L"Starting FunB");
-        if(sw->TraceWarning)
+        if (sw->TraceWarning)
             Debug::WriteLine(L"FunB warning...");
         FunC();
         Trace::WriteLine(L"Ending FunB");
         Trace::Unindent();
     }
 
-    void FunC()
-    {
+    void FunC() {
         Trace::Indent();
         Trace::WriteLine(L"Starting FunC");
-        if(sw->TraceError)
+        if (sw->TraceError)
             Debug::WriteLine(L"FunC error...");
         Debug::Assert(value < 4);
         Trace::WriteLine(L"Ending FunC");
@@ -63,19 +59,18 @@ private:
 int main(array<System::String ^> ^args)
 {
     // Direct output to the command line
-    TextWriterTraceListener^ listener = gcnew TextWriterTraceListener( Console::Out);
+    TextWriterTraceListener^ listener = gcnew TextWriterTraceListener(Console::Out);
     Debug::Listeners->Add(listener);
 
     Debug::IndentSize = 2;              // Set the indent size
 
     array<TraceLevel>^ levels = { TraceLevel::Off,     TraceLevel::Error,
-                                  TraceLevel::Warning ,TraceLevel::Verbose
+                                  TraceLevel::Warning , TraceLevel::Verbose
                                 };
     TraceTest^ obj = gcnew TraceTest(0);
 
     Console::WriteLine(L"Starting trace and debug test...");
-    for each(TraceLevel level in levels)
-    {
+    for each(TraceLevel level in levels) {
         obj->Level = level;                // Set level for messages
         Console::WriteLine(L"\nTrace level is {0}", obj->Level);
         obj->FunA();

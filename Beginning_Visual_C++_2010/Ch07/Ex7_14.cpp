@@ -15,10 +15,9 @@ private:
 
 public:
     // Create a height from inches value
-    Height(int ins)
-    {
-        feet = ins/12;
-        inches = ins%12;
+    Height(int ins) {
+        feet = ins / 12;
+        inches = ins % 12;
     }
 
     // Create a height from feet and inches
@@ -27,7 +26,7 @@ public:
 
 int main(array<System::String ^> ^args)
 {
-    Height myHeight(Height(6,3));
+    Height myHeight(Height(6, 3));
     Height^ yourHeight(Height(70));
     Height hisHeight(*yourHeight);
 

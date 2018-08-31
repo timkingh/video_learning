@@ -8,66 +8,59 @@ using std::endl;
 
 class Person
 {
-  public:
-  // Constructor, includes no-arg constructor
-  Person(const char* first = "John", const char* second = "Doe")
-  {
-    initName(first, second);
-  }
-    
-  // Copy constructor
-  Person(const Person& p)
-  {
-    initName(p.firstname, p.secondname);
-  }
+public:
+    // Constructor, includes no-arg constructor
+    Person(const char* first = "John", const char* second = "Doe") {
+        initName(first, second);
+    }
 
-  // Destructor
-  ~Person()
-  {
-    delete[] firstname;
-    delete[] secondname;
-  }
+    // Copy constructor
+    Person(const Person& p) {
+        initName(p.firstname, p.secondname);
+    }
 
-  // Assignment operator
-  Person& operator=(const Person& p)
-  {
-    // Deal with p = p assignment situation
-    if(&p == this)
-      return *this;
+    // Destructor
+    ~Person() {
+        delete[] firstname;
+        delete[] secondname;
+    }
 
-    delete[] firstname;
-    delete[] secondname;
-    initName(p.firstname, p.secondname);
-    return *this;
-  }
+    // Assignment operator
+    Person& operator=(const Person& p) {
+        // Deal with p = p assignment situation
+        if (&p == this)
+            return *this;
 
-  // Less-than operator
-  bool operator<(const Person& p)
-  {
-    int result(strcmp(secondname, p.secondname));
-    if(result < 0 || result ==  0 && strcmp(firstname, p.firstname) < 0)
-      return true;
-    return false;
-  }
+        delete[] firstname;
+        delete[] secondname;
+        initName(p.firstname, p.secondname);
+        return *this;
+    }
 
-  // Output a person
-  void showPerson() const
-  {
-    cout << firstname << " " << secondname << endl;
-  }
+    // Less-than operator
+    bool operator<(const Person& p) {
+        int result(strcmp(secondname, p.secondname));
+        if (result < 0 || result ==  0 && strcmp(firstname, p.firstname) < 0)
+            return true;
+        return false;
+    }
 
-  private:
-  char* firstname;
-  char* secondname;
+    // Output a person
+    void showPerson() const {
+        cout << firstname << " " << secondname << endl;
+    }
 
-  // Private helper function to avoid codde duplication
-  void initName(const char* first, const char* second)
-  {
-    size_t length(strlen(first)+1);
-    firstname = new char[length];
-    strcpy_s(firstname, length, first);
-    length = strlen(second)+1;
-    secondname = new char[length];
-    strcpy_s(secondname, length, second);
-  }
+private:
+    char* firstname;
+    char* secondname;
+
+    // Private helper function to avoid codde duplication
+    void initName(const char* first, const char* second) {
+        size_t length(strlen(first) + 1);
+        firstname = new char[length];
+        strcpy_s(firstname, length, first);
+        length = strlen(second) + 1;
+        secondname = new char[length];
+        strcpy_s(secondname, length, second);
+    }
 };

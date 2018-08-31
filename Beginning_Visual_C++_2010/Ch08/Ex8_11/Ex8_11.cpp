@@ -13,13 +13,13 @@ int main()
     CBox carton(30.0, 18.0, 18.0);         // Carton definition
 
     // Calculate candies per candy box
-    int numCandies = candyBox/candy;
+    int numCandies = candyBox / candy;
 
     // Calculate candy boxes per carton
-    int numCboxes = carton/candyBox;
+    int numCboxes = carton / candyBox;
 
     // Calculate wasted carton space
-    double space = carton%candyBox;
+    double space = carton % candyBox;
 
     cout << endl << "There are " << numCandies << " candies per candy box" << endl
          << "For the standard boxes there are " << numCboxes
@@ -29,17 +29,14 @@ int main()
     cout << endl << endl << "CUSTOM CANDY BOX ANALYSIS (No Waste)";
 
     // Try the whole range of custom candy boxes
-    for(double length = 3.0 ; length <= 7.5 ; length += 0.5)
-    {
-        for(double width = 3.0 ; width <= 5.0 ; width += 0.5)
-        {
-            for(double height = 1.0 ; height <= 2.5 ; height += 0.5)
-            {
+    for (double length = 3.0 ; length <= 7.5 ; length += 0.5) {
+        for (double width = 3.0 ; width <= 5.0 ; width += 0.5) {
+            for (double height = 1.0 ; height <= 2.5 ; height += 0.5) {
                 // Create new box each cycle
                 CBox tryBox(length, width, height);
 
-                if(carton%tryBox < tryBox.Volume() &&
-                        tryBox % candy == 0.0 && tryBox/candy >= 30)
+                if (carton % tryBox < tryBox.Volume() &&
+                    tryBox % candy == 0.0 && tryBox / candy >= 30)
                     cout << endl << endl
                          << "Trial Box L = " << tryBox.GetLength()
                          << " W = " << tryBox.GetWidth()

@@ -12,7 +12,7 @@ int main(array<System::String ^> ^args)
     interior_ptr<double> pstart(&data[0]);
     interior_ptr<double> pend(&data[data->Length - 1]);
     double sum(0.0);
-    while(pstart <= pend)
+    while (pstart <= pend)
         sum += *pstart++;
 
     Console::WriteLine(L"Total of data array elements = {0}\n", sum);
@@ -24,8 +24,8 @@ int main(array<System::String ^> ^args)
                                 L"Never throw into the wind!"
                               };
 
-    for(interior_ptr<String^> pstrings = &strings[0] ;
-            pstrings-&strings[0] < strings->Length ; ++pstrings)
+    for (interior_ptr<String^> pstrings = &strings[0] ;
+         pstrings - &strings[0] < strings->Length ; ++pstrings)
         Console::WriteLine(*pstrings);
 
     return 0;

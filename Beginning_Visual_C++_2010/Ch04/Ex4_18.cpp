@@ -16,22 +16,20 @@ int main(array<System::String ^> ^args)
 
     // Find the length of the maximum length value string
     int maxLength(0);                    // Holds the maximum length found
-    for each(int value in values)
-    {
+    for each(int value in values) {
         number = L"" + value;               // Create string from value
-        if(maxLength<number->Length)
+        if (maxLength < number->Length)
             maxLength = number->Length;
     }
 
     // Create the format string to be used for output
-    String^ format(formatStr1 + (maxLength+1) + formatStr2);
+    String^ format(formatStr1 + (maxLength + 1) + formatStr2);
 
     // Output the values
     int numberPerLine(3);
-    for(int i = 0 ; i< values->Length ; i++)
-    {
+    for (int i = 0 ; i < values->Length ; i++) {
         Console::Write(format, values[i]);
-        if((i+1)%numberPerLine == 0)
+        if ((i + 1) % numberPerLine == 0)
             Console::WriteLine();
     }
     return 0;

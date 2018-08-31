@@ -5,20 +5,20 @@
 
 class CTextDialog : public CDialog
 {
-	DECLARE_DYNAMIC(CTextDialog)
+    DECLARE_DYNAMIC(CTextDialog)
 
 public:
-	CTextDialog(CWnd* pParent = NULL);   // standard constructor
-	virtual ~CTextDialog();
+    CTextDialog(CWnd* pParent = NULL);   // standard constructor
+    virtual ~CTextDialog();
 
 // Dialog Data
-	enum { IDD = IDD_TEXT_DLG };
+    enum { IDD = IDD_TEXT_DLG };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+    virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
-	DECLARE_MESSAGE_MAP()
+    DECLARE_MESSAGE_MAP()
 public:
-  // Stores the text string that is entered
-  CString m_TextString;
+    // Stores the text string that is entered
+    CString m_TextString;
 };

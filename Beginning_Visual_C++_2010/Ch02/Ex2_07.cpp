@@ -6,14 +6,16 @@ using std::cout;
 using std::endl;
 
 int main()
-{   // Function scope starts here
+{
+    // Function scope starts here
     int count1 = 10;
     int count3 = 50;
     cout << endl
          << "Value of outer count1 = " << count1
          << endl;
 
-    {   // New scope starts here...
+    {
+        // New scope starts here...
         int count1 = 20;              // This hides the outer count1
         int count2 = 30;
         cout << "Value of inner count1 = " << count1

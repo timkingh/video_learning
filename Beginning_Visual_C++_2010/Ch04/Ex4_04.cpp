@@ -21,7 +21,7 @@ int main()
          << "Enter a number between 1 and 6: ";
     cin >> dice;
 
-    if(dice >= 1 && dice <= 6)                  // Check input validity
+    if (dice >= 1 && dice <= 6)                 // Check input validity
         cout << endl                             // Output star name
              << "Your lucky star is " << stars[dice - 1];
     else

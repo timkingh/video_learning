@@ -6,7 +6,7 @@
 using std::cout;
 using std::endl;
 
-const double PI= 3.14159265;           // Global definition for PI
+const double PI = 3.14159265;          // Global definition for PI
 
 int main(void)
 {

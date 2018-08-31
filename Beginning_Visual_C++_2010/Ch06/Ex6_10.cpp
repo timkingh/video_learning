@@ -25,12 +25,11 @@ int main()
          << "Enter an expression, or an empty line to quit."
          << endl;
 
-    for(;;)
-    {
+    for (;;) {
         cin.getline(buffer, sizeof buffer);   // Read an input line
         eatspaces(buffer);                    // Remove blanks from input
 
-        if(!buffer[0])                        // Empty line ends calculator
+        if (!buffer[0])                       // Empty line ends calculator
             return 0;
 
         cout << "\t= " << expr(buffer)        // Output value of expression
@@ -45,9 +44,9 @@ void eatspaces(char* str)
     int i(0);                              // 'Copy to' index to string
     int j(0);                              // 'Copy from' index to string
 
-    while((*(str + i) = *(str + j++)) != '\0')  // Loop while character
+    while ((*(str + i) = *(str + j++)) != '\0') // Loop while character
         // copied is not \0
-        if(*(str + i) != ' ')                    // Increment i as long as
+        if (*(str + i) != ' ')                   // Increment i as long as
             i++;                                  // character is not a space
     return;
 }
@@ -60,10 +59,8 @@ double expr(char* str)
 
     value = term(str, index);            // Get first term
 
-    for(;;)                              // Indefinite loop, all exits inside
-    {
-        switch(*(str + index++))           // Choose action based on current character
-        {
+    for (;;) {                           // Indefinite loop, all exits inside
+        switch (*(str + index++)) {        // Choose action based on current character
         case '\0':                       // We're at the end of the string
             return value;                 // so return what we have got
 
@@ -93,13 +90,12 @@ double term(char* str, int& index)
     value = number(str, index);          // Get the first number in the term
 
     // Loop as long as we have a good operator
-    while(true)
-    {
+    while (true) {
 
-        if(*(str + index) == '*')          // If it's multiply,
+        if (*(str + index) == '*')         // If it's multiply,
             value *= number(str, ++index);   // multiply by next number
 
-        else if(*(str + index) == '/')     // If it's divide,
+        else if (*(str + index) == '/')    // If it's divide,
             value /= number(str, ++index);   // divide by next number
         else
             break;
@@ -114,26 +110,25 @@ double number(char* str, int& index)
     double value(0.0);                  // Store the resulting value
 
     // There must be at least one digit...
-    if(!isdigit(*(str + index)))
-    {   // There's no digits so input is junk...
+    if (!isdigit(*(str + index))) {
+        // There's no digits so input is junk...
         cout << endl
              << "Arrrgh!*#!! There's an error"
              << endl;
         exit(1);
     }
 
-    while(isdigit(*(str + index)))       // Loop accumulating leading digits
-        value = 10*value + (*(str + index++) - '0');
+    while (isdigit(*(str + index)))      // Loop accumulating leading digits
+        value = 10 * value + (*(str + index++) - '0');
 
     // Not a digit when we get to here
-    if(*(str + index) != '.')            // so check for decimal point
+    if (*(str + index) != '.')           // so check for decimal point
         return value;                      // and if not, return value
 
     double factor(1.0);                  // Factor for decimal places
-    while(isdigit(*(str + (++index))))   // Loop as long as we have digits
-    {
+    while (isdigit(*(str + (++index)))) { // Loop as long as we have digits
         factor *= 0.1;                     // Decrease factor by factor of 10
-        value = value + (*(str + index) - '0')*factor;   // Add decimal place
+        value = value + (*(str + index) - '0') * factor; // Add decimal place
     }
 
     return value;                        // On loop exit we are done

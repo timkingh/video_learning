@@ -8,8 +8,7 @@ class CBox                             // Class definition at global scope
 {
 public:
     // Constructor definition
-    explicit CBox(double lv = 1.0, double bv = 1.0, double hv = 1.0)
-    {
+    explicit CBox(double lv = 1.0, double bv = 1.0, double hv = 1.0) {
         cout << endl << "Constructor called.";
         m_Length = lv;                   // Set values of
         m_Width = bv;                    // data members
@@ -17,16 +16,14 @@ public:
     }
 
     // Function to calculate the volume of a box
-    double Volume() const
-    {
-        return m_Length*m_Width*m_Height;
+    double Volume() const {
+        return m_Length * m_Width * m_Height;
     }
 
     // Function to compare two boxes which returns true
     // if the first is greater that the second, and false otherwise
-    bool Compare(CBox* pBox) const
-    {
-        if(!pBox)
+    bool Compare(CBox* pBox) const {
+        if (!pBox)
             return 0;
         return this->Volume() > pBox->Volume();
     }
@@ -52,7 +49,7 @@ int main()
          << pB1->Volume();                    // Volume of object pointed to
 
     pB2 = &match;
-    if(pB2->Compare(pB1))                     // Compare via pointers
+    if (pB2->Compare(pB1))                    // Compare via pointers
         cout << endl
              << "match is greater than cigar";
     else

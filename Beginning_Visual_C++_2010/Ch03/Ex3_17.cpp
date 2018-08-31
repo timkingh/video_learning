@@ -11,13 +11,10 @@ int main(array<System::String ^> ^args)
     int vowels(0), consonants(0);
     String^ proverb(L"A nod is as good as a wink to a blind horse.");
 
-    for each(wchar_t ch in proverb)
-    {
-        if(Char::IsLetter(ch))
-        {
+    for each(wchar_t ch in proverb) {
+        if (Char::IsLetter(ch)) {
             ch = Char::ToLower(ch);      // Convert to lowercase
-            switch(ch)
-            {
+            switch (ch) {
             case 'a':
             case 'e':
             case 'i':

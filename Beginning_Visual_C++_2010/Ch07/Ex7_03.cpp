@@ -12,9 +12,8 @@ public:
     double m_Height;                   // Height of a box in inches
 
     // Function to calculate the volume of a box
-    double Volume()
-    {
-        return m_Length*m_Width*m_Height;
+    double Volume() {
+        return m_Length * m_Width * m_Height;
     }
 };
 
@@ -30,8 +29,8 @@ int main()
     box1.m_Width = 24.0;                 // the object box1
 
     box2.m_Height = box1.m_Height - 10;  // Define box2
-    box2.m_Length = box1.m_Length/2.0;   // members in
-    box2.m_Width = 0.25*box1.m_Length;   // terms of box1
+    box2.m_Length = box1.m_Length / 2.0; // members in
+    box2.m_Width = 0.25 * box1.m_Length; // terms of box1
 
     boxVolume = box1.Volume();           // Calculate volume of box1
     cout << endl

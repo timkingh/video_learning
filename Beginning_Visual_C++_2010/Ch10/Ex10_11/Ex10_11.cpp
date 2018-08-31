@@ -42,10 +42,9 @@ void addEntry(map<Person, string>& book)
     auto entry = make_pair(person, number);
     auto pr = book.insert(entry);
 
-    if(pr.second)
+    if (pr.second)
         cout << "Entry successful." << endl;
-    else
-    {
+    else {
         cout << "Entry exists for " << person.getName()
              << ". The number is " << pr.first->second << endl;
     }
@@ -54,15 +53,13 @@ void addEntry(map<Person, string>& book)
 // List the contents of a phone book
 void listEntries(map<Person, string>& book)
 {
-    if(book.empty())
-    {
+    if (book.empty()) {
         cout << "The phone book is empty." << endl;
         return;
     }
 //  map<Person, string>::iterator iter;
     cout << setiosflags(ios::left);              // Left justify output
-    for(auto iter = book.begin() ; iter != book.end() ; iter++)
-    {
+    for (auto iter = book.begin() ; iter != book.end() ; iter++) {
         cout << setw(30) << iter->first.getName()
              << setw(12) << iter->second << endl;
     }
@@ -74,7 +71,7 @@ void getEntry(map<Person, string>& book)
 {
     Person person = getPerson();
     auto iter = book.find(person);
-    if(iter == book.end())
+    if (iter == book.end())
         cout << "No entry found for " << person.getName() << endl;
     else
         cout << "The number for " << person.getName()
@@ -86,10 +83,9 @@ void deleteEntry(map<Person, string>& book)
 {
     Person person = getPerson();
     map<Person, string>::iterator iter = book.find(person);
-    if(iter == book.end())
+    if (iter == book.end())
         cout << "No entry found for " << person.getName() << endl;
-    else
-    {
+    else {
         book.erase(iter);
         cout << person.getName() << " erased." << endl;
     }
@@ -100,15 +96,13 @@ int main()
     map<Person, string> phonebook;
     char answer = 0;
 
-    while(true)
-    {
+    while (true) {
         cout << "Do you want to enter a phone book entry(Y or N): " ;
         cin >> answer;
         cin.ignore();                      // Ignore newline in buffer
-        if(toupper(answer) == 'N')
+        if (toupper(answer) == 'N')
             break;
-        if(toupper(answer) != 'Y')
-        {
+        if (toupper(answer) != 'Y') {
             cout << "Invalid response. Try again." << endl;
             continue;
         }
@@ -116,16 +110,14 @@ int main()
     }
 
     // Query the phonebook
-    while(true)
-    {
+    while (true) {
         cout << endl << "Choose from the following options:" << endl
              << "A  Add an entry   D Delete an entry   G  Get an entry" << endl
              << "L  List entries   Q  Quit" << endl;
         cin >> answer;
         cin.ignore();                      // Ignore newline in buffer
 
-        switch(toupper(answer))
-        {
+        switch (toupper(answer)) {
         case 'A':
             addEntry(phonebook);
             break;

@@ -18,7 +18,7 @@ int main()
 
     cin.getline(buffer, MAX, '\n');     // Read a string until \n
 
-    while(*pbuffer)                     // Continue until \0
+    while (*pbuffer)                    // Continue until \0
         pbuffer++;
 
     cout << endl

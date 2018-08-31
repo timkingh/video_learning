@@ -14,18 +14,18 @@
 #define MAX_LOADSTRING 100
 
 // Global Variables:
-HINSTANCE hInst;								        // current instance
-TCHAR szTitle[MAX_LOADSTRING];					// The title bar text
-TCHAR szWindowClass[MAX_LOADSTRING];		// the main window class name
+HINSTANCE hInst;                                        // current instance
+TCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
+TCHAR szWindowClass[MAX_LOADSTRING];        // the main window class name
 const size_t MaxIterations(8000);       // Maximum iterations before infinity
 HRTimer timer;                          // Timer object to calculate processor time
 bool parallel(false);                   // True for parallel execution
 
 // Forward declarations of functions included in this code module:
-ATOM				MyRegisterClass(HINSTANCE hInstance);
-BOOL				InitInstance(HINSTANCE, int);
-LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
+ATOM                MyRegisterClass(HINSTANCE hInstance);
+BOOL                InitInstance(HINSTANCE, int);
+LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 size_t IteratePoint(double zReal, double zImaginary, double cReal, double cImaginary);
 COLORREF Color(int n);                             // Selects a pixel color based on n
 void DrawSet(HWND hWnd);                           // Draws the Mandelbrot set
@@ -49,18 +49,15 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
     MyRegisterClass(hInstance);
 
     // Perform application initialization:
-    if (!InitInstance (hInstance, nCmdShow))
-    {
+    if (!InitInstance(hInstance, nCmdShow)) {
         return FALSE;
     }
 
     hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_EX13_05));
 
     // Main message loop:
-    while (GetMessage(&msg, NULL, 0, 0))
-    {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-        {
+    while (GetMessage(&msg, NULL, 0, 0)) {
+        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
@@ -90,17 +87,17 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
     wcex.cbSize = sizeof(WNDCLASSEX);
 
-    wcex.style			= CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc	= WndProc;
-    wcex.cbClsExtra		= 0;
-    wcex.cbWndExtra		= 0;
-    wcex.hInstance		= hInstance;
-    wcex.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_EX13_05));
-    wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
-    wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName	= MAKEINTRESOURCE(IDC_EX13_05);
-    wcex.lpszClassName	= szWindowClass;
-    wcex.hIconSm		= LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+    wcex.style          = CS_HREDRAW | CS_VREDRAW;
+    wcex.lpfnWndProc    = WndProc;
+    wcex.cbClsExtra     = 0;
+    wcex.cbWndExtra     = 0;
+    wcex.hInstance      = hInstance;
+    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_EX13_05));
+    wcex.hCursor        = LoadCursor(NULL, IDC_ARROW);
+    wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW + 1);
+    wcex.lpszMenuName   = MAKEINTRESOURCE(IDC_EX13_05);
+    wcex.lpszClassName  = szWindowClass;
+    wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
     return RegisterClassEx(&wcex);
 }
@@ -124,8 +121,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
                         100, 100, 800, 600, NULL, NULL, hInstance, NULL);
 
-    if (!hWnd)
-    {
+    if (!hWnd) {
         return FALSE;
     }
 
@@ -133,8 +129,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
                                   WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP, 0, 0, 0, 0,
                                   hWnd, (HMENU)IDC_STATUS, GetModuleHandle(NULL), NULL);
     // Set up the panels in the statusbar
-    int statwidths[] = {100,200, -1};
-    SendMessage(hStatus, SB_SETPARTS, sizeof(statwidths)/sizeof(int), (LPARAM)statwidths);
+    int statwidths[] = {100, 200, -1};
+    SendMessage(hStatus, SB_SETPARTS, sizeof(statwidths) / sizeof(int), (LPARAM)statwidths);
     SendMessage(hStatus, SB_SETTEXT, 0, (LPARAM)_T("Processor Time :"));
     SendMessage(hStatus, SB_SETTEXT, 2, (LPARAM)_T(" Right-click for parallel execution"));
 
@@ -149,9 +145,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 //  PURPOSE:  Processes messages for the main window.
 //
-//  WM_COMMAND	- process the application menu
-//  WM_PAINT	- Paint the main window
-//  WM_DESTROY	- post a quit message and return
+//  WM_COMMAND  - process the application menu
+//  WM_PAINT    - Paint the main window
+//  WM_DESTROY  - post a quit message and return
 //
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -160,14 +156,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     PAINTSTRUCT ps;
     HDC hdc;
 
-    switch (message)
-    {
+    switch (message) {
     case WM_COMMAND:
         wmId    = LOWORD(wParam);
         wmEvent = HIWORD(wParam);
         // Parse the menu selections:
-        switch (wmId)
-        {
+        switch (wmId) {
         case IDM_ABOUT:
             DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
             break;
@@ -182,7 +176,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         hdc = BeginPaint(hWnd, &ps);
         // TODO: Add any drawing code here...
         timer.StartTimer();
-        if(parallel)
+        if (parallel)
             DrawSetParallel(hWnd);
         else
             DrawSet(hWnd);
@@ -196,8 +190,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         parallel = !parallel;
         SendMessage(GetDlgItem(hWnd, IDC_STATUS), SB_SETTEXT, 2,
                     (LPARAM)(parallel ? _T(" Right-click for serial execution") : _T(" Right-click for parallel execution")));
-        InvalidateRect (hWnd, NULL, TRUE);
-        UpdateWindow (hWnd);
+        InvalidateRect(hWnd, NULL, TRUE);
+        UpdateWindow(hWnd);
         break;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
@@ -209,14 +203,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     UNREFERENCED_PARAMETER(lParam);
-    switch (message)
-    {
+    switch (message) {
     case WM_INITDIALOG:
         return (INT_PTR)TRUE;
 
     case WM_COMMAND:
-        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-        {
+        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL) {
             EndDialog(hDlg, LOWORD(wParam));
             return (INT_PTR)TRUE;
         }
@@ -230,14 +222,14 @@ size_t IteratePoint(double zReal, double zImaginary, double cReal, double cImagi
 {
     double zReal2(0.0), zImaginary2(0.0); // z components squared
     size_t n(0);
-    for( ; n < MaxIterations ; ++n)       // Iterate equation Zn = Zn-1**2 + K
-    {   // for Mandelbrot K = c and Z0 = c
-        zReal2 = zReal*zReal;
-        zImaginary2 = zImaginary*zImaginary;
-        if(zReal2 + zImaginary2 > 4)        // If distance from origin > 2, point will
+    for (; n < MaxIterations ; ++n) {     // Iterate equation Zn = Zn-1**2 + K
+        // for Mandelbrot K = c and Z0 = c
+        zReal2 = zReal * zReal;
+        zImaginary2 = zImaginary * zImaginary;
+        if (zReal2 + zImaginary2 > 4)       // If distance from origin > 2, point will
             break;                            // go to infinity so we are done
         // Calculate next Z value
-        zImaginary = 2*zReal*zImaginary + cImaginary;
+        zImaginary = 2 * zReal * zImaginary + cImaginary;
         zReal = zReal2 - zImaginary2 + cReal;
     }
     return n;
@@ -246,45 +238,44 @@ size_t IteratePoint(double zReal, double zImaginary, double cReal, double cImagi
 // Select a color based on the value of n
 COLORREF Color(int n)
 {
-    if(n == MaxIterations) return RGB(0, 0, 0);
+    if (n == MaxIterations) return RGB(0, 0, 0);
 
     const int nColors = 16;
-    switch(n%nColors)
-    {
+    switch (n % nColors) {
     case 0:
-        return RGB(100,100,100);
+        return RGB(100, 100, 100);
     case 1:
-        return RGB(100,0,0);
+        return RGB(100, 0, 0);
     case 2:
-        return RGB(200,0,0);
+        return RGB(200, 0, 0);
     case 3:
-        return RGB(100,100,0);
+        return RGB(100, 100, 0);
     case 4:
-        return RGB(200,100,0);
+        return RGB(200, 100, 0);
     case 5:
-        return RGB(200,200,0);
+        return RGB(200, 200, 0);
     case 6:
-        return RGB(0,200,0);
+        return RGB(0, 200, 0);
     case 7:
-        return RGB(0,100,100);
+        return RGB(0, 100, 100);
     case 8:
-        return RGB(0,200,100);
+        return RGB(0, 200, 100);
     case 9:
-        return RGB(0,100,200);
+        return RGB(0, 100, 200);
     case 10:
-        return RGB(0,200,200);
+        return RGB(0, 200, 200);
     case 11:
-        return RGB(0,0,200);
+        return RGB(0, 0, 200);
     case 12:
-        return RGB(100,0,100);
+        return RGB(100, 0, 100);
     case 13:
-        return RGB(200,0,100);
+        return RGB(200, 0, 100);
     case 14:
-        return RGB(100,0,200);
+        return RGB(100, 0, 200);
     case 15:
-        return RGB(200,0,200);
+        return RGB(200, 0, 200);
     default:
-        return RGB(200,200,200);
+        return RGB(200, 200, 200);
     };
 }
 
@@ -309,21 +300,19 @@ void DrawSet(HWND hWnd)
     double imaginaryMax(+1.3);        // Maximum imaginary value
 
     // Set maximum imaginary so axes are the same scale
-    double realMax(realMin+(imaginaryMax-imaginaryMin)*imageWidth/imageHeight);
+    double realMax(realMin + (imaginaryMax - imaginaryMin)*imageWidth / imageHeight);
 
     // Get scale factors to convert pixel coordinates
-    double realScale((realMax-realMin)/(imageWidth-1));
-    double imaginaryScale((imaginaryMax-imaginaryMin)/(imageHeight-1));
+    double realScale((realMax - realMin) / (imageWidth - 1));
+    double imaginaryScale((imaginaryMax - imaginaryMin) / (imageHeight - 1));
 
     double cReal(0.0), cImaginary(0.0);   // Stores c components
     double zReal(0.0), zImaginary(0.0);   // Stores z components
 
-    for(int y = 0 ; y < imageHeight ; ++y)             // Iterate over image rows
-    {
-        zImaginary = cImaginary = imaginaryMax - y*imaginaryScale;
-        for(int x = 0 ; x < imageWidth ; ++x)            // Iterate over pixels in a row
-        {
-            zReal = cReal = realMin + x*realScale;
+    for (int y = 0 ; y < imageHeight ; ++y) {          // Iterate over image rows
+        zImaginary = cImaginary = imaginaryMax - y * imaginaryScale;
+        for (int x = 0 ; x < imageWidth ; ++x) {         // Iterate over pixels in a row
+            zReal = cReal = realMin + x * realScale;
             // Set current pixel color based on n
             SetPixel(memDC, x, 0, Color(IteratePoint(zReal, zImaginary, cReal, cImaginary)));
         }
@@ -362,40 +351,36 @@ void DrawSetParallel(HWND hWnd)
     double imaginaryMax(+1.3);        // Maximum imaginary value
 
     // Set maximum real so axes are the same scale
-    double realMax(realMin+(imaginaryMax-imaginaryMin)*imageWidth/imageHeight);
+    double realMax(realMin + (imaginaryMax - imaginaryMin)*imageWidth / imageHeight);
 
     // Get scale factors to convert pixel coordinates
-    double realScale((realMax-realMin)/(imageWidth-1));
-    double imaginaryScale((imaginaryMax-imaginaryMin)/(imageHeight-1));
+    double realScale((realMax - realMin) / (imageWidth - 1));
+    double imaginaryScale((imaginaryMax - imaginaryMin) / (imageHeight - 1));
 
 
     // Lambda expression to create an image row
-    auto rowCalc = [&] (HDC& memDC, int yLocal)
-    {
+    auto rowCalc = [&](HDC & memDC, int yLocal) {
         double zReal(0.0), cReal(0.0);
-        double zImaginary(imaginaryMax - yLocal*imaginaryScale);
+        double zImaginary(imaginaryMax - yLocal * imaginaryScale);
         double cImaginary(zImaginary);
-        for(int x = 0 ; x < imageWidth ; ++x)            // Iterate over pixels in a row
-        {
-            zReal = cReal = realMin + x*realScale;
+        for (int x = 0 ; x < imageWidth ; ++x) {         // Iterate over pixels in a row
+            zReal = cReal = realMin + x * realScale;
             // Set current pixel color based on n
             SetPixel(memDC, x, 0, Color(IteratePoint(zReal, zImaginary, cReal, cImaginary)));
         }
     };
     Concurrency::task_group taskGroup;
-    for(int y = 1 ; y < imageHeight ; y += 2)             // Iterate over image rows
-    {
-        taskGroup.run([&] {rowCalc(memDC1, y-1);});
+    for (int y = 1 ; y < imageHeight ; y += 2) {          // Iterate over image rows
+        taskGroup.run([&] {rowCalc(memDC1, y - 1);});
         rowCalc(memDC2, y);
         taskGroup.wait();
-        BitBlt(hdc, 0, y-1, imageWidth, 1, memDC1, 0, 0, SRCCOPY);
+        BitBlt(hdc, 0, y - 1, imageWidth, 1, memDC1, 0, 0, SRCCOPY);
         BitBlt(hdc, 0, y, imageWidth, 1, memDC2, 0, 0, SRCCOPY);
     }
     // If there's an odd number of rows, take care of the last one
-    if(imageHeight%2 == 1)
-    {
-        rowCalc(memDC1, imageWidth-1);
-        BitBlt(hdc, 0, imageHeight-1, imageWidth, 1, memDC1, 0, 0, SRCCOPY);
+    if (imageHeight % 2 == 1) {
+        rowCalc(memDC1, imageWidth - 1);
+        BitBlt(hdc, 0, imageHeight - 1, imageWidth, 1, memDC1, 0, 0, SRCCOPY);
     }
 
     SelectObject(memDC1, oldBmp1);

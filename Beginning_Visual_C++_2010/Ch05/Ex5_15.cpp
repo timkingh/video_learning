@@ -12,8 +12,8 @@ int main(void)
     double result(0.0);
 
     // Calculate x raised to powers -3 to +3 inclusive
-    for(int index = -3 ; index<=3 ; index++)
-        cout << x << " to the power " << index << " is " << power(x, index)<< endl;
+    for (int index = -3 ; index <= 3 ; index++)
+        cout << x << " to the power " << index << " is " << power(x, index) << endl;
 
     return 0;
 }
@@ -22,9 +22,9 @@ int main(void)
 // First argument is value, second argument is power index
 double power(double x, int n)
 {
-    if(n < 0)
-        return power(1.0/x, -n);
-    if(n > 0)
-        return x*power(x, n-1);
+    if (n < 0)
+        return power(1.0 / x, -n);
+    if (n > 0)
+        return x * power(x, n - 1);
     return 1.0;
 }

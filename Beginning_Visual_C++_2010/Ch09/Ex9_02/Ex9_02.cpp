@@ -8,7 +8,7 @@ using std::endl;
 
 int main()
 {
-    CBox myBox(4.0,3.0,2.0);                       // Create CBox object
+    CBox myBox(4.0, 3.0, 2.0);                     // Create CBox object
     CCandyBox myCandyBox;
     CCandyBox myMintBox("Wafer Thin Mints");       // Create CCandyBox object
 

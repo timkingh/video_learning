@@ -15,7 +15,7 @@ int main()
          << MAX << " characters:\n";
     cin.getline(buffer, MAX, '\n');    // Read a string until \n
 
-    while(buffer[count] != '\0')       // Increment count as long as
+    while (buffer[count] != '\0')      // Increment count as long as
         count++;                        // the current character is not null
 
     cout << endl

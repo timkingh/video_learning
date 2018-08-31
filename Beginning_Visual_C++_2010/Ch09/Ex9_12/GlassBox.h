@@ -4,7 +4,7 @@
 
 class CGlassBox: public CBox           // Derived class
 {
-  public:
+public:
     // Destructor
     ~CGlassBox()
     { cout << "CGlassBox destructor called" << endl; }
@@ -13,8 +13,8 @@ class CGlassBox: public CBox           // Derived class
     // Function to calculate volume of a CGlassBox
     // allowing 15% for packing
     virtual double Volume() const
-    { return 0.85*m_Length*m_Width*m_Height; }
+    { return 0.85 * m_Length * m_Width * m_Height; }
 
     // Constructor
-    CGlassBox(double lv, double wv, double hv): CBox(lv, wv, hv){}
+    CGlassBox(double lv, double wv, double hv): CBox(lv, wv, hv) {}
 };

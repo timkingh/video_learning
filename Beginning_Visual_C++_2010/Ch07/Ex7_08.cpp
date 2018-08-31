@@ -9,8 +9,7 @@ class CBox                             // Class definition at global scope
 public:
 
     // Constructor definition
-    explicit CBox(double lv = 1.0, double bv = 1.0, double hv = 1.0)
-    {
+    explicit CBox(double lv = 1.0, double bv = 1.0, double hv = 1.0) {
         cout << endl << "Constructor called.";
         m_Length = lv;                   // Set values of
         m_Width = bv;                    // data members
@@ -18,9 +17,8 @@ public:
     }
 
     // Function to calculate the volume of a box
-    double Volume()
-    {
-        return m_Length*m_Width*m_Height;
+    double Volume() {
+        return m_Length * m_Width * m_Height;
     }
 
 private:
@@ -35,9 +33,9 @@ private:
 // friend function to calculate the surface area of a Box object
 double BoxSurface(CBox aBox)
 {
-    return 2.0*(aBox.m_Length*aBox.m_Width +
-                aBox.m_Length*aBox.m_Height +
-                aBox.m_Height*aBox.m_Width);
+    return 2.0 * (aBox.m_Length * aBox.m_Width +
+                  aBox.m_Length * aBox.m_Height +
+                  aBox.m_Height * aBox.m_Width);
 }
 
 int main()

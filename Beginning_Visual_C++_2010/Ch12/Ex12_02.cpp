@@ -3,19 +3,18 @@
 #include <afxwin.h>                        // For the class library
 
 // Application class definition
-class COurApp:public CWinApp
+class COurApp: public CWinApp
 {
 public:
     virtual BOOL InitInstance();
 };
 
 // Window class definition
-class COurWnd:public CFrameWnd
+class COurWnd: public CFrameWnd
 {
 public:
     // Constructor
-    COurWnd()
-    {
+    COurWnd() {
         Create(0, L"Our Dumb MFC Application");
     }
 };

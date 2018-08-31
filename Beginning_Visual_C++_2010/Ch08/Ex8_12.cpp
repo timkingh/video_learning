@@ -12,7 +12,7 @@ using std::getline;
 void listnames(string names[], string ages[], size_t count)
 {
     cout << endl << "The names you entered are: " << endl;
-    for(size_t i = 0 ; i < count && !names[i].empty() ; ++i)
+    for (size_t i = 0 ; i < count && !names[i].empty() ; ++i)
         cout << names[i] + " aged " + ages[i] + '.' << endl;
 }
 
@@ -24,12 +24,10 @@ int main()
     string firstname;
     string secondname;
 
-    for(size_t i = 0 ; i<count ; i++)
-    {
+    for (size_t i = 0 ; i < count ; i++) {
         cout << endl << "Enter a first name or press Enter to end: ";
         getline(cin, firstname, '\n');
-        if(firstname.empty())
-        {
+        if (firstname.empty()) {
             listnames(names, ages, i);
             cout << "Done!!" << endl;
             return 0;

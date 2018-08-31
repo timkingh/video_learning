@@ -6,7 +6,8 @@
 using namespace System;
 
 // Define the enumeration at global scope
-enum class Suit {
+enum class Suit
+{
     Clubs, Diamonds, Hearts, Spades
 };
 

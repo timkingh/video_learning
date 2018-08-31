@@ -12,10 +12,10 @@ template <class T> T average(const vector<T>& vec)
 {
     T sum(0);
     for_each(vec.begin(), vec.end(),
-    [&sum](const T& value) {
+    [&sum](const T & value) {
         sum += value;
     });
-    return sum/vec.size();
+    return sum / vec.size();
 }
 
 // Template function to set a vector to values beginning with start and incremented by increment
@@ -34,8 +34,8 @@ template<class T> void randomValues(vector<T>& vec, T min, T max)
 {
     srand(static_cast<unsigned int>(time(0)));   // Initialize random number generator
     generate(vec.begin(), vec.end(),
-    [=]() {
-        return static_cast<T>(static_cast<double>(rand())/RAND_MAX*(max-min)+min);
+    [ = ]() {
+        return static_cast<T>(static_cast<double>(rand()) / RAND_MAX * (max - min) + min);
     });
 }
 
@@ -44,12 +44,12 @@ template<class T> void listVector(const vector<T>& vec)
 {
     int count = 0;      // Used to control outputs per line
     for_each(vec.begin(), vec.end(),
-             [&count](const T& n)->void {  cout << setw(10) << n;
-                                           if(++count % 5)
-                                           cout << "  ";
-                                           else
-                                               cout << endl;
-                                            });
+             [&count](const T & n)->void {  cout << setw(10) << n;
+                                            if (++count % 5)
+                                            cout << "  ";
+                                            else
+                                                cout << endl;
+                                             });
 }
 
 int main()
@@ -58,13 +58,13 @@ int main()
     randomValues(integerData, 1, 10);    // Set random integer values
     cout << "Vector contains:" << endl;
     listVector(integerData);
-    cout << "Average value is "<< average(integerData) << endl;
+    cout << "Average value is " << average(integerData) << endl;
 
     vector<double> realData(20);
     setValues(realData, 5.0, 2.5);   // Set real values starting at 5.0
     cout << "Vector contains:" << endl;
     listVector(realData);
-    cout << "Average value is "<< average(realData) << endl;
+    cout << "Average value is " << average(realData) << endl;
 
     return 0;
 }

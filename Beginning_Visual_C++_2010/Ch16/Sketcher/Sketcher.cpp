@@ -79,7 +79,7 @@ BOOL CSketcherApp::InitInstance()
     CMFCToolTipInfo ttParams;
     ttParams.m_bVislManagerTheme = TRUE;
     theApp.GetTooltipManager()->SetTooltipParams(AFX_TOOLTIP_TYPE_ALL,
-            RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams);
+                                                 RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams);
 
     // Register the application's document templates.  Document templates
     //  serve as the connection between documents, frame windows and views
@@ -94,8 +94,7 @@ BOOL CSketcherApp::InitInstance()
 
     // create main MDI Frame window
     CMainFrame* pMainFrame = new CMainFrame;
-    if (!pMainFrame || !pMainFrame->LoadFrame(IDR_MAINFRAME))
-    {
+    if (!pMainFrame || !pMainFrame->LoadFrame(IDR_MAINFRAME)) {
         delete pMainFrame;
         return FALSE;
     }

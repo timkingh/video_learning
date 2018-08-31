@@ -74,12 +74,9 @@ BOOL CSketcherDoc::OnNewDocument()
 
 void CSketcherDoc::Serialize(CArchive& ar)
 {
-    if (ar.IsStoring())
-    {
+    if (ar.IsStoring()) {
         // TODO: add storing code here
-    }
-    else
-    {
+    } else {
         // TODO: add loading code here
     }
 }
@@ -120,16 +117,12 @@ void CSketcherDoc::InitializeSearchContent()
 
 void CSketcherDoc::SetSearchContent(const CString& value)
 {
-    if (value.IsEmpty())
-    {
+    if (value.IsEmpty()) {
         RemoveChunk(PKEY_Search_Contents.fmtid, PKEY_Search_Contents.pid);
-    }
-    else
-    {
+    } else {
         CMFCFilterChunkValueImpl *pChunk = NULL;
         ATLTRY(pChunk = new CMFCFilterChunkValueImpl);
-        if (pChunk != NULL)
-        {
+        if (pChunk != NULL) {
             pChunk->SetTextValue(PKEY_Search_Contents, value, CHUNK_TEXT);
             SetChunkValue(pChunk);
         }
@@ -208,54 +201,54 @@ void CSketcherDoc::OnElementCurve()
 void CSketcherDoc::OnUpdateColorBlack(CCmdUI *pCmdUI)
 {
     // Set menu item Checked if the current color is black
-    pCmdUI->SetCheck(m_Color==BLACK);
+    pCmdUI->SetCheck(m_Color == BLACK);
 }
 
 
 void CSketcherDoc::OnUpdateColorRed(CCmdUI *pCmdUI)
 {
     // Set menu item Checked if the current color is red
-    pCmdUI->SetCheck(m_Color==RED);
+    pCmdUI->SetCheck(m_Color == RED);
 }
 
 
 void CSketcherDoc::OnUpdateColorGreen(CCmdUI *pCmdUI)
 {
     // Set menu item Checked if the current color is green
-    pCmdUI->SetCheck(m_Color==GREEN);
+    pCmdUI->SetCheck(m_Color == GREEN);
 }
 
 
 void CSketcherDoc::OnUpdateColorBlue(CCmdUI *pCmdUI)
 {
     // Set menu item Checked if the current color is blue
-    pCmdUI->SetCheck(m_Color==BLUE);
+    pCmdUI->SetCheck(m_Color == BLUE);
 }
 
 
 void CSketcherDoc::OnUpdateElementLine(CCmdUI *pCmdUI)
 {
     // Set Checked if the current element is a line
-    pCmdUI->SetCheck(m_Element==LINE);
+    pCmdUI->SetCheck(m_Element == LINE);
 }
 
 
 void CSketcherDoc::OnUpdateElementRectangle(CCmdUI *pCmdUI)
 {
     // Set Checked if the current element is a rectangle
-    pCmdUI->SetCheck(m_Element==RECTANGLE);
+    pCmdUI->SetCheck(m_Element == RECTANGLE);
 }
 
 
 void CSketcherDoc::OnUpdateElementCircle(CCmdUI *pCmdUI)
 {
     // Set Checked if the current element is a circle
-    pCmdUI->SetCheck(m_Element==CIRCLE);
+    pCmdUI->SetCheck(m_Element == CIRCLE);
 }
 
 
 void CSketcherDoc::OnUpdateElementCurve(CCmdUI *pCmdUI)
 {
     // Set Checked if the current element is a curve
-    pCmdUI->SetCheck(m_Element==CURVE);
+    pCmdUI->SetCheck(m_Element == CURVE);
 }

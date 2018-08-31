@@ -45,7 +45,7 @@ char* Name::getName(char* pName) const
     pName[strlen(pName)] = ' ';                         // Append a space
 
     // Append second name and return total
-    return strcpy(pName+strlen(pName)+1, pSurname);
+    return strcpy(pName + strlen(pName) + 1, pSurname);
 }
 
 // Returns the total length of a name
@@ -55,6 +55,6 @@ size_t Name::getNameLength() const
     // Trace function calls
     cout << '\n' << __FUNCTION__ << " called.";
 #endif
-    return strlen(pFirstname)+strlen(pSurname);
+    return strlen(pFirstname) + strlen(pSurname);
 }
 

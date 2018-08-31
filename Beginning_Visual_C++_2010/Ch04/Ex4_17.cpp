@@ -7,8 +7,7 @@ using namespace System;
 
 int main(array<System::String ^> ^args)
 {
-    array< array< String^ >^ >^ grades = gcnew array< array< String^ >^ >
-    {
+    array< array< String^ >^ >^ grades = gcnew array< array< String^ >^ > {
         gcnew array<String^>{"Louise", "Jack"},                  // Grade A
         gcnew array<String^>{"Bill", "Mary", "Ben", "Joan"},     // Grade B
         gcnew array<String^>{"Jill", "Will", "Phil"},            // Grade C
@@ -18,12 +17,11 @@ int main(array<System::String ^> ^args)
 
     wchar_t gradeLetter('A');
 
-    for each(array< String^ >^ grade in grades)
-    {
+    for each(array< String^ >^ grade in grades) {
         Console::WriteLine(L"Students with Grade {0}:", gradeLetter++);
 
-        for each( String^ student in grade)
-            Console::Write(L"{0,12}",student);          // Output the current name
+        for each(String ^ student in grade)
+            Console::Write(L"{0,12}", student);         // Output the current name
 
         Console::WriteLine();                        // Write a newline
     }

@@ -13,8 +13,7 @@ int main()
          << "Enter a small letter: ";
     cin >> letter;
 
-    switch(letter*(letter >= 'a' && letter <= 'z'))
-    {
+    switch (letter * (letter >= 'a' && letter <= 'z')) {
     case 'a':
     case 'e':
     case 'i':

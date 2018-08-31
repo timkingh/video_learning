@@ -21,7 +21,7 @@ bool operator>(const CBox& aBox, const double& value)
 }
 
 // Function for testing if CBox object is < a constant
-bool operator<( const CBox& aBox, const double& value)
+bool operator<(const CBox& aBox, const double& value)
 {
     return value > aBox;
 }
@@ -39,13 +39,13 @@ bool operator<=(const double& value, const CBox& aBox)
 }
 
 // Function for testing if CBox object is >= a constant
-bool operator>=( const CBox& aBox, const double& value)
+bool operator>=(const CBox& aBox, const double& value)
 {
     return value <= aBox;
 }
 
 // Function for testing if CBox object is <= a constant
-bool operator<=( const CBox& aBox, const double& value)
+bool operator<=(const CBox& aBox, const double& value)
 {
     return value >= aBox;
 }
@@ -69,7 +69,7 @@ CBox operator*(int n, const CBox& aBox)
 }
 
 // Operator to return the free volume in a packed CBox
-double operator%( const CBox& aBox, const CBox& bBox)
+double operator%(const CBox& aBox, const CBox& bBox)
 {
     return aBox.Volume() - (aBox / bBox) * bBox.Volume();
 }

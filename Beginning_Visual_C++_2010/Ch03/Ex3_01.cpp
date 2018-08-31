@@ -14,10 +14,8 @@ int main()
          << "Enter a letter: ";           // Prompt for the input
     cin >> letter;                        // then read a character
 
-    if(letter >= 'A')                     // Test for 'A' or larger
-    {
-        if(letter <= 'Z')                  // Test for 'Z' or smaller
-        {
+    if (letter >= 'A') {                  // Test for 'A' or larger
+        if (letter <= 'Z') {               // Test for 'Z' or smaller
             cout << endl
                  << "You entered a capital letter."
                  << endl;
@@ -25,10 +23,8 @@ int main()
         }
     }
 
-    if(letter >= 'a')                     // Test for 'a' or larger
-    {
-        if(letter <= 'z')                  // Test for 'z' or smaller
-        {
+    if (letter >= 'a') {                  // Test for 'a' or larger
+        if (letter <= 'z') {               // Test for 'z' or smaller
             cout << endl
                  << "You entered a small letter."
                  << endl;

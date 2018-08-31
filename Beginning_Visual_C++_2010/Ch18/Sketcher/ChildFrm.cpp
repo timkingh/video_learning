@@ -33,7 +33,7 @@ CChildFrame::~CChildFrame()
 BOOL CChildFrame::PreCreateWindow(CREATESTRUCT& cs)
 {
     // TODO: Modify the Window class or styles here by modifying the CREATESTRUCT cs
-    if( !CMDIChildWndEx::PreCreateWindow(cs) )
+    if (!CMDIChildWndEx::PreCreateWindow(cs))
         return FALSE;
 
     return TRUE;
@@ -64,7 +64,7 @@ int CChildFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
     // Create the status bar
     m_StatusBar.Create(this);
     static UINT indicators[] = {ID_INDICATOR_SCALE};
-    m_StatusBar.SetIndicators(indicators, sizeof(indicators)/sizeof(UINT));
+    m_StatusBar.SetIndicators(indicators, sizeof(indicators) / sizeof(UINT));
     m_StatusBar.SetPaneStyle(0, SBPS_STRETCH);
 
     return 0;

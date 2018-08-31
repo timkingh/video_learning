@@ -13,11 +13,11 @@ int main()
     int junk [5];
 
     cout << endl;
-    for(int i = 0; i < 5; i++)
+    for (int i = 0; i < 5; i++)
         cout << setw(12) << value[i];
 
     cout << endl;
-    for(int i = 0; i < 5; i++)
+    for (int i = 0; i < 5; i++)
         cout << setw(12) << junk[i];
 
     cout << endl;

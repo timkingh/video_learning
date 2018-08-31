@@ -16,7 +16,7 @@ int main()
                    };
     char* pstart("Your lucky star is ");
 
-    int count((sizeof pstr)/(sizeof pstr[0]));  // Number of array elements
+    int count((sizeof pstr) / (sizeof pstr[0])); // Number of array elements
 
     int dice(0);
 
@@ -26,7 +26,7 @@ int main()
     cin >> dice;
 
     cout << endl;
-    if(dice >= 1 && dice <= count)               // Check input validity
+    if (dice >= 1 && dice <= count)              // Check input validity
         cout << pstart << pstr[dice - 1];         // Output star name
     else
         cout << "Sorry, you haven't got a lucky star."; // Invalid input

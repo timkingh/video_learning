@@ -19,9 +19,8 @@ void listRecords(const Records& people)
 {
     const size_t ID(0), firstname(1), secondname(2), age(3);
     cout << std::setiosflags(std::ios::left);
-    for(auto iter = people.begin() ; iter != people.end() ; ++iter)
-    {
-        if(*iter == Record()) break;
+    for (auto iter = people.begin() ; iter != people.end() ; ++iter) {
+        if (*iter == Record()) break;
         cout << setw(6)  << get<ID>(*iter)         << setw(15) << get<firstname>(*iter)
              << setw(15) << get<secondname>(*iter) << setw(5)  << get<age>(*iter) << endl;
     }

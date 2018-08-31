@@ -17,32 +17,31 @@ int main(array<System::String ^> ^args)
                          };
 
     Console::WriteLine(L"The array of boxes have the following volumes:");
-    for each(Box^ box in boxes)
+    for each(Box ^ box in boxes)
         box->ShowVolume();           // Output the volume of a box
 
     Console::WriteLine(L"\nNow pushing the boxes on the stack...");
 
     Stack^ stack = gcnew Stack;         // Create the stack
-    for each(Box^ box in boxes)
+    for each(Box ^ box in boxes)
         stack->Push(box);
 
     Console::WriteLine(
         L"Popping the boxes off the stack presents them in reverse order:");
     Object^ item;
-    while((item = stack->Pop()) != nullptr)
+    while ((item = stack->Pop()) != nullptr)
         safe_cast<Container^>(item)->ShowVolume();
 
 
     Console::WriteLine(L"\nNow pushing integers onto the stack:");
-    for(int i = 2 ; i<=12 ; i += 2)
-    {
-        Console::Write(L"{0,5}",i);
+    for (int i = 2 ; i <= 12 ; i += 2) {
+        Console::Write(L"{0,5}", i);
         stack->Push(i);
     }
 
     Console::WriteLine(L"\n\nPopping integers off the stack produces:");
-    while((item = stack->Pop()) != nullptr)
-        Console::Write(L"{0,5}",item);
+    while ((item = stack->Pop()) != nullptr)
+        Console::Write(L"{0,5}", item);
 
     Console::WriteLine();
     return 0;

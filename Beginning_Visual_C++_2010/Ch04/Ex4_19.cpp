@@ -17,8 +17,7 @@ int main(array<System::String ^> ^args)
 
     int index(0);                        // Index of character found
     int count(0);                        // Count of punctuation characters
-    while((index = sentence->IndexOfAny(punctuation, index)) >= 0)
-    {
+    while ((index = sentence->IndexOfAny(punctuation, index)) >= 0) {
         indicators[index] = L'^';          // Set marker
         ++index;                           // Increment to next character
         ++count;                           // Increase the count

@@ -13,8 +13,7 @@ int main()
     int i(0);                        // Count of number of values
     char indicator('y');             // Continue or not?
 
-    while('y' == indicator)          // Loop as long as y is entered
-    {
+    while ('y' == indicator) {       // Loop as long as y is entered
         cout << endl
              << "Enter a value: ";
         cin >> value;                 // Read a value
@@ -28,7 +27,7 @@ int main()
 
     cout << endl
          << "The average of the " << i
-         << " values you entered is " << sum/i << "."
+         << " values you entered is " << sum / i << "."
          << endl;
     return 0;
 }

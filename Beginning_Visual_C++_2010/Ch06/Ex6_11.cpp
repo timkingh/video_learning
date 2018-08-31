@@ -11,8 +11,8 @@ IComparable
 T MaxElement(array<T>^ x)
 {
     T max(x[0]);
-    for(int i = 1; i < x->Length; i++)
-        if(max->CompareTo(x[i]) < 0)
+    for (int i = 1; i < x->Length; i++)
+        if (max->CompareTo(x[i]) < 0)
             max = x[i];
     return max;
 }
@@ -25,18 +25,13 @@ array<T>^ RemoveElement(T element, array<T>^ data)
     array<T>^ newData = gcnew array<T>(data->Length - 1);
     int index(0);                  // Index to elements in newData array
     bool found(false);             // Indicates that the element to remove was found
-    for each(T item in data)
-    {
+    for each(T item in data) {
         // Check for invalid index or element found
-        if((!found) && item->CompareTo(element) == 0)
-        {
+        if ((!found) && item->CompareTo(element) == 0) {
             found = true;
             continue;
-        }
-        else
-        {
-            if(newData->Length == index)
-            {
+        } else {
+            if (newData->Length == index) {
                 Console::WriteLine(L"Element to remove not found");
                 return data;
             }
@@ -65,7 +60,7 @@ int main(array<System::String ^> ^args)
     Console::WriteLine(L" After removing maximum, array contains:");
     ListElements(result);
 
-    array<int>^ numbers = {3, 12, 7, 0, 10,11};
+    array<int>^ numbers = {3, 12, 7, 0, 10, 11};
     Console::WriteLine(L"\nArray contains:");
     ListElements(numbers);
     Console::WriteLine(L"\nMaximum element = {0}\n", MaxElement(numbers));

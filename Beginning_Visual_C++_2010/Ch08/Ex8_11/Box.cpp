@@ -30,10 +30,10 @@ CBox CBox::operator+(const CBox& aBox) const
 // Multiply a box by an integer
 CBox CBox::operator*(int n) const
 {
-    if(n%2)
-        return CBox(m_Length, m_Width, n*m_Height);           // n odd
+    if (n % 2)
+        return CBox(m_Length, m_Width, n * m_Height);         // n odd
     else
-        return CBox(m_Length, 2.0*m_Width, (n/2)*m_Height);   // n even
+        return CBox(m_Length, 2.0 * m_Width, (n / 2) * m_Height); // n even
 }
 
 // Divide one box into another
@@ -44,12 +44,12 @@ int CBox::operator/(const CBox& aBox) const
     // Temporary for number in a plane that way
     int tc2 = 0;
 
-    tc1 = static_cast<int>((m_Length/aBox.m_Length))*
-          static_cast<int>((m_Width/aBox.m_Width));	 // to fit this way
+    tc1 = static_cast<int>((m_Length / aBox.m_Length)) *
+          static_cast<int>((m_Width / aBox.m_Width)); // to fit this way
 
-    tc2 = static_cast<int>((m_Length/aBox.m_Width))*
-          static_cast<int>((m_Width/aBox.m_Length));	 // and that way
+    tc2 = static_cast<int>((m_Length / aBox.m_Width)) *
+          static_cast<int>((m_Width / aBox.m_Length));   // and that way
 
     //Return best fit
-    return static_cast<int>((m_Height/aBox.m_Height))*(tc1>tc2 ? tc1 : tc2);
+    return static_cast<int>((m_Height / aBox.m_Height)) * (tc1 > tc2 ? tc1 : tc2);
 }

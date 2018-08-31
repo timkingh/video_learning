@@ -16,37 +16,31 @@ public:
     Name(...array<String^>^ names) : Names(names) {}
 
     // Scalar property specifying number of names
-    property int NameCount
-    {
+    property int NameCount {
         int get() {
             return Names->Length;
         }
     }
 
     // Indexed property to return names
-property String^ default[int]
-    {
-        String^ get(int index)
-        {
-            if(index >= Names->Length)
+property String^ default[int] {
+        String ^ get(int index) {
+            if (index >= Names->Length)
                 throw gcnew Exception(L"Index out of range");
             return Names[index];
         }
 
-        void set(int index, String^ name)
-        {
-            if(index >= Names->Length)
+        void set(int index, String ^ name) {
+            if (index >= Names->Length)
                 throw gcnew Exception(L"Index out of range");
             Names[index] = name;
         }
     }
 
     // Indexed property to return initials
-    property wchar_t Initials[int]
-    {
-        wchar_t get(int index)
-        {
-            if(index >= Names->Length)
+    property wchar_t Initials[int] {
+        wchar_t get(int index) {
+            if (index >= Names->Length)
                 throw gcnew Exception(L"Index out of range");
             return Names[index][0];
         }
@@ -60,12 +54,12 @@ int main(array<System::String ^> ^args)
     myName[myName->NameCount - 1] = L"Oberwurst";  // Change last indexed property
 
     // List the names
-    for(int i = 0 ; i < myName->NameCount ; i++)
-        Console::WriteLine(L"Name {0} is  {1}", i+1, myName[i]);
+    for (int i = 0 ; i < myName->NameCount ; i++)
+        Console::WriteLine(L"Name {0} is  {1}", i + 1, myName[i]);
 
     // Output the initials
     Console::Write(L"The initials are:");
-    for(int i = 0 ; i < myName->NameCount ; i++)
+    for (int i = 0 ; i < myName->NameCount ; i++)
         Console::Write(L" {0}", myName->Initials[i]);
     Console::WriteLine();
 

@@ -40,13 +40,13 @@ END_MESSAGE_MAP()
 // CSketcherView construction/destruction
 
 CSketcherView::CSketcherView()
-    : m_FirstPoint(CPoint(0,0))
-    , m_SecondPoint(CPoint(0,0))
+    : m_FirstPoint(CPoint(0, 0))
+    , m_SecondPoint(CPoint(0, 0))
     , m_pTempElement(nullptr)
     , m_pSelected(nullptr)
     , m_MoveMode(false)
-    , m_CursorPos(CPoint(0,0))
-    , m_FirstPos(CPoint(0,0))
+    , m_CursorPos(CPoint(0, 0))
+    , m_FirstPos(CPoint(0, 0))
 {
     // TODO: add construction code here
 
@@ -74,10 +74,9 @@ void CSketcherView::OnDraw(CDC* pDC)
         return;
 
     CElement* pElement(nullptr);
-    for(auto iter = pDoc->begin() ; iter != pDoc->end() ; ++iter)
-    {
+    for (auto iter = pDoc->begin() ; iter != pDoc->end() ; ++iter) {
         pElement = *iter;
-        if(pDC->RectVisible(pElement->GetBoundRect())) // If the element is visible
+        if (pDC->RectVisible(pElement->GetBoundRect())) // If the element is visible
             pElement->Draw(pDC, m_pSelected);         // ...draw it
     }
 }
@@ -111,8 +110,7 @@ void CSketcherView::OnEndPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
 
 void CSketcherView::OnRButtonUp(UINT /* nFlags */, CPoint point)
 {
-    if(m_MoveMode)
-    {
+    if (m_MoveMode) {
         m_MoveMode = false;
         return;
     }
@@ -124,13 +122,13 @@ void CSketcherView::OnRButtonUp(UINT /* nFlags */, CPoint point)
 void CSketcherView::OnContextMenu(CWnd* /* pWnd */, CPoint point)
 {
 #ifndef SHARED_HANDLERS
-//	theApp.GetContextMenuManager()->ShowPopupMenu(IDR_POPUP_EDIT, point.x, point.y, this, TRUE);
-    if(m_pSelected)
+//  theApp.GetContextMenuManager()->ShowPopupMenu(IDR_POPUP_EDIT, point.x, point.y, this, TRUE);
+    if (m_pSelected)
         theApp.GetContextMenuManager()->ShowPopupMenu(IDR_ELEMENT_MENU,
-                point.x, point.y, this);
+                                                      point.x, point.y, this);
     else
         theApp.GetContextMenuManager()->ShowPopupMenu(IDR_NOELEMENT_MENU,
-                point.x, point.y, this);
+                                                      point.x, point.y, this);
 #endif
 }
 
@@ -161,12 +159,11 @@ CSketcherDoc* CSketcherView::GetDocument() const // non-debug version is inline
 
 void CSketcherView::OnLButtonUp(UINT nFlags, CPoint point)
 {
-    if(this == GetCapture())
+    if (this == GetCapture())
         ReleaseCapture();                                          // Stop capturing mouse messages
 
     // If there is an element, add it to the document
-    if(m_pTempElement)
-    {
+    if (m_pTempElement) {
         GetDocument()->AddElement(m_pTempElement);
         GetDocument()->UpdateAllViews(nullptr, 0, m_pTempElement);  // Tell the views
         m_pTempElement = nullptr;                                   // Reset the element pointer
@@ -180,8 +177,7 @@ void CSketcherView::OnLButtonDown(UINT nFlags, CPoint point)
     OnPrepareDC(&aDC);                        // Get origin adjusted
     aDC.DPtoLP(&point);                       // convert point to logical coordinates
 
-    if(m_MoveMode)
-    {
+    if (m_MoveMode) {
         // In moving mode, so drop the element
         m_MoveMode = false;                      // Kill move mode
         m_pSelected = nullptr;                   // De-select the element
@@ -202,19 +198,16 @@ void CSketcherView::OnMouseMove(UINT nFlags, CPoint point)
     aDC.DPtoLP(&point);                  // convert point to logical coordinates
 
     // If we are in move mode, move the selected element and return
-    if(m_MoveMode)
-    {
+    if (m_MoveMode) {
         MoveElement(aDC, point);           // Move the element
         return;
     }
 
-    if((nFlags & MK_LBUTTON) && (this == GetCapture()))
-    {
+    if ((nFlags & MK_LBUTTON) && (this == GetCapture())) {
         m_SecondPoint = point;             // Save the current cursor position
-        if(m_pTempElement)
-        {
-            if(CURVE == GetDocument()->GetElementType())   // Is it a curve?
-            {   // We are drawing a curve so add a segment to the existing curve
+        if (m_pTempElement) {
+            if (CURVE == GetDocument()->GetElementType()) { // Is it a curve?
+                // We are drawing a curve so add a segment to the existing curve
                 static_cast<CCurve*>(m_pTempElement)->AddSegment(m_SecondPoint);
                 m_pTempElement->Draw(&aDC);   // Now draw it
                 return;                       // We are done
@@ -232,17 +225,15 @@ void CSketcherView::OnMouseMove(UINT nFlags, CPoint point)
         // is recorded in the document object, and draw it
         m_pTempElement = CreateElement();  // Create a new element
         m_pTempElement->Draw(&aDC);        // Draw the element
-    }
-    else
-    {   // We are not creating an element so do highlighting
-        CSketcherDoc* pDoc=GetDocument();         // Get a pointer to the document
+    } else {
+        // We are not creating an element so do highlighting
+        CSketcherDoc* pDoc = GetDocument();       // Get a pointer to the document
         CElement* pOldSelected(m_pSelected);
         m_pSelected = pDoc->FindElement(point);   // Set selected element
-        if(m_pSelected != pOldSelected)
-        {
-            if(m_pSelected)
+        if (m_pSelected != pOldSelected) {
+            if (m_pSelected)
                 InvalidateRect(m_pSelected->GetBoundRect(), FALSE);
-            if(pOldSelected)
+            if (pOldSelected)
                 InvalidateRect(pOldSelected->GetBoundRect(), FALSE);
             pDoc->UpdateAllViews(nullptr);
         }
@@ -257,8 +248,7 @@ CElement* CSketcherView::CreateElement(void) const
     ASSERT_VALID(pDoc);                 // Verify the pointer is good
 
     // Now select the element using the type stored in the document
-    switch(pDoc->GetElementType())
-    {
+    switch (pDoc->GetElementType()) {
     case RECTANGLE:
         return new CRectangle(m_FirstPoint, m_SecondPoint,
                               pDoc->GetElementColor());
@@ -285,8 +275,7 @@ void CSketcherView::OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint)
 {
     // Invalidate the area corresponding to the element pointed to
     // if there is one, otherwise invalidate the whole client area
-    if(pHint)
-    {
+    if (pHint) {
         CClientDC aDC(this);            // Create a device context
         OnPrepareDC(&aDC);              // Get origin adjusted
 
@@ -294,9 +283,7 @@ void CSketcherView::OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint)
         CRect aRect = static_cast<CElement*>(pHint)->GetBoundRect();
         aDC.LPtoDP(aRect);
         InvalidateRect(aRect);          // Get the area redrawn
-    }
-    else
-    {
+    } else {
         InvalidateRect(nullptr);
     }
 }
@@ -306,7 +293,7 @@ void CSketcherView::OnInitialUpdate()
     CScrollView::OnInitialUpdate();
 
     // Define document size as 30x30ins in MM_LOENGLISH
-    CSize DocSize(3000,3000);
+    CSize DocSize(3000, 3000);
 
     // Set mapping mode and document size.
     SetScrollSizes(MM_LOENGLISH, DocSize);
@@ -327,8 +314,7 @@ void CSketcherView::OnElementMove()
 
 void CSketcherView::OnElementDelete()
 {
-    if(m_pSelected)
-    {
+    if (m_pSelected) {
         CSketcherDoc* pDoc = GetDocument();// Get the document pointer
         pDoc->DeleteElement(m_pSelected);  // Delete the element
         pDoc->UpdateAllViews(nullptr);     // Redraw all the views
@@ -342,8 +328,7 @@ void CSketcherView::MoveElement(CClientDC& aDC, const CPoint& point)
     m_CursorPos = point;                    // Set current point as 1st for next time
 
     // If there is an element, selected, move it
-    if(m_pSelected)
-    {
+    if (m_pSelected) {
         aDC.SetROP2(R2_NOTXORPEN);
         m_pSelected->Draw(&aDC, m_pSelected); // Draw the element to erase it
         m_pSelected->Move(distance);          // Now move the element
@@ -354,8 +339,7 @@ void CSketcherView::MoveElement(CClientDC& aDC, const CPoint& point)
 
 void CSketcherView::OnRButtonDown(UINT nFlags, CPoint point)
 {
-    if(m_MoveMode)
-    {
+    if (m_MoveMode) {
         // In moving mode, so drop element back in original position
         CClientDC aDC(this);
         OnPrepareDC(&aDC);                      // Get origin adjusted

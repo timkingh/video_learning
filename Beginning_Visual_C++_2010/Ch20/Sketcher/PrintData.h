@@ -2,7 +2,7 @@
 
 class CPrintData
 {
-  public:
+public:
     UINT printWidth;                   // Printable page width - units 0.01 inches
     UINT printLength;                  // Printable page length - units 0.01 inches
     UINT m_nWidths;                    // Page count for the width of the document
@@ -11,8 +11,8 @@ class CPrintData
     CString m_DocTitle;                // The name of the document
 
     // Constructor
-     CPrintData():
-      printWidth(750)                  // 7.5 inches
-    , printLength(1000)                // 10 inches
-      {}
+    CPrintData():
+        printWidth(750)                  // 7.5 inches
+        , printLength(1000)                // 10 inches
+    {}
 };

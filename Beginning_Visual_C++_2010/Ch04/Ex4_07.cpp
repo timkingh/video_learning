@@ -24,7 +24,7 @@ int main()
     cin >> dice;
 
     cout << endl;
-    if(dice >= 1 && dice <= 6)                    // Check input validity
+    if (dice >= 1 && dice <= 6)                   // Check input validity
         cout << pstart << pstr[dice - 1];          // Output star name
 
     else

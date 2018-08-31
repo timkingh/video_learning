@@ -16,14 +16,12 @@ private:
 public:
 
     // Function to display a message
-    void ShowIt() const
-    {
+    void ShowIt() const {
         cout << endl << pmessage;
     }
 
     // Constructor definition
-    CMessage(const char* text = "Default message")
-    {
+    CMessage(const char* text = "Default message") {
         pmessage = new char[strlen(text) + 1];        // Allocate space for text
         strcpy_s(pmessage, strlen(text) + 1, text);   // Copy text to new memory
     }

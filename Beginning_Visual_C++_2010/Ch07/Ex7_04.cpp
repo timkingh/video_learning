@@ -12,8 +12,7 @@ public:
     double m_Height;                   // Height of a box in inches
 
     // Constructor definition
-    CBox(double lv, double bv, double hv)
-    {
+    CBox(double lv, double bv, double hv) {
         cout << endl << "Constructor called.";
         m_Length = lv;                   // Set values of
         m_Width = bv;                    // data members
@@ -21,16 +20,15 @@ public:
     }
 
     // Function to calculate the volume of a box
-    double Volume()
-    {
-        return m_Length* m_Width* m_Height;
+    double Volume() {
+        return m_Length * m_Width * m_Height;
     }
 };
 
 int main()
 {
-    CBox box1(78.0,24.0,18.0);           // Declare and initialize box1
-    CBox cigarBox(8.0,5.0,1.0);          // Declare and initialize cigarBox
+    CBox box1(78.0, 24.0, 18.0);         // Declare and initialize box1
+    CBox cigarBox(8.0, 5.0, 1.0);        // Declare and initialize cigarBox
 
     double boxVolume(0.0);               // Stores the volume of a box
 

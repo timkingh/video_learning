@@ -12,14 +12,12 @@ public:
     MyClass(int n) : value(n) {}
 
     // Destructor
-    ~MyClass()
-    {
+    ~MyClass() {
         Console::WriteLine("MyClass object({0}) destructor called.", value);
     }
 
     // Finalizer
-    !MyClass()
-    {
+    !MyClass() {
         Console::WriteLine("MyClass object({0}) finalizer called.", value);
     }
 private:

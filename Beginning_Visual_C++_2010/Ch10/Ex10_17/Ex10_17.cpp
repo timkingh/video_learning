@@ -17,15 +17,14 @@ int main(array<System::String ^> ^args)
     String^ second;            // Stores a second name
     Person person;             // Stores a Person
 
-    while(true)
-    {
+    while (true) {
         Console::Write(L"Enter a first name or press Enter to end: ");
         first = Console::ReadLine();
-        if(0 == first->Length)
+        if (0 == first->Length)
             break;
         Console::Write(L"Enter a second name: ");
         second = Console::ReadLine();
-        person = Person(first->Trim(),second->Trim());
+        person = Person(first->Trim(), second->Trim());
         people->push_back(person);
     }
 
@@ -33,8 +32,8 @@ int main(array<System::String ^> ^args)
 
     // Output the contents of the vector
     Console::WriteLine(L"\nThe persons in the vector are:");
-    for each(Person^ p in people)
-        Console::WriteLine("{0}",p);
+    for each(Person ^ p in people)
+        Console::WriteLine("{0}", p);
 
     return 0;
 }

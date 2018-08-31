@@ -29,5 +29,5 @@ int incr10(const int& num)       // Function with const reference argument
 {
     cout << endl << "Value received = " << num;
 //   num += 10;                  // this statement would now be illegal
-    return num+10;              // Return the incremented value
+    return num + 10;            // Return the incremented value
 }

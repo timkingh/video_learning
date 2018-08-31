@@ -18,11 +18,10 @@ int main()
 {
     priority_queue<Person, vector<Person>, greater<Person>> people;
     string first, second;;
-    while(true)
-    {
+    while (true) {
         cout << "Enter a first name or press Enter to end: " ;
         getline(cin, first);
-        if(first.empty())
+        if (first.empty())
             break;
 
         cout << "Enter a second name: " ;
@@ -35,8 +34,7 @@ int main()
          << endl << endl;
 
     cout << "The names that you entered are:" << endl;
-    while(!people.empty())
-    {
+    while (!people.empty()) {
         people.top().showPerson();
         people.pop();
     }

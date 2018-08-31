@@ -12,23 +12,20 @@ private:
 
 public:
     // Function to display a message
-    void ShowIt() const
-    {
+    void ShowIt() const {
         cout << endl << pmessage;
     }
 
     //Function to reset a message to *
-    void Reset()
-    {
+    void Reset() {
         char* temp = pmessage;
-        while(*temp)
+        while (*temp)
             *(temp++) = '*';
     }
 
     // Overloaded assignment operator for CMessage objects
-    CMessage& operator=(const CMessage& aMess)
-    {
-        if(this == &aMess)               // Check addresses, if equal
+    CMessage& operator=(const CMessage& aMess) {
+        if (this == &aMess)              // Check addresses, if equal
             return *this;                  // return the 1st operand
 
         // Release memory for 1st operand
@@ -43,23 +40,20 @@ public:
     }
 
     // Constructor definition
-    CMessage(const char* text = "Default message")
-    {
+    CMessage(const char* text = "Default message") {
         pmessage = new char[strlen(text) + 1];       // Allocate space for text
-        strcpy_s(pmessage, strlen(text)+1, text);    // Copy text to new memory
+        strcpy_s(pmessage, strlen(text) + 1, text);  // Copy text to new memory
     }
 
     // Copy constructor definition
-    CMessage(const CMessage& aMess)
-    {
-        size_t len = strlen(aMess.pmessage)+1;
+    CMessage(const CMessage& aMess) {
+        size_t len = strlen(aMess.pmessage) + 1;
         pmessage = new char[len];
         strcpy_s(pmessage, len, aMess.pmessage);
     }
 
     // Destructor to free memory allocated by new
-    ~CMessage()
-    {
+    ~CMessage() {
         cout << "Destructor called."     // Just to track what happens
              << endl;
         delete[] pmessage;               // Free memory assigned to pointer

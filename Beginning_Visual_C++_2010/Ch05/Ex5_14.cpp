@@ -10,7 +10,7 @@ int main(void)
 {
     record();
 
-    for(int i = 0; i <= 123; i++)
+    for (int i = 0; i <= 123; i++)
         record();
 
     cout << endl;
@@ -22,11 +22,10 @@ void record(void)
 {
     static int count(0);
     cout << endl << "This is the " << ++count;
-    if((count%100 > 10) && (count%100 < 14))         // All this....
-        cout <<"th";
+    if ((count % 100 > 10) && (count % 100 < 14))    // All this....
+        cout << "th";
     else
-        switch(count%10)                              // is just to get...
-        {
+        switch (count % 10) {                         // is just to get...
         case 1:
             cout << "st";
             break;

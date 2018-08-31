@@ -18,10 +18,9 @@ int main()
     queue<string> sayings;
     string saying;
     cout << "Enter one or more sayings. Press Enter to end." << endl;
-    while(true)
-    {
+    while (true) {
         getline(cin, saying);
-        if(saying.empty())
+        if (saying.empty())
             break;
         sayings.push(saying);
     }
@@ -30,8 +29,7 @@ int main()
          << " sayings in the queue."
          << endl << endl;
     cout << "The sayings that you entered are:" << endl;
-    while(!sayings.empty())
-    {
+    while (!sayings.empty()) {
         cout << sayings.front() << endl;
         sayings.pop();
     }

@@ -15,25 +15,23 @@ private:
 
 public:
     // Create a height from inches value
-    Height(int ins)
-    {
-        feet = ins/12;
-        inches = ins%12;
+    Height(int ins) {
+        feet = ins / 12;
+        inches = ins % 12;
     }
 
     // Create a height from feet and inches
     Height(int ft, int ins) : feet(ft), inches(ins) {}
 
     // Create a string representation of the object
-    virtual String^ ToString() override
-    {
-        return feet + L" feet "+ inches + L" inches";
+    virtual String^ ToString() override {
+        return feet + L" feet " + inches + L" inches";
     }
 };
 
 int main(array<System::String ^> ^args)
 {
-    Height myHeight(Height(6,3));
+    Height myHeight(Height(6, 3));
     Height^ yourHeight(Height(70));
     Height hisHeight(*yourHeight);
 

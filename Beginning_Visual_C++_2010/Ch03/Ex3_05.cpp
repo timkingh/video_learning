@@ -21,8 +21,7 @@ int main()
          << endl << endl << "Enter your selection number: ";
     cin >> choice;
 
-    switch(choice)
-    {
+    switch (choice) {
     case 1:
         cout << endl << "Boil some eggs." << endl;
         break;
@@ -36,7 +35,7 @@ int main()
         cout << endl << "Coddle some eggs." << endl;
         break;
     default:
-        cout << endl <<"You entered a wrong number, try raw eggs."
+        cout << endl << "You entered a wrong number, try raw eggs."
              << endl;
     }
     return 0;

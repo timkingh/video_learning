@@ -14,9 +14,9 @@ int main(void)
     long medium[] = {23, 245, 123, 1, 234, 2345};
     double large[] = {23.0, 1.4, 2.456, 345.5, 12.0, 21.0};
 
-    int lensmall(sizeof small/sizeof small[0]);
-    int lenmedium(sizeof medium/sizeof medium[0]);
-    int lenlarge(sizeof large/sizeof large[0]);
+    int lensmall(sizeof small / sizeof small[0]);
+    int lenmedium(sizeof medium / sizeof medium[0]);
+    int lenlarge(sizeof large / sizeof large[0]);
 
     cout << endl << max(small, lensmall);
     cout << endl << max(medium, lenmedium);
@@ -30,8 +30,8 @@ int main(void)
 int max(int x[], int len)
 {
     int maximum(x[0]);
-    for(int i = 1; i < len; i++)
-        if(maximum < x[i])
+    for (int i = 1; i < len; i++)
+        if (maximum < x[i])
             maximum = x[i];
     return maximum;
 }
@@ -39,9 +39,9 @@ int max(int x[], int len)
 // Maximum of longs
 long max(long x[], int len)
 {
-    long maximum (x[0]);
-    for(int i = 1; i < len; i++)
-        if(maximum < x[i])
+    long maximum(x[0]);
+    for (int i = 1; i < len; i++)
+        if (maximum < x[i])
             maximum = x[i];
     return maximum;
 }
@@ -50,8 +50,8 @@ long max(long x[], int len)
 double max(double x[], int len)
 {
     double maximum(x[0]);
-    for(int i = 1; i < len; i++)
-        if(maximum < x[i])
+    for (int i = 1; i < len; i++)
+        if (maximum < x[i])
             maximum = x[i];
     return maximum;
 }

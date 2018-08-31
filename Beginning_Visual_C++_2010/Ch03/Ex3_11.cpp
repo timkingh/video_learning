@@ -11,7 +11,7 @@ using std::setw;
 
 int main()
 {
-    for(char capital = 'A', small = 'a'; capital <= 'Z'; capital++, small++)
+    for (char capital = 'A', small = 'a'; capital <= 'Z'; capital++, small++)
         cout << endl
              << "\t" << capital                      // Output capital as a character
              << hex << setw(10) << static_cast<int>(capital)   // and as hexadecimal

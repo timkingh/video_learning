@@ -26,9 +26,9 @@ int main()
     listInfo(data);
 
     // Create a vector with 10 elements and initialize it
-    vector<int> numbers(10,-1);
+    vector<int> numbers(10, -1);
     cout << endl << "The initial values are:";
-    for(vector<int>::size_type i = 0; i<numbers.size() ; i++)
+    for (vector<int>::size_type i = 0; i < numbers.size() ; i++)
         cout << " " << numbers[i];
 
     // See how adding elements affects capacity increments
@@ -36,12 +36,10 @@ int main()
     auto newC = oldC;          // New capacity after adding element
     cout << endl << endl;
     listInfo(numbers);
-    for(int i = 0; i<1000 ; i++)
-    {
-        numbers.push_back(2*i);
+    for (int i = 0; i < 1000 ; i++) {
+        numbers.push_back(2 * i);
         newC = numbers.capacity();
-        if(oldC < newC)
-        {
+        if (oldC < newC) {
             oldC = newC;
             listInfo(numbers);
         }

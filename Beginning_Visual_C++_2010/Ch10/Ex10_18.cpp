@@ -9,7 +9,7 @@ int main(array<System::String ^> ^args)
 {
     array<double>^ values = {2.5, -4.5, 6.5, -2.5, 2.5, 7.5, 1.5, 3.5};
     list<double>^ data = gcnew list<double>();
-    for(int i = 0 ; i<values->Length ; i++)
+    for (int i = 0 ; i < values->Length ; i++)
         data->push_back(values[i]);
 
     Console::WriteLine("The list contains: ");

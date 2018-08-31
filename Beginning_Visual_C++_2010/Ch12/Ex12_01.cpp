@@ -64,8 +64,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     UpdateWindow(hWnd);             // Cause window client area to be drawn
 
     // The message loop
-    while(GetMessage(&msg, 0, 0, 0) == TRUE)  // Get any messages
-    {
+    while (GetMessage(&msg, 0, 0, 0) == TRUE) { // Get any messages
         TranslateMessage(&msg);                 // Translate the message
         DispatchMessage(&msg);                  // Dispatch the message
     }
@@ -82,8 +81,7 @@ LRESULT WINAPI WindowProc(HWND hWnd, UINT message,
     PAINTSTRUCT PaintSt;           // Structure defining area to be drawn
     RECT aRect;                    // A working rectangle
 
-    switch(message)                // Process selected messages
-    {
+    switch (message) {             // Process selected messages
     case WM_PAINT:                     // Message is to redraw the window
         hDC = BeginPaint(hWnd, &PaintSt);// Prepare to draw the window
 
@@ -98,8 +96,8 @@ LRESULT WINAPI WindowProc(HWND hWnd, UINT message,
             L"But, soft! What light through yonder window breaks?",
             -1,                  // Indicate null terminated string
             &aRect,              // Rectangle in which text is to be drawn
-            DT_SINGLELINE|       // Text format - single line
-            DT_CENTER|           //             - centered in the line
+            DT_SINGLELINE |      // Text format - single line
+            DT_CENTER |          //             - centered in the line
             DT_VCENTER);         //             - line centered in aRect
 
         EndPaint(hWnd, &PaintSt);   // Terminate window redraw operation

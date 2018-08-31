@@ -9,15 +9,13 @@ class CBox                             // Class definition at global scope
 public:
     // Constructor definition using an initialisation list
     explicit CBox(double lv = 1.0, double bv = 1.0, double hv = 1.0):
-        m_Length(lv), m_Width(bv), m_Height(hv)
-    {
+        m_Length(lv), m_Width(bv), m_Height(hv) {
         cout << endl << "Constructor called.";
     }
 
     // Function to calculate the volume of a box
-    double Volume()
-    {
-        return m_Length*m_Width*m_Height;
+    double Volume() {
+        return m_Length * m_Width * m_Height;
     }
 
 private:

@@ -3,13 +3,12 @@
 #include "Box.h"
 class CCandyBox: CBox
 {
-  public:
+public:
     char* m_Contents;
 
-    CCandyBox(char* str = "Candy")               // Constructor
-    {
-      m_Contents = new char[ strlen(str) + 1 ];
-      strcpy_s(m_Contents, strlen(str) + 1, str);
+    CCandyBox(char* str = "Candy") {             // Constructor
+        m_Contents = new char[ strlen(str) + 1 ];
+        strcpy_s(m_Contents, strlen(str) + 1, str);
     }
 
     ~CCandyBox()                                 // Destructor
