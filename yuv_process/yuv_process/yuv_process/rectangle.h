@@ -31,7 +31,7 @@ public:
 };
 
 void merge_rect(void *proc_ctx, std::vector<Rect> &rects, std::vector<Rect> &rects_org);
-void merge_rect_optimize(void *proc_ctx, std::vector<Rect> &rects);
+void merge_rect_optimize(void *proc_ctx, std::vector<Rect> &rects_org, std::vector<Rect> &rects_new);
 void draw_blue_rectangle(YuvInfo *yuv, std::vector<Rect> &rects);
 void draw_rectangle(YuvInfo *yuv, RectangleInfo *rec);
 

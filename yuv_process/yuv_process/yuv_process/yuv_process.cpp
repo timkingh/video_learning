@@ -34,7 +34,7 @@ static void rk_handle_md(ProcCtx *ctx, ifstream *sad)
     YuvInfo *yuv = &ctx->yuv_info;
     SadInfo *info = &ctx->sad_info;
     uint32_t frame_num = ctx->frame_read;
-    vector<Rect> rects;
+    vector<Rect> rects, rects_new;
     Rect rect;
     char lines[512];
     if (frame_num == 1 && sad->getline(lines, 512)) {
@@ -78,13 +78,13 @@ static void rk_handle_md(ProcCtx *ctx, ifstream *sad)
     cout << "frame_num " << frame_num << " Vector Rect Number " << rects.size() << endl;
 
     //merge_rect((void *)ctx, rects);
-    merge_rect_optimize((void *)ctx, rects);
+    merge_rect_optimize((void *)ctx, rects, rects_new);
 
     end = time_usec();
     duration = (double)(end - start) / 1000000;
     cout << "frame_num " << frame_num << " finish merge, " << duration << " seconds" << endl;
 
-    draw_blue_rectangle(yuv, rects);
+    draw_blue_rectangle(yuv, rects_new);
 
 }
 

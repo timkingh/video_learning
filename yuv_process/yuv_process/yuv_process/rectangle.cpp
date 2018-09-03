@@ -186,9 +186,9 @@ run_again:
     display_rects(rects);
 }
 
-void merge_rect_optimize(void *proc_ctx, vector<Rect> &rects)
+void merge_rect_optimize(void *proc_ctx, vector<Rect> &rects_org, vector<Rect> &rects_new)
 {
-    vector<Rect> rects_org = rects;
+    vector<Rect> rects = rects_org;
     uint32_t idx;
     Rect ave_rect;
 
@@ -200,7 +200,6 @@ void merge_rect_optimize(void *proc_ctx, vector<Rect> &rects)
     for (idx = 0; idx < 4; idx++)
         merge_rect(proc_ctx, groups[idx], groups[idx]);
 
-    vector<Rect> rects_new;
     merge_groups_into_rects(groups, rects_new);
 
     merge_rect(proc_ctx, rects_new, rects_org);
