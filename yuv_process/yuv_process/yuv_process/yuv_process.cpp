@@ -5,7 +5,6 @@
 #include <string.h>
 #include "getopt.hpp"
 #include "common.h"
-#include "rectangle.h"
 #include "yuv_process.h"
 
 using namespace std;
@@ -100,6 +99,9 @@ int main(int argc, char **argv)
     ProcCtx *ctx = &proc_ctx;
     memset(ctx, 0, sizeof(ProcCtx));
 
+    /* -c 3903.md --- Motion detected regions of Hisilicon
+     * -s   *.sad --- Motion detected regions of RK
+     */
     cout << "----------Test-------------" << endl;
     bool help = getarg(false, "-H", "--help", "-?");
     string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576.yuv", "-i", "--input");

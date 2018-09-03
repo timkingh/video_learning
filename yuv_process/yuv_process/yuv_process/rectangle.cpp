@@ -62,6 +62,16 @@ static uint32_t calc_motion_rate(vector<Rect> &rects, Rect &dst)
     return rate;
 }
 
+void display_rects(vector<Rect> &rects)
+{
+    uint32_t idx = 0;
+    vector<Rect>::iterator iter;
+    for (iter = rects.begin(); iter < rects.end(); iter++) {
+        cout << "rectangle " << idx++ << ": " << iter->left << " " << iter->top
+             << " " << iter->right << " " << iter->bottom << endl;
+    }
+}
+
 void merge_rect(void *proc_ctx, vector<Rect> &rects)
 {
     ProcCtx *ctx = (ProcCtx *)proc_ctx;
@@ -95,6 +105,7 @@ run_again:
     }
 
     cout << "After merge, vector rect number " << rects.size() << endl;
+    display_rects(rects);
 }
 
 void draw_rectangle(YuvInfo *yuv, RectangleInfo *rec)

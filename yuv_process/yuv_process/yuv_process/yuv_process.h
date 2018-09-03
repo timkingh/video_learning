@@ -1,6 +1,9 @@
 #ifndef __YUV_PROCESS_H__
 #define __YUV_PROCESS_H__
+
 #include <stdint.h>
+#include "rectangle.h"
+
 
 typedef struct {
     uint32_t frame_cnt;
