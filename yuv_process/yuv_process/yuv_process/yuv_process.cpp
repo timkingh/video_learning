@@ -77,13 +77,8 @@ static void rk_handle_md(ProcCtx *ctx, ifstream *sad)
     start = time_usec();
     cout << "frame_num " << frame_num << " Vector Rect Number " << rects.size() << endl;
 
-    /*  vector<Rect>::iterator iter;
-      for (iter = rects.begin(); iter != rects.end(); iter++) {
-          cout << iter->left << " " << iter->top << " "
-               << iter->right << " " << iter->bottom << endl;
-      }*/
-
-    merge_rect((void *)ctx, rects);
+    //merge_rect((void *)ctx, rects);
+    merge_rect_optimize((void *)ctx, rects);
 
     end = time_usec();
     duration = (double)(end - start) / 1000000;

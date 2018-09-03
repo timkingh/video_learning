@@ -84,10 +84,73 @@ void display_rects(vector<Rect> &rects)
     }*/
 }
 
-void merge_rect(void *proc_ctx, vector<Rect> &rects)
+void calc_rects_average(vector<Rect> &rects, Rect *ave)
+{
+    Rect sum;
+    sum.left = sum.top = sum.right = sum.bottom = 0;
+
+    vector<Rect>::iterator iter;
+    for (iter = rects.begin(); iter != rects.end(); iter++) {
+        sum.left += iter->left;
+        sum.top += iter->top;
+        sum.right += iter->right;
+        sum.bottom += iter->bottom;
+    }
+
+    ave->left = sum.left / rects.size();
+    ave->top = sum.top / rects.size();
+    ave->right = sum.right / rects.size();
+    ave->bottom = sum.bottom / rects.size();
+
+    cout << "average region: ";
+    display_rect(ave);
+    cout << endl;
+}
+
+void divide_rects_into_groups(vector<Rect> &rects, Rect *ave, vector<Rect> groups[])
+{
+    uint32_t total_num = rects.size();
+    uint32_t idx, rects_idx;
+    vector<Rect>::iterator iter;
+
+    for (idx = 0; idx < total_num; idx++) {
+        iter = rects.begin();
+
+        if (iter->left <= ave->left && iter->top <= ave->top) {
+            rects_idx = 0;
+        } else if (iter->left > ave->left && iter->top <= ave->top) {
+            rects_idx = 1;
+        } else if (iter->left <= ave->left && iter->top > ave->top) {
+            rects_idx = 2;
+        } else {
+            rects_idx = 3;
+        }
+
+        groups[rects_idx].push_back(rects.at(0));
+        rects.erase(iter);
+    }
+
+    cout << "After division " << setw(4) << groups[0].size()
+        << setw(4) << groups[1].size()
+        << setw(4) << groups[2].size()
+        << setw(4) << groups[3].size() << endl;
+}
+
+void merge_groups_into_rects(vector<Rect> groups[], vector<Rect> &rects_new)
+{
+    uint32_t idx, rects_idx;
+    for (rects_idx = 0; rects_idx < 4; rects_idx++) {
+        for (idx = 0; idx < groups[rects_idx].size(); idx++) {
+            rects_new.push_back(groups[rects_idx].at(idx));
+        }
+    }
+
+    cout << "new rects " << rects_new.size() << endl;
+}
+
+void merge_rect(void *proc_ctx, vector<Rect> &rects, vector<Rect> &rects_org)
 {
     ProcCtx *ctx = (ProcCtx *)proc_ctx;
-    vector<Rect> rects_org = rects;
     Rect dst;
     uint32_t i, j;
     uint32_t motion_rate = 1, merge_cnt = 1;
@@ -104,7 +167,8 @@ run_again:
                 Rect b = rects.at(j);
                 //display_rect(&a);
                 //display_rect(&b);
-                cout << "merge cnt " << merge_cnt++ << " motion rate " << motion_rate << endl;
+                cout << "merge cnt " << setw(4) << merge_cnt++
+                     << " motion rate " << setw(3) << motion_rate << endl;
 
                 vector<Rect>::iterator iter;
                 iter = find(rects.begin(), rects.end(), a);
@@ -120,6 +184,26 @@ run_again:
 
     cout << "After merge, vector rect number " << rects.size() << endl;
     display_rects(rects);
+}
+
+void merge_rect_optimize(void *proc_ctx, vector<Rect> &rects)
+{
+    vector<Rect> rects_org = rects;
+    uint32_t idx;
+    Rect ave_rect;
+
+    calc_rects_average(rects, &ave_rect);
+
+    vector<Rect> groups[4];
+    divide_rects_into_groups(rects, &ave_rect, groups);
+
+    for (idx = 0; idx < 4; idx++)
+        merge_rect(proc_ctx, groups[idx], groups[idx]);
+
+    vector<Rect> rects_new;
+    merge_groups_into_rects(groups, rects_new);
+
+    merge_rect(proc_ctx, rects_new, rects_org);
 }
 
 void draw_rectangle(YuvInfo *yuv, RectangleInfo *rec)
