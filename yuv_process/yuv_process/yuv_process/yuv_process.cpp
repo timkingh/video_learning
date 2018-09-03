@@ -115,7 +115,7 @@ int main(int argc, char **argv)
     uint32_t right = getarg(50, "-r", "--right");
     uint32_t bottom = getarg(80, "-b", "--bottom");
     ctx->frames = getarg(2, "-f", "--frames");
-    ctx->motion_rate_thresh = getarg(30, "-m", "--motion_thresh");
+    ctx->motion_rate_thresh = getarg(50, "-m", "--motion_thresh");
     ctx->enable_draw_dot = getarg(1, "-dd", "--draw_dot");
 
     if (help) {
@@ -157,7 +157,7 @@ int main(int argc, char **argv)
         }
     }
 
-    cout << "sad path: " << sad_file << endl;
+    cout << "rk sad path: " << sad_file << endl;
     ifstream sad_path(sad_file.c_str());
     YuvInfo *yuv_info = &ctx->yuv_info;
     RectangleInfo rec_info;

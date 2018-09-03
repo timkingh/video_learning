@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <algorithm>
 #include "rectangle.h"
@@ -62,14 +63,25 @@ static uint32_t calc_motion_rate(vector<Rect> &rects, Rect &dst)
     return rate;
 }
 
+void display_rect(Rect *rect)
+{
+    cout << " (" << setw(3) << rect->left << "," << setw(3) << rect->top
+         << "," << setw(3) << rect->right << "," << setw(3) << rect->bottom << ") ";
+}
+
 void display_rects(vector<Rect> &rects)
 {
-    uint32_t idx = 0;
-    vector<Rect>::iterator iter;
-    for (iter = rects.begin(); iter < rects.end(); iter++) {
-        cout << "rectangle " << idx++ << ": " << iter->left << " " << iter->top
-             << " " << iter->right << " " << iter->bottom << endl;
+    uint32_t i = 0;
+    for (i = 0; i < rects.size(); i++) {
+        cout << "rectangle " << setw(3) << i << ": ";
+        display_rect(&(rects.at(i)));
+        cout << endl;
     }
+  /*  vector<Rect>::iterator iter;
+    for (iter = rects.begin(); iter < rects.end(); iter++) {
+        cout << "rectangle " << setw(3) << idx++ << ": " << setw(3) << iter->left << " " << iter->top
+             << " " << iter->right << " " << iter->bottom << endl;
+    }*/
 }
 
 void merge_rect(void *proc_ctx, vector<Rect> &rects)
@@ -78,7 +90,7 @@ void merge_rect(void *proc_ctx, vector<Rect> &rects)
     vector<Rect> rects_org = rects;
     Rect dst;
     uint32_t i, j;
-    uint32_t motion_rate = 1;
+    uint32_t motion_rate = 1, merge_cnt = 1;
     uint32_t motion_rate_thresh = ctx->motion_rate_thresh;
 
 run_again:
@@ -90,6 +102,9 @@ run_again:
             if (motion_rate >= motion_rate_thresh) {
                 Rect a = rects.at(i);
                 Rect b = rects.at(j);
+                //display_rect(&a);
+                //display_rect(&b);
+                cout << "merge cnt " << merge_cnt++ << " motion rate " << motion_rate << endl;
 
                 vector<Rect>::iterator iter;
                 iter = find(rects.begin(), rects.end(), a);
@@ -101,7 +116,6 @@ run_again:
                 goto run_again;
             }
         }
-
     }
 
     cout << "After merge, vector rect number " << rects.size() << endl;
