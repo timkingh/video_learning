@@ -197,8 +197,11 @@ void merge_rect_optimize(void *proc_ctx, vector<Rect> &rects_org, vector<Rect> &
     vector<Rect> groups[4];
     divide_rects_into_groups(rects, &ave_rect, groups);
 
-    for (idx = 0; idx < 4; idx++)
-        merge_rect(proc_ctx, groups[idx], groups[idx]);
+    vector<Rect> groups_org[4];
+    for (idx = 0; idx < 4; idx++) {
+        groups_org[idx] = groups[idx];
+        merge_rect(proc_ctx, groups[idx], groups_org[idx]);
+    }
 
     merge_groups_into_rects(groups, rects_new);
 
@@ -268,13 +271,13 @@ void draw_rectangle(YuvInfo *yuv, RectangleInfo *rec)
 
 void draw_blue_rectangle(YuvInfo *yuv, vector<Rect> &rects)
 {
-    uint32_t idx = 0;
+    uint32_t idx = 0, rects_size = rects.size();
     RectangleInfo rec_info;
     rec_info.y_pixel = 29; /* Blue */
     rec_info.u_pixel = 255;
     rec_info.v_pixel = 107;
 
-    for (idx = 0; idx < rects.size(); idx++) {
+    for (idx = 0; idx < rects_size; idx++) {
         Rect &rect = rects.back();
         rec_info.left = rect.left;
         rec_info.top = rect.top;
