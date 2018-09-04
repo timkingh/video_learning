@@ -56,6 +56,7 @@ static void rk_handle_md(ProcCtx *ctx, ifstream *sad)
         rect.right = rect.left + info->mb_size;
         rect.bottom = rect.top + info->mb_size;
         rect.motion_rate = 100;
+        rect.area = 16;
         rects.push_back(rect);
 
         if (sad->getline(lines, 512)) {

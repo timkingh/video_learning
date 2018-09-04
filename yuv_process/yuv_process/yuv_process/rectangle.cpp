@@ -17,6 +17,11 @@ inline bool Rect::operator == (const Rect &rect) const
     return false;
 }
 
+void Rect::calculate_area()
+{
+    area = (right - left) * (bottom - top);
+}
+
 /* judge whether two rects intersect */
 static bool is_intersect(Rect &rect1, Rect &rect2)
 {
@@ -66,8 +71,8 @@ static uint32_t calc_motion_rate(vector<Rect> &rects, Rect &dst)
 void display_rect(Rect *rect)
 {
     cout << " (" << setw(3) << rect->left << "," << setw(3) << rect->top
-         << "," << setw(3) << rect->right << "," << setw(3) << rect->bottom
-         << "," << setw(3) << rect->motion_rate << ") ";
+         << "," << setw(3) << rect->right << "," << setw(3) << rect->bottom << ") ("
+         << setw(6) << rect->area << "," << setw(3) << rect->motion_rate << ") ";
 }
 
 void display_rects(vector<Rect> &rects)
@@ -98,7 +103,12 @@ static void calculate_distance(vector<Rect> &rects)
     }
 }
 
-static bool compare_rect(const Rect &a, const Rect &b)
+static bool compare_area(const Rect &a, const Rect &b)
+{
+    return (a.area > b.area);
+}
+
+static bool compare_dist(const Rect &a, const Rect &b)
 {
     return (a.distance < b.distance);
 }
@@ -109,7 +119,7 @@ static void sort_rects(vector<Rect> groups[])
 
     for (idx = 0; idx < 4; idx++) {
         calculate_distance(groups[idx]);
-        sort(groups[idx].begin(), groups[idx].end(), compare_rect);
+        sort(groups[idx].begin(), groups[idx].end(), compare_dist);
     }
 }
 
@@ -206,6 +216,7 @@ run_again:
                 rects.erase(iter);
 
                 dst.motion_rate = motion_rate;
+                dst.calculate_area();
                 rects.push_back(dst);
 
                 goto run_again;
@@ -213,6 +224,8 @@ run_again:
         }
     }
 
+    /* sort rects in area, descending order */
+    sort(rects.begin(), rects.end(), compare_area);
     cout << "After merge, vector rect number " << rects.size() << endl;
     display_rects(rects);
 }

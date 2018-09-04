@@ -29,7 +29,10 @@ public:
     uint32_t bottom;
     uint32_t motion_rate;
     uint32_t distance;
+    uint32_t area;
+
     inline bool operator == (const Rect &rect1) const;
+    void calculate_area();
 };
 
 void merge_rect(void *proc_ctx, std::vector<Rect> &rects, std::vector<Rect> &rects_org);
