@@ -27,6 +27,8 @@ public:
     uint32_t top;
     uint32_t right;
     uint32_t bottom;
+    uint32_t motion_rate;
+    uint32_t distance;
     inline bool operator == (const Rect &rect1) const;
 };
 

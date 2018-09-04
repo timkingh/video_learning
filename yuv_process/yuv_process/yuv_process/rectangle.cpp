@@ -66,7 +66,8 @@ static uint32_t calc_motion_rate(vector<Rect> &rects, Rect &dst)
 void display_rect(Rect *rect)
 {
     cout << " (" << setw(3) << rect->left << "," << setw(3) << rect->top
-         << "," << setw(3) << rect->right << "," << setw(3) << rect->bottom << ") ";
+         << "," << setw(3) << rect->right << "," << setw(3) << rect->bottom
+         << "," << setw(3) << rect->motion_rate << ") ";
 }
 
 void display_rects(vector<Rect> &rects)
@@ -82,6 +83,34 @@ void display_rects(vector<Rect> &rects)
         cout << "rectangle " << setw(3) << idx++ << ": " << setw(3) << iter->left << " " << iter->top
              << " " << iter->right << " " << iter->bottom << endl;
     }*/
+}
+
+static void calculate_distance(vector<Rect> &rects)
+{
+    vector<Rect>::iterator iter = rects.begin();
+    uint32_t base_left = iter->left;
+    uint32_t base_top = iter->top;
+
+    for (iter; iter != rects.end(); iter++) {
+        int32_t x_diff = iter->left - base_left;
+        int32_t y_diff = iter->top - base_top;
+        iter->distance = x_diff * x_diff + y_diff * y_diff;
+    }
+}
+
+static bool compare_rect(Rect &a, Rect &b)
+{
+    return (a.distance < b.distance);
+}
+
+static void sort_rects(vector<Rect> groups[])
+{
+    uint32_t idx;
+
+    for (idx = 0; idx < 4; idx++) {
+        calculate_distance(groups[idx]);
+        sort(groups[idx].begin(), groups[idx].end(), compare_rect);
+    }
 }
 
 void calc_rects_average(vector<Rect> &rects, Rect *ave)
@@ -175,6 +204,8 @@ run_again:
                 rects.erase(iter);
                 iter = find(rects.begin(), rects.end(), b);
                 rects.erase(iter);
+
+                dst.motion_rate = motion_rate;
                 rects.push_back(dst);
 
                 goto run_again;
@@ -196,6 +227,8 @@ void merge_rect_optimize(void *proc_ctx, vector<Rect> &rects_org, vector<Rect> &
 
     vector<Rect> groups[4];
     divide_rects_into_groups(rects, &ave_rect, groups);
+
+    sort_rects(groups);
 
     vector<Rect> groups_org[4];
     for (idx = 0; idx < 4; idx++) {
@@ -278,14 +311,13 @@ void draw_blue_rectangle(YuvInfo *yuv, vector<Rect> &rects)
     rec_info.v_pixel = 107;
 
     for (idx = 0; idx < rects_size; idx++) {
-        Rect &rect = rects.back();
+        Rect rect = rects.at(idx);
         rec_info.left = rect.left;
         rec_info.top = rect.top;
         rec_info.right = rect.right;
         rec_info.bottom = rect.bottom;
 
         draw_rectangle(yuv, &rec_info);
-        rects.pop_back();
     }
 }
 
