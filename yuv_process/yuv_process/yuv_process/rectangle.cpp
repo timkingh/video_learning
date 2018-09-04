@@ -98,7 +98,7 @@ static void calculate_distance(vector<Rect> &rects)
     }
 }
 
-static bool compare_rect(Rect &a, Rect &b)
+static bool compare_rect(const Rect &a, const Rect &b)
 {
     return (a.distance < b.distance);
 }
