@@ -175,6 +175,74 @@ void divide_rects_into_groups(vector<Rect> &rects, Rect *ave, vector<Rect> group
         << setw(4) << groups[3].size() << endl;
 }
 
+void handle_horizontal_rects(vector<uint32_t> &xs, uint32_t y_min, uint32_t y_max, vector<Rect> &rects)
+{
+    vector<uint32_t> all_x = xs;
+    uint32_t num = all_x.size() / 2;
+
+    sort(all_x.begin(), all_x.end());
+    all_x.erase(unique(all_x.begin(), all_x.end()), all_x.end());
+
+    for (uint32_t i = 0; i < all_x.size() - 1; i++) {
+        uint32_t low = all_x[i], high = all_x[i + 1];
+
+        for (uint32_t j = 0; j < num; j++) {
+            if (xs[j * 2] <= low && high <= xs[j * 2 + 1]) {
+                Rect rect;
+                rect.left = low;
+                rect.right = high;
+                rect.top = y_min;
+                rect.bottom = y_max;
+
+                rects.push_back(rect);
+            }
+        }
+    }
+}
+
+void handle_vertical_rects(vector<uint32_t> &all_y, vector<Rect> &rects_org, vector<Rect> &rects)
+{
+    uint32_t i, j;
+    vector<uint32_t> xs;
+    Rect rect;
+
+    rects.clear(); /* used for saving new rects */
+
+    for (i = 0; i < all_y.size(); i++) {
+        uint32_t y_min = all_y.at(i);
+        uint32_t y_max = all_y.at(i + 1);
+
+        for (j = 0; j < rects_org.size(); j++) {
+            rect = rects_org.at(j);
+
+            if (rect.top <= y_min && y_max <= rect.bottom) {
+                xs.push_back(rect.left);
+                xs.push_back(rect.right);
+            }
+        }
+
+        if (xs.size() != 0) {
+			handle_horizontal_rects(xs, y_min, y_max, rects);
+        }
+    }
+}
+
+void make_rect_unique(vector<Rect> &rects)
+{
+    vector<uint32_t> all_y;
+    vector<Rect>::iterator iter;
+    for (iter = rects.begin(); iter != rects.end(); iter++) {
+        all_y.push_back(iter->top);
+        all_y.push_back(iter->bottom);
+    }
+
+    sort(all_y.begin(), all_y.end());
+    all_y.erase(unique(all_y.begin(), all_y.end()), all_y.end());
+
+    vector<Rect> rects_org = rects;
+    handle_vertical_rects(all_y, rects_org, rects);
+}
+
 void merge_groups_into_rects(vector<Rect> groups[], vector<Rect> &rects_new)
 {
     uint32_t idx, rects_idx;
@@ -252,6 +320,8 @@ void merge_rect_optimize(void *proc_ctx, vector<Rect> &rects_org, vector<Rect> &
     merge_groups_into_rects(groups, rects_new);
 
     merge_rect(proc_ctx, rects_new, rects_org);
+
+    make_rect_unique(rects_new);
 }
 
 void draw_rectangle(YuvInfo *yuv, RectangleInfo *rec)
