@@ -19,6 +19,7 @@ typedef struct ProcCtx {
     uint32_t frame_read;
     uint32_t motion_rate_thresh;
     uint8_t  enable_draw_dot;
+    uint8_t  judge_neighbor;
     YuvInfo yuv_info;
     SadInfo sad_info;
 } ProcCtx;

@@ -29,6 +29,19 @@ static bool is_intersect(const Rect &rect1, const Rect &rect2)
              rect1.top >= rect2.bottom || rect2.top >= rect1.bottom);
 }
 
+static bool is_neighboring(const Rect &a, const Rect &b)
+{
+    uint32_t width_a = a.right - a.left;
+    uint32_t width_b = b.right - b.left;
+    uint32_t height_a = a.bottom - a.top;
+    uint32_t height_b = b.bottom - b.top;
+
+    return ((b.top == a.top && b.right == a.left && height_a == height_b) || \
+            (b.top == a.top && b.left == a.right && height_a == height_b) || \
+            (b.left == a.left && b.bottom == a.top && width_a == width_b) || \
+            (b.left == a.left && b.top == a.bottom && width_a == width_b));
+}
+
 static void merge_two_rect(Rect &a, Rect &b, Rect &dst)
 {
     dst.left = (a.left < b.left) ? a.left : b.left;
@@ -293,32 +306,39 @@ void merge_rect(void *proc_ctx, vector<Rect> &rects, const vector<Rect> &rects_o
     uint32_t i, j;
     uint32_t motion_rate = 1, merge_cnt = 1;
     uint32_t motion_rate_thresh = ctx->motion_rate_thresh;
+    uint8_t merge_flg = 1;
 
 run_again:
     for (i = 0; i < rects.size() - 1; i++) {
         for (j = i + 1; j < rects.size(); j++) {
-            merge_two_rect(rects.at(i), rects.at(j), dst);
+            if (ctx->judge_neighbor) {
+                merge_flg = (uint8_t)is_neighboring(rects.at(i), rects.at(j));
+            }
 
-            motion_rate = calc_motion_rate(rects_org, dst);
-            if (motion_rate >= motion_rate_thresh) {
-                Rect a = rects.at(i);
-                Rect b = rects.at(j);
-                //display_rect(&a);
-                //display_rect(&b);
-                cout << "merge cnt " << setw(4) << merge_cnt++
-                     << " motion rate " << setw(3) << motion_rate << endl;
+            if (merge_flg) {
+                merge_two_rect(rects.at(i), rects.at(j), dst);
 
-                vector<Rect>::iterator iter;
-                iter = find(rects.begin(), rects.end(), a);
-                rects.erase(iter);
-                iter = find(rects.begin(), rects.end(), b);
-                rects.erase(iter);
+                motion_rate = calc_motion_rate(rects_org, dst);
+                if (motion_rate >= motion_rate_thresh) {
+                    Rect a = rects.at(i);
+                    Rect b = rects.at(j);
+                    //display_rect(&a);
+                    //display_rect(&b);
+                    cout << "merge cnt " << setw(4) << merge_cnt++
+                         << " motion rate " << setw(3) << motion_rate << endl;
 
-                dst.motion_rate = motion_rate;
-                dst.calculate_area();
-                rects.push_back(dst);
+                    vector<Rect>::iterator iter;
+                    iter = find(rects.begin(), rects.end(), a);
+                    rects.erase(iter);
+                    iter = find(rects.begin(), rects.end(), b);
+                    rects.erase(iter);
 
-                goto run_again;
+                    dst.motion_rate = motion_rate;
+                    dst.calculate_area();
+                    rects.push_back(dst);
+
+                    goto run_again;
+                }
             }
         }
     }
@@ -331,33 +351,46 @@ run_again:
 
 void merge_rect_optimize(void *proc_ctx, const vector<Rect> &rects_org, vector<Rect> &rects_new)
 {
+    ProcCtx *ctx = (ProcCtx *)proc_ctx;
     vector<Rect> rects = rects_org;
     uint32_t idx;
     Rect ave_rect;
 
+    cout << "Step 1 --- calculate average coordinate of rectangles" << endl;
     calc_rects_average(rects, &ave_rect);
 
+
+    cout << "Step 2 --- divide rectangles into four groups" << endl;
     vector<Rect> groups[4];
     divide_rects_into_groups(rects, &ave_rect, groups);
 
+    cout << "Step 3 --- sort rectangles in distance" << endl;
     sort_rects(groups);
 
+    cout << "Step 4 --- merge rectangles respectively" << endl;
     vector<Rect> groups_org[4];
     for (idx = 0; idx < 4; idx++) {
         groups_org[idx] = groups[idx];
         merge_rect(proc_ctx, groups[idx], groups_org[idx]);
     }
 
+    cout << "Step 5 --- merge four groups of rectangles" << endl;
     merge_groups_into_rects(groups, rects_new);
-
     merge_rect(proc_ctx, rects_new, rects_org);
 
     {
         /* remove duplicated blocks */
+        cout << "Step 6 --- remove duplicated blocks" << endl;
         make_rect_unique(rects_new);
 
         /* remove rectangles whose motion rate is less than motion_rate_thresh */
+        cout << "Step 7 --- remove still blocks" << endl;
         detect_motion_rate(proc_ctx, rects_org, rects_new);
+
+        /* merge neighboring rectangles */
+        cout << "Step 8 --- merge neighboring rectangles" << endl;
+        ctx->judge_neighbor = 1;
+        merge_rect(proc_ctx, rects_new, rects_org);
     }
 }
 
