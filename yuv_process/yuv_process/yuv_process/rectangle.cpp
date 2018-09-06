@@ -195,6 +195,7 @@ void handle_horizontal_rects(vector<uint32_t> &xs, uint32_t y_min, uint32_t y_ma
                 rect.bottom = y_max;
 
                 rects.push_back(rect);
+                break;
             }
         }
     }
@@ -208,7 +209,7 @@ void handle_vertical_rects(vector<uint32_t> &all_y, vector<Rect> &rects_org, vec
 
     rects.clear(); /* used for saving new rects */
 
-    for (i = 0; i < all_y.size(); i++) {
+    for (i = 0; i < all_y.size() - 1; i++) {
         uint32_t y_min = all_y.at(i);
         uint32_t y_max = all_y.at(i + 1);
 
@@ -241,6 +242,7 @@ void make_rect_unique(vector<Rect> &rects)
 
     vector<Rect> rects_org = rects;
     handle_vertical_rects(all_y, rects_org, rects);
+    display_rects(rects);
 }
 
 void merge_groups_into_rects(vector<Rect> groups[], vector<Rect> &rects_new)
