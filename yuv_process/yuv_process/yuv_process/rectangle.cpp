@@ -29,6 +29,12 @@ static bool is_intersect(const Rect &rect1, const Rect &rect2)
              rect1.top >= rect2.bottom || rect2.top >= rect1.bottom);
 }
 
+static bool is_intersect2(const Rect &rect1, const Rect &rect2)
+{
+    return !(rect1.left > rect2.right || rect2.left > rect1.right || \
+             rect1.top > rect2.bottom || rect2.top > rect1.bottom);
+}
+
 static bool is_neighboring(const Rect &a, const Rect &b)
 {
     uint32_t width_a = a.right - a.left;
@@ -315,11 +321,16 @@ run_again:
                 merge_flg = (uint8_t)is_neighboring(rects.at(i), rects.at(j));
             }
 
+            if (ctx->judge_intersect) {
+                merge_flg = (uint8_t)is_intersect2(rects.at(i), rects.at(j));
+            }
+
             if (merge_flg) {
                 merge_two_rect(rects.at(i), rects.at(j), dst);
 
                 motion_rate = calc_motion_rate(rects_org, dst);
-                if (motion_rate >= motion_rate_thresh) {
+                if ((motion_rate >= motion_rate_thresh) || ctx->judge_neighbor == 1 ||
+                     ctx->judge_intersect == 1) {
                     Rect a = rects.at(i);
                     Rect b = rects.at(j);
                     //display_rect(&a);
@@ -390,6 +401,11 @@ void merge_rect_optimize(void *proc_ctx, const vector<Rect> &rects_org, vector<R
         /* merge neighboring rectangles */
         cout << "Step 8 --- merge neighboring rectangles" << endl;
         ctx->judge_neighbor = 1;
+        merge_rect(proc_ctx, rects_new, rects_org);
+
+        /* merge intersecting rectangles */
+        cout << "Step 9 --- merge intersecting rectangles" << endl;
+        ctx->judge_intersect = 1;
         merge_rect(proc_ctx, rects_new, rects_org);
     }
 }
