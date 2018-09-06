@@ -23,7 +23,7 @@ void Rect::calculate_area()
 }
 
 /* judge whether two rects intersect */
-static bool is_intersect(Rect &rect1, Rect &rect2)
+static bool is_intersect(const Rect &rect1, const Rect &rect2)
 {
     return !(rect1.left >= rect2.right || rect2.left >= rect1.right || \
              rect1.top >= rect2.bottom || rect2.top >= rect1.bottom);
@@ -37,7 +37,7 @@ static void merge_two_rect(Rect &a, Rect &b, Rect &dst)
     dst.bottom = (a.bottom > b.bottom) ? a.bottom : b.bottom;
 }
 
-static uint32_t calc_motion_rate(vector<Rect> &rects, Rect &dst)
+static uint32_t calc_motion_rate(const vector<Rect> &rects, Rect &dst)
 {
     uint32_t cnt = 0, rate = 1;
     uint32_t x, y;
@@ -113,6 +113,11 @@ static bool compare_dist(const Rect &a, const Rect &b)
     return (a.distance < b.distance);
 }
 
+static bool compare_mr(const Rect &a, const Rect &b)
+{
+    return (a.motion_rate > b.motion_rate);
+}
+
 static void sort_rects(vector<Rect> groups[])
 {
     uint32_t idx;
@@ -173,6 +178,31 @@ void divide_rects_into_groups(vector<Rect> &rects, Rect *ave, vector<Rect> group
         << setw(4) << groups[1].size()
         << setw(4) << groups[2].size()
         << setw(4) << groups[3].size() << endl;
+}
+
+void detect_motion_rate(void *proc_ctx, const vector<Rect> &rects_org, vector<Rect> &rects_new)
+{
+    ProcCtx *ctx = (ProcCtx *)proc_ctx;
+
+    for (uint32_t i = 0; i < rects_new.size(); i++) {
+        rects_new[i].motion_rate = calc_motion_rate(rects_org, rects_new[i]);
+        rects_new[i].calculate_area();
+        rects_new[i].distance = 0;
+    }
+
+    sort(rects_new.begin(), rects_new.end(), compare_mr);
+    vector<Rect>::iterator iter;
+    for (iter = rects_new.begin(); iter != rects_new.end(); iter++) {
+        if (iter->motion_rate <= 0)
+            break;
+    }
+
+    /* remove rectangles whose motion rate is less than motion_rate_thresh */
+    if (iter != rects_new.end()) {
+        rects_new.erase(iter, rects_new.end());
+    }
+
+    display_rects(rects_new);
 }
 
 void handle_horizontal_rects(vector<uint32_t> &xs, uint32_t y_min, uint32_t y_max, vector<Rect> &rects)
@@ -242,7 +272,6 @@ void make_rect_unique(vector<Rect> &rects)
 
     vector<Rect> rects_org = rects;
     handle_vertical_rects(all_y, rects_org, rects);
-    display_rects(rects);
 }
 
 void merge_groups_into_rects(vector<Rect> groups[], vector<Rect> &rects_new)
@@ -257,7 +286,7 @@ void merge_groups_into_rects(vector<Rect> groups[], vector<Rect> &rects_new)
     cout << "new rects " << rects_new.size() << endl;
 }
 
-void merge_rect(void *proc_ctx, vector<Rect> &rects, vector<Rect> &rects_org)
+void merge_rect(void *proc_ctx, vector<Rect> &rects, const vector<Rect> &rects_org)
 {
     ProcCtx *ctx = (ProcCtx *)proc_ctx;
     Rect dst;
@@ -300,7 +329,7 @@ run_again:
     display_rects(rects);
 }
 
-void merge_rect_optimize(void *proc_ctx, vector<Rect> &rects_org, vector<Rect> &rects_new)
+void merge_rect_optimize(void *proc_ctx, const vector<Rect> &rects_org, vector<Rect> &rects_new)
 {
     vector<Rect> rects = rects_org;
     uint32_t idx;
@@ -323,7 +352,13 @@ void merge_rect_optimize(void *proc_ctx, vector<Rect> &rects_org, vector<Rect> &
 
     merge_rect(proc_ctx, rects_new, rects_org);
 
-    make_rect_unique(rects_new);
+    {
+        /* remove duplicated blocks */
+        make_rect_unique(rects_new);
+
+        /* remove rectangles whose motion rate is less than motion_rate_thresh */
+        detect_motion_rate(proc_ctx, rects_org, rects_new);
+    }
 }
 
 void draw_rectangle(YuvInfo *yuv, RectangleInfo *rec)
