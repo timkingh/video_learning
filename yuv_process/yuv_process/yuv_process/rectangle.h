@@ -33,6 +33,9 @@ public:
 
     inline bool operator == (const Rect &rect1) const;
     void calculate_area();
+    Rect();
+    Rect(uint32_t l, uint32_t t, uint32_t r, uint32_t b);
+    ~Rect();
 };
 
 void merge_rect(void *proc_ctx, std::vector<Rect> &rects, const std::vector<Rect> &rects_org);

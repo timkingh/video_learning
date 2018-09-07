@@ -9,6 +9,22 @@ using namespace std;
 
 #define MB_SIZE    (4)
 
+Rect::Rect()
+     : left(0), right(0), top(0), bottom(0), motion_rate(0),
+       distance(0), area(0)
+{
+}
+
+Rect::Rect(uint32_t l, uint32_t t, uint32_t r, uint32_t b)
+     : left(l), right(r), top(t), bottom(b), motion_rate(0),
+       distance(0), area(0)
+{
+}
+
+Rect::~Rect()
+{
+}
+
 inline bool Rect::operator == (const Rect &rect) const
 {
     if (left == rect.left && top == rect.top &&
@@ -237,12 +253,7 @@ void handle_horizontal_rects(vector<uint32_t> &xs, uint32_t y_min, uint32_t y_ma
 
         for (uint32_t j = 0; j < num; j++) {
             if (xs[j * 2] <= low && high <= xs[j * 2 + 1]) {
-                Rect rect;
-                rect.left = low;
-                rect.right = high;
-                rect.top = y_min;
-                rect.bottom = y_max;
-
+                Rect rect(low, y_min, high, y_max);
                 rects.push_back(rect);
                 break;
             }
