@@ -501,25 +501,3 @@ void draw_blue_rectangle(YuvInfo *yuv, vector<Rect> &rects)
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

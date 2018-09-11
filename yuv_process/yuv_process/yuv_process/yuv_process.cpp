@@ -38,7 +38,6 @@ static void rk_handle_md(ProcCtx *ctx, ifstream *sad)
     Rect rect;
     char lines[512];
     if (frame_num == 1 && sad->getline(lines, 512)) {
-        cout << lines << endl;
         int match_cnt = SSCANF(lines, "frame=%d mb_size=%d mb_width=%d mb_height=%d mb_x=%d mb_y=%d",
                                &info->frame_cnt, &info->mb_size, &info->mb_width, &info->mb_height, &info->mb_x, &info->mb_y);
         if (match_cnt > 1) {
@@ -60,7 +59,6 @@ static void rk_handle_md(ProcCtx *ctx, ifstream *sad)
         rects.push_back(rect);
 
         if (sad->getline(lines, 512)) {
-            //cout << lines << endl;
             int match_cnt = SSCANF(lines, "frame=%d mb_size=%d mb_width=%d mb_height=%d mb_x=%d mb_y=%d",
                                    &info->frame_cnt, &info->mb_size, &info->mb_width, &info->mb_height, &info->mb_x, &info->mb_y);
             if (match_cnt > 1) {
@@ -74,20 +72,25 @@ static void rk_handle_md(ProcCtx *ctx, ifstream *sad)
         }
     }
 
-    int64_t start, end;
-    double duration;
-    start = time_usec();
-    cout << "frame_num " << frame_num << " Vector Rect Number " << rects.size() << endl;
+    /* merge motion macroblocks and draw blue rectangles */
+    if (ctx->draw_blue_rect) {
+        int64_t start, end;
+        double duration;
+        start = time_usec();
+        cout << "frame_num " << frame_num << " Vector Rect Number " << rects.size() << endl;
 
-    //merge_rect((void *)ctx, rects);
-    merge_rect_optimize((void *)ctx, rects, rects_new);
+        /* simplest merge, low efficiency */
+        //merge_rect((void *)ctx, rects);
 
-    end = time_usec();
-    duration = (double)(end - start) / 1000000;
-    cout << "frame_num " << frame_num << " finish merge, " << duration << " seconds" << endl;
+        /* optimized merge, middle efficiency */
+        merge_rect_optimize((void *)ctx, rects, rects_new);
 
-    draw_blue_rectangle(yuv, rects_new);
+        end = time_usec();
+        duration = (double)(end - start) / 1000000;
+        cout << "frame_num " << frame_num << " finish merge, " << duration << " seconds" << endl;
 
+        draw_blue_rectangle(yuv, rects_new);
+    }
 }
 
 int main(int argc, char **argv)
@@ -103,8 +106,8 @@ int main(int argc, char **argv)
     bool help = getarg(false, "-H", "--help", "-?");
     string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576.yuv", "-i", "--input");
     string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576_hi_rk.yuv", "-o", "--output");
-    string coord_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903.md", "-c", "--coordinate");
-    string sad_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576_150.sad", "-s", "--sad");
+    string coord_file = getarg("F:\\rkvenc_verify\\cfg\\3903_hisilicon.md", "-c", "--coordinate");
+    string sad_file = getarg("F:\\rkvenc_verify\\cfg\\3903_720x576_150_1.sad", "-s", "--sad");
     uint32_t width = getarg(720, "-w", "--width");
     uint32_t height = getarg(576, "-h", "--height");
     uint32_t left = getarg(10, "-l", "--left");
@@ -114,6 +117,7 @@ int main(int argc, char **argv)
     ctx->frames = getarg(2, "-f", "--frames");
     ctx->motion_rate_thresh = getarg(50, "-m", "--motion_thresh");
     ctx->enable_draw_dot = getarg(1, "-dd", "--draw_dot");
+    ctx->draw_blue_rect = getarg(0, "-dbr", "--draw_blue_rect");
 
     if (help) {
         cout << "Usage:" << endl
@@ -142,8 +146,6 @@ int main(int argc, char **argv)
     ifstream coord(coord_file.c_str());
     char lines[512];
     if (coord.getline(lines, 512)) {
-        cout << lines << endl;
-
         int match_cnt = SSCANF(lines, "frame=%d, num=%d, idx=%d, left=%d, top=%d, right=%d, bottom=%d",
                                &frame_cnt, &region_num, &region_idx, &left, &top, &right, &bottom);
         if (match_cnt > 1) {
@@ -176,8 +178,6 @@ int main(int argc, char **argv)
             draw_rectangle(yuv_info, &rec_info);
 
             if (coord.getline(lines, 512)) {
-                //cout << lines << endl;
-
                 int match_cnt = SSCANF(lines, "frame=%d, num=%d, idx=%d, left=%d, top=%d, right=%d, bottom=%d",
                                        &frame_cnt, &region_num, &region_idx, &left, &top, &right, &bottom);
                 if (match_cnt > 1) {
@@ -207,9 +207,7 @@ int main(int argc, char **argv)
     if (ifs && ifs != &cin)
         delete ifs;
     ofs.close();
-
-    if (buf)
-        delete [] buf;
+    delete [] buf;
 
     cout << "----------End!-------------" << endl;
     //string str;
