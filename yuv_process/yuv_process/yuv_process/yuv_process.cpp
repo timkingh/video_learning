@@ -1,3 +1,6 @@
+#include <iostream>
+#include <fstream>
+#include <string.h>  /* needed by sscanf */
 #include <string>
 #include <vector>
 #include "getopt.hpp"
@@ -26,6 +29,113 @@ static void draw_red_dot(YuvInfo *yuv, SadInfo *info)
     draw_rectangle(yuv, &rec_info);
 }
 
+static void draw_blue_dot(ProcCtx *ctx, vector<Rect> &rects)
+{
+    YuvInfo *yuv = &ctx->yuv_info;
+    RectangleInfo rec_info;
+    vector<Rect>::iterator iter;
+
+    for (iter = rects.begin(); iter != rects.end(); iter++) {
+
+        rec_info.left = iter->left;
+        rec_info.top = iter->top;
+        rec_info.right = iter->left + 1;
+        rec_info.bottom = iter->top + 1;
+        rec_info.y_pixel = 29; /* Blue */
+        rec_info.u_pixel = 255;
+        rec_info.v_pixel = 107;
+
+        draw_rectangle(yuv, &rec_info);
+    }
+}
+
+static bool circle_state(char *buf, uint32_t stride, uint32_t pos)
+{
+    if (buf[pos - stride] && buf[pos + stride] &&
+        buf[pos - 1] && buf[pos - 1 - stride] && buf[pos - 1 + stride] &&
+        buf[pos + 1] && buf[pos + 1 - stride] && buf[pos + 1 + stride]) {
+        return true;
+    }
+    return false;
+}
+
+static void set_motion_blocks(ProcCtx *ctx, char *buf, uint32_t buf_len)
+{
+    uint32_t mb_width = ctx->width / ctx->mb_size;
+    uint32_t mb_height = ctx->height / ctx->mb_size;
+    uint32_t buf_stride = mb_width + 2;
+    uint32_t pos;
+    char *p = buf + buf_stride + 1;
+
+    for (uint32_t row = 0; row < mb_height; row++) {
+        for (uint32_t col = 0; col < mb_width; col++) {
+            pos = col + row * buf_stride;
+            if (circle_state(buf, buf_stride, pos)) {
+                p[pos] = 1;
+            }
+        }
+    }
+}
+
+static void translate_coordinate(ProcCtx *ctx, char *buf, vector<Rect> &rects_fill)
+{
+    uint32_t mb_width = ctx->width / ctx->mb_size;
+    uint32_t mb_height = ctx->height / ctx->mb_size;
+    uint32_t buf_stride = mb_width + 2;
+    uint32_t pos;
+    char *p = buf + buf_stride + 1;
+
+    for (uint32_t row = 0; row < mb_height; row++) {
+        for (uint32_t col = 0; col < mb_width; col++) {
+            pos = col + row * buf_stride;
+            if (p[pos] == 1) {
+                uint32_t left = col * ctx->mb_size;
+                uint32_t top = row * ctx->mb_size;
+                uint32_t right = left + ctx->mb_size;
+                uint32_t bottom = top + ctx->mb_size;
+                Rect rect(left, top, right, bottom);
+                rects_fill.push_back(rect);
+            }
+        }
+    }
+
+}
+
+static void fill_motion_blocks(ProcCtx *ctx, const vector<Rect> &rects, vector<Rect> &rects_fill)
+{
+    uint32_t idx, x_filled, y_filled;
+    uint32_t mb_width = ctx->width / ctx->mb_size;
+    uint32_t mb_height = ctx->height / ctx->mb_size;
+    uint32_t buf_stride = mb_width + 2;
+    uint32_t buf_len = (mb_width + 2) * (mb_height + 2);
+    char *buf = new char[buf_len];
+    Rect rect;
+    memset(buf, 0, sizeof(char) * buf_len);
+
+    for (idx = 0; idx < rects.size(); idx++) {
+        rect = rects.at(idx);
+        x_filled = rect.left / ctx->mb_size + 1;
+        y_filled = rect.top / ctx->mb_size + 1;
+        buf[x_filled + y_filled * buf_stride] = 1; /* motional block */
+    }
+
+    uint32_t pos = (mb_height + 1) * buf_stride;
+    for (idx = 1; idx <= mb_width; idx++) {
+        buf[idx] = buf[idx + buf_stride]; /* y_filled = 0 */
+        buf[idx + pos] = buf[idx + pos - buf_stride]; /* y_filled = mb_height + 1 */
+    }
+
+    for (idx = 0; idx <= mb_height + 1; idx++) {
+        buf[idx * buf_stride] = buf[idx * buf_stride + 1]; /* x_filled = 0 */
+        buf[idx * buf_stride + buf_stride - 1] = buf[idx * buf_stride + buf_stride - 2]; /* x_filled = mb_width + 1 */
+    }
+
+    set_motion_blocks(ctx, buf, buf_len);
+    translate_coordinate(ctx, buf, rects_fill);
+
+    delete [] buf;
+}
+
 static void rk_handle_md(ProcCtx *ctx, ifstream *sad)
 {
     YuvInfo *yuv = &ctx->yuv_info;
@@ -41,6 +151,8 @@ static void rk_handle_md(ProcCtx *ctx, ifstream *sad)
             cout << "match_cnt " << match_cnt << " frame_cnt " << info->frame_cnt
                  << " mb_width " << info->mb_width << " mb_height " << info->mb_height
                  << " mb_x " << info->mb_x << " mb_y " << info->mb_y << endl;
+
+            ctx->mb_size = info->mb_size;
         }
     }
 
@@ -87,6 +199,12 @@ static void rk_handle_md(ProcCtx *ctx, ifstream *sad)
         cout << "frame_num " << frame_num << " finish merge, " << duration << " seconds" << endl;
 
         draw_blue_rectangle(yuv, rects_new);
+    }
+
+    if (ctx->draw_blue_dot) {
+        vector<Rect> rects_fill;
+        fill_motion_blocks(ctx, rects, rects_fill);
+        draw_blue_dot(ctx, rects_fill);
     }
 }
 
@@ -189,6 +307,7 @@ int main(int argc, char **argv)
     ctx->frames = getarg(2, "-f", "--frames");
     ctx->motion_rate_thresh = getarg(50, "-m", "--motion_thresh");
     ctx->enable_draw_dot = getarg(1, "-dd", "--draw_dot");
+    ctx->draw_blue_dot = getarg(1, "-dbd", "--draw_blue_dot");
     ctx->draw_blue_rect = getarg(0, "-dbr", "--draw_blue_rect");
 
     if (help) {
