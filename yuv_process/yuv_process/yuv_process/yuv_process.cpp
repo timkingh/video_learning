@@ -1,8 +1,5 @@
-#include <iostream>
-#include <fstream>
 #include <string>
 #include <vector>
-#include <string.h>
 #include "getopt.hpp"
 #include "common.h"
 #include "yuv_process.h"
@@ -93,58 +90,23 @@ static void rk_handle_md(ProcCtx *ctx, ifstream *sad)
     }
 }
 
-int main(int argc, char **argv)
+static void process_yuv(ProcCtx *ctx)
 {
-    ProcCtx proc_ctx;
-    ProcCtx *ctx = &proc_ctx;
-    memset(ctx, 0, sizeof(ProcCtx));
-
-    /* -c 3903.md --- Motion detected regions of Hisilicon
-     * -s   *.sad --- Motion detected regions of RK
-     */
-    cout << "----------Test-------------" << endl;
-    bool help = getarg(false, "-H", "--help", "-?");
-    string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576.yuv", "-i", "--input");
-    string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576_hi_rk.yuv", "-o", "--output");
-    string coord_file = getarg("F:\\rkvenc_verify\\cfg\\3903_hisilicon.md", "-c", "--coordinate");
-    string sad_file = getarg("F:\\rkvenc_verify\\cfg\\3903_720x576_150_1.sad", "-s", "--sad");
-    uint32_t width = getarg(720, "-w", "--width");
-    uint32_t height = getarg(576, "-h", "--height");
-    uint32_t left = getarg(10, "-l", "--left");
-    uint32_t top = getarg(20, "-t", "--top");
-    uint32_t right = getarg(50, "-r", "--right");
-    uint32_t bottom = getarg(80, "-b", "--bottom");
-    ctx->frames = getarg(2, "-f", "--frames");
-    ctx->motion_rate_thresh = getarg(50, "-m", "--motion_thresh");
-    ctx->enable_draw_dot = getarg(1, "-dd", "--draw_dot");
-    ctx->draw_blue_rect = getarg(0, "-dbr", "--draw_blue_rect");
-
-    if (help) {
-        cout << "Usage:" << endl
-             << "./yuv_process -i=3903_720x576.yuv -o=3903_720x576_hi_rk.yuv "
-             << "-c=3903.md -s=3903_720x576_150.sad -f=2"
-             << endl;
-        return 0;
-    }
-
-    unsigned int luma_size = width * height;
-    unsigned int chroma_size = luma_size / 2;
-    unsigned int frame_size = luma_size + chroma_size;
-    char *buf = new char[frame_size];
-    unsigned int idx = 0;
-
-    cout << "input: " << in_file << endl;
-    string in_path = in_file;
-    istream *ifs = new ifstream(in_path.c_str(), ios::binary | ios::in);
-
-    cout << "output: " << out_file << endl;
-    string out_path = out_file;
-    ofstream ofs;
-    ofs.open(out_path.c_str(), ios::binary | ios::out);
-
-    unsigned int frame_cnt, region_num, region_idx;
-    ifstream coord(coord_file.c_str());
+    uint32_t luma_size = ctx->width * ctx->height;
+    uint32_t chroma_size = luma_size / 2;
+    uint32_t frame_size = luma_size + chroma_size;
+    uint32_t left = ctx->left;
+    uint32_t top = ctx->top;
+    uint32_t right = ctx->right;
+    uint32_t bottom = ctx->bottom;
+    uint32_t frame_cnt, region_num, region_idx;
+    ifstream coord(ctx->coord_file.c_str());
+    ifstream sad_path(ctx->sad_file.c_str());
+    YuvInfo *yuv_info = &ctx->yuv_info;
+    RectangleInfo rec_info;
     char lines[512];
+    char *buf = new char[frame_size];
+
     if (coord.getline(lines, 512)) {
         int match_cnt = SSCANF(lines, "frame=%d, num=%d, idx=%d, left=%d, top=%d, right=%d, bottom=%d",
                                &frame_cnt, &region_num, &region_idx, &left, &top, &right, &bottom);
@@ -156,17 +118,13 @@ int main(int argc, char **argv)
         }
     }
 
-    cout << "rk sad path: " << sad_file << endl;
-    ifstream sad_path(sad_file.c_str());
-    YuvInfo *yuv_info = &ctx->yuv_info;
-    RectangleInfo rec_info;
-    ifs->read(buf, frame_size);
+    ctx->ifs->read(buf, frame_size);
 
     do {
         while (ctx->frame_read == frame_cnt) {
             yuv_info->buf = buf;
-            yuv_info->width = width;
-            yuv_info->height = height;
+            yuv_info->width = ctx->width;
+            yuv_info->height = ctx->height;
             rec_info.left = left;
             rec_info.top = top;
             rec_info.right = right;
@@ -198,16 +156,62 @@ int main(int argc, char **argv)
             rk_handle_md(ctx, &sad_path);
         }
 
-        ofs.write(buf, frame_size);
+        ctx->ofs->write(buf, frame_size);
 
-        ifs->read(buf, frame_size);
+        ctx->ifs->read(buf, frame_size);
         ctx->frame_read++;
     } while (ctx->frame_read < ctx->frames);
 
-    if (ifs && ifs != &cin)
-        delete ifs;
-    ofs.close();
     delete [] buf;
+}
+
+int main(int argc, char **argv)
+{
+    ProcCtx proc_ctx;
+    ProcCtx *ctx = &proc_ctx;
+    memset(ctx, 0, sizeof(ProcCtx));
+
+    /* -c 3903.md --- Motion detected regions of Hisilicon
+     * -s   *.sad --- Motion detected regions of RK
+     */
+    cout << "----------Test-------------" << endl;
+    bool help = getarg(false, "-H", "--help", "-?");
+    string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576.yuv", "-i", "--input");
+    string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576_hi_rk.yuv", "-o", "--output");
+    ctx->coord_file = getarg("F:\\rkvenc_verify\\cfg\\3903_hisilicon.md", "-c", "--coordinate");
+    ctx->sad_file = getarg("F:\\rkvenc_verify\\cfg\\3903_720x576_150_1.sad", "-s", "--sad");
+    ctx->width = getarg(720, "-w", "--width");
+    ctx->height = getarg(576, "-h", "--height");
+    ctx->left = getarg(10, "-l", "--left");
+    ctx->top = getarg(20, "-t", "--top");
+    ctx->right = getarg(50, "-r", "--right");
+    ctx->bottom = getarg(80, "-b", "--bottom");
+    ctx->frames = getarg(2, "-f", "--frames");
+    ctx->motion_rate_thresh = getarg(50, "-m", "--motion_thresh");
+    ctx->enable_draw_dot = getarg(1, "-dd", "--draw_dot");
+    ctx->draw_blue_rect = getarg(0, "-dbr", "--draw_blue_rect");
+
+    if (help) {
+        cout << "Usage:" << endl
+             << "./yuv_process -i=3903_720x576.yuv -o=3903_720x576_hi_rk.yuv "
+             << "-c=3903.md -s=3903_720x576_150.sad -f=2"
+             << endl;
+        return 0;
+    }
+
+    cout << "input: " << in_file << endl
+         << "output: " << out_file << endl;
+    ctx->ifs = new ifstream(in_file.c_str(), ios::binary | ios::in);
+
+    ofstream ofs;
+    ctx->ofs = &ofs;
+    ofs.open(out_file.c_str(), ios::binary | ios::out);
+
+    process_yuv(ctx);
+
+    if (ctx->ifs && ctx->ifs != &cin)
+        delete ctx->ifs;
+    ofs.close();
 
     cout << "----------End!-------------" << endl;
     //string str;
