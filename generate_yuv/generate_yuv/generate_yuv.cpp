@@ -15,6 +15,8 @@ using namespace std;
 #define SSCANF sscanf
 #endif
 
+#define INVALID_PIXEL      (256)
+
 typedef struct BlkInfo {
     uint32_t y_left;
     uint32_t y_top;
@@ -35,15 +37,18 @@ static void fill_block(BufInfo *buf_info, BlkInfo *blk_info)
     char *buf_y = buf_info->buf;
     char *buf_u = buf_info->buf + width * height;
     char *buf_v = buf_u + width * height / 4;
+    char *buf;
     x0 = blk_info->y_left;
     y0 = blk_info->y_top;
     mb_size = blk_info->mb_size;
 
     /* Y */
-    char *buf = buf_y + x0 + y0 * width;
-    for (row = 0; row < mb_size; row++) {
-        for (col = 0; col < mb_size; col++) {
-            buf[row * width + col] = blk_info->y_pixel;
+    if (blk_info->y_pixel != INVALID_PIXEL) {
+        buf = buf_y + x0 + y0 * width;
+        for (row = 0; row < mb_size; row++) {
+            for (col = 0; col < mb_size; col++) {
+                buf[row * width + col] = blk_info->y_pixel;
+            }
         }
     }
 
@@ -52,41 +57,61 @@ static void fill_block(BufInfo *buf_info, BlkInfo *blk_info)
     y0 = blk_info->uv_top;
 
     /* U */
-    buf = buf_u + x0 + y0 * chroma_width;
-    for (row = 0; row < mb_size; row++) {
-        for (col = 0; col < mb_size; col++) {
-            buf[row * chroma_width + col] = blk_info->u_pixel;
+    if (blk_info->u_pixel != INVALID_PIXEL) {
+        buf = buf_u + x0 + y0 * chroma_width;
+        for (row = 0; row < mb_size; row++) {
+            for (col = 0; col < mb_size; col++) {
+                buf[row * chroma_width + col] = blk_info->u_pixel;
+            }
         }
     }
 
     /* V */
-    buf = buf_v + x0 + y0 * chroma_width;
-    for (row = 0; row < mb_size; row++) {
-        for (col = 0; col < mb_size; col++) {
-            buf[row * chroma_width + col] = blk_info->v_pixel;
+    if (blk_info->v_pixel != INVALID_PIXEL) {
+        buf = buf_v + x0 + y0 * chroma_width;
+        for (row = 0; row < mb_size; row++) {
+            for (col = 0; col < mb_size; col++) {
+                buf[row * chroma_width + col] = blk_info->v_pixel;
+            }
         }
     }
 }
 
-
-static void fill_blocks(GenCtx *ctx, char *buf)
+static void fill_blocks(GenCtx *ctx, char *buf, vector<BlkInfo> &blocks)
 {
     BlkInfo blk_info;
-    blk_info.y_left = 0;
-    blk_info.y_top = 0;
-    blk_info.uv_left = 0;
-    blk_info.uv_top = 0;
-    blk_info.mb_size = 4;
-    blk_info.y_pixel = 0;
-    blk_info.u_pixel = 0;
-    blk_info.v_pixel = 0;
-
     BufInfo buf_info;
     buf_info.buf = buf;
     buf_info.width = ctx->width;
     buf_info.height = ctx->height;
 
-    fill_block(&buf_info, &blk_info);
+    for (uint32_t idx = 0; idx < blocks.size(); idx++) {
+        blk_info = blocks.at(idx);
+        fill_block(&buf_info, &blk_info);
+    }
+
+    blocks.clear();
+}
+
+static void gen_blocks_info(GenCtx *ctx, vector<BlkInfo> &blocks)
+{
+    uint32_t cu_idx[] = {0, 1, 88, 89}; /* CU4x4 raster scan */
+    uint32_t pix_idx[] = {0, 0, 0, 255};
+    uint32_t mb_width = ctx->width / ctx->mb_size;
+    uint32_t mb_height = ctx->height / ctx->mb_size;
+    uint32_t idx;
+    BlkInfo blk_info;
+    blk_info.mb_size = 4;
+    blk_info.y_pixel = INVALID_PIXEL;
+    blk_info.u_pixel = INVALID_PIXEL;
+    blk_info.v_pixel = INVALID_PIXEL;
+
+    for (idx = 0; idx < sizeof(cu_idx) / sizeof(uint32_t); idx++) {
+        blk_info.y_left = (cu_idx[idx] % mb_width) * ctx->mb_size;
+        blk_info.y_top = (cu_idx[idx] / mb_width) * ctx->mb_size;
+        blk_info.y_pixel = pix_idx[idx];
+        blocks.push_back(blk_info);
+    }
 }
 
 static void generate_yuv(GenCtx *ctx)
@@ -94,13 +119,15 @@ static void generate_yuv(GenCtx *ctx)
     uint32_t luma_size = ctx->width * ctx->height;
     uint32_t chroma_size = luma_size / 2;
     uint32_t frame_size = luma_size + chroma_size;
-    uint32_t frame_cnt, region_num, region_idx;
     char *buf = new char[frame_size];
+    vector<BlkInfo> blocks;
 
     do {
         ctx->ifs->read(buf, frame_size);
 
-        fill_blocks(ctx, buf);
+        gen_blocks_info(ctx, blocks);
+
+        fill_blocks(ctx, buf, blocks);
 
         ctx->ofs->write(buf, frame_size);
 
@@ -123,6 +150,7 @@ int main(int argc, char **argv)
     ctx->width = getarg(352, "-w", "--width");
     ctx->height = getarg(288, "-h", "--height");
     ctx->frames = getarg(5, "-f", "--frames");
+    ctx->mb_size = 4;
 
     if (help) {
         cout << "Usage:" << endl
