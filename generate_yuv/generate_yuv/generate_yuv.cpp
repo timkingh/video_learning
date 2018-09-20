@@ -16,6 +16,7 @@ using namespace std;
 #endif
 
 #define INVALID_PIXEL      (256)
+#define CU16x16_WIDTH      (22)
 #define CU4x4_WIDTH        (88)
 
 typedef struct BlkInfo {
@@ -98,10 +99,10 @@ static void gen_blocks_info(GenCtx *ctx, vector<BlkInfo> &blocks)
 {
     /* CU4x4 raster scan */
     uint32_t cu_idx[] = {
-        CU4x4_WIDTH * 0, CU4x4_WIDTH * 0 + 1, CU4x4_WIDTH * 0 + 2, CU4x4_WIDTH * 0 + 3,
-        CU4x4_WIDTH * 1, CU4x4_WIDTH * 1 + 1, CU4x4_WIDTH * 1 + 2, CU4x4_WIDTH * 1 + 3,
-        CU4x4_WIDTH * 2, CU4x4_WIDTH * 2 + 1, CU4x4_WIDTH * 2 + 2, CU4x4_WIDTH * 2 + 3,
-        CU4x4_WIDTH * 3, CU4x4_WIDTH * 3 + 1, CU4x4_WIDTH * 3 + 2, CU4x4_WIDTH * 3 + 3
+        CU16x16_WIDTH * 0, CU16x16_WIDTH * 0 + 1, CU16x16_WIDTH * 0 + 2, CU16x16_WIDTH * 0 + 3,
+        CU16x16_WIDTH * 1, CU16x16_WIDTH * 1 + 1, CU16x16_WIDTH * 1 + 2, CU16x16_WIDTH * 1 + 3,
+        CU16x16_WIDTH * 2, CU16x16_WIDTH * 2 + 1, CU16x16_WIDTH * 2 + 2, CU16x16_WIDTH * 2 + 3,
+        CU16x16_WIDTH * 3, CU16x16_WIDTH * 3 + 1, CU16x16_WIDTH * 3 + 2, CU16x16_WIDTH * 3 + 3
     };
     uint32_t pix_idx[] = {0,  255,   0, 255,
                           255,  0, 255,   0,
@@ -112,7 +113,7 @@ static void gen_blocks_info(GenCtx *ctx, vector<BlkInfo> &blocks)
     uint32_t mb_height = ctx->height / ctx->mb_size;
     uint32_t idx;
     BlkInfo blk_info;
-    blk_info.mb_size = 4;
+    blk_info.mb_size = ctx->mb_size;
     blk_info.y_pixel = INVALID_PIXEL;
     blk_info.u_pixel = INVALID_PIXEL;
     blk_info.v_pixel = INVALID_PIXEL;
@@ -161,7 +162,7 @@ int main(int argc, char **argv)
     ctx->width = getarg(352, "-w", "--width");
     ctx->height = getarg(288, "-h", "--height");
     ctx->frames = getarg(5, "-f", "--frames");
-    ctx->mb_size = 4;
+    ctx->mb_size = 16;
 
     if (help) {
         cout << "Usage:" << endl
