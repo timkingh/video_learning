@@ -16,6 +16,7 @@ using namespace std;
 #endif
 
 #define INVALID_PIXEL      (256)
+#define CU4x4_WIDTH        (88)
 
 typedef struct BlkInfo {
     uint32_t y_left;
@@ -95,8 +96,18 @@ static void fill_blocks(GenCtx *ctx, char *buf, vector<BlkInfo> &blocks)
 
 static void gen_blocks_info(GenCtx *ctx, vector<BlkInfo> &blocks)
 {
-    uint32_t cu_idx[] = {0, 1, 88, 89}; /* CU4x4 raster scan */
-    uint32_t pix_idx[] = {0, 0, 0, 255};
+    /* CU4x4 raster scan */
+    uint32_t cu_idx[] = {
+        CU4x4_WIDTH * 0, CU4x4_WIDTH * 0 + 1, CU4x4_WIDTH * 0 + 2, CU4x4_WIDTH * 0 + 3,
+        CU4x4_WIDTH * 1, CU4x4_WIDTH * 1 + 1, CU4x4_WIDTH * 1 + 2, CU4x4_WIDTH * 1 + 3,
+        CU4x4_WIDTH * 2, CU4x4_WIDTH * 2 + 1, CU4x4_WIDTH * 2 + 2, CU4x4_WIDTH * 2 + 3,
+        CU4x4_WIDTH * 3, CU4x4_WIDTH * 3 + 1, CU4x4_WIDTH * 3 + 2, CU4x4_WIDTH * 3 + 3
+    };
+    uint32_t pix_idx[] = {0,  255,   0, 255,
+                          255,  0, 255,   0,
+                          0,  255,   0, 255,
+                          255,  0, 255,   0,
+    };
     uint32_t mb_width = ctx->width / ctx->mb_size;
     uint32_t mb_height = ctx->height / ctx->mb_size;
     uint32_t idx;
