@@ -126,20 +126,61 @@ static void gen_blocks_info(GenCtx *ctx, vector<BlkInfo> &blocks)
     }
 }
 
+static void handle_one_frame(GenCtx *ctx, char *buf)
+{
+    switch(ctx->frame_read) {
+        case 0 :{
+            vector<BlkInfo> blocks;
+            gen_blocks_info(ctx, blocks);
+            fill_blocks(ctx, buf, blocks);
+            break;
+        } case 1 : case 3 :{
+            memset(buf, 0, ctx->frame_size);
+            break;
+        } case 2 : case 4 :{
+            memset(buf, 255, ctx->frame_size);
+            break;
+        } default :{
+        }
+    }
+
+    if (ctx->frame_read > 4 && ctx->frame_read < 13) {
+        static uint8_t pixels[8][3] = {
+                {0, 0, 0},   {255, 0, 0},   {0, 255, 0},   {255, 255, 0},
+                {0, 0, 255}, {255, 0, 255}, {0, 255, 255}, {255, 255, 255},
+        };
+        uint8_t y_pixel, u_pixel, v_pixel;
+        uint8_t idx;
+
+        idx = ctx->frame_read - 5;
+        y_pixel = pixels[idx][0];
+        u_pixel = pixels[idx][1];
+        v_pixel = pixels[idx][2];
+
+        uint32_t luma_len = ctx->width * ctx->height;
+        uint32_t chroma_len = luma_len / 4;
+        char *buf_y = buf;
+        char *buf_u = buf + luma_len;
+        char *buf_v = buf_u + chroma_len;
+
+        memset(buf_y, y_pixel, luma_len);
+        memset(buf_u, u_pixel, chroma_len);
+        memset(buf_v, v_pixel, chroma_len);
+    }
+}
+
 static void generate_yuv(GenCtx *ctx)
 {
     uint32_t luma_size = ctx->width * ctx->height;
     uint32_t chroma_size = luma_size / 2;
     uint32_t frame_size = luma_size + chroma_size;
     char *buf = new char[frame_size];
-    vector<BlkInfo> blocks;
+    ctx->frame_size = frame_size;
 
     do {
         ctx->ifs->read(buf, frame_size);
 
-        gen_blocks_info(ctx, blocks);
-
-        fill_blocks(ctx, buf, blocks);
+        handle_one_frame(ctx, buf);
 
         ctx->ofs->write(buf, frame_size);
 
@@ -161,7 +202,7 @@ int main(int argc, char **argv)
     string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\Bus_352x288_25_out.yuv", "-o", "--output");
     ctx->width = getarg(352, "-w", "--width");
     ctx->height = getarg(288, "-h", "--height");
-    ctx->frames = getarg(5, "-f", "--frames");
+    ctx->frames = getarg(15, "-f", "--frames");
     ctx->mb_size = 16;
 
     if (help) {

@@ -7,6 +7,7 @@ typedef struct GenCtx {
     uint32_t width;
     uint32_t height;
     uint32_t mb_size; /* default: 4 */
+    uint32_t frame_size;
     uint32_t left;
     uint32_t top;
     uint32_t right;
