@@ -23,6 +23,9 @@ typedef struct CliCtx {
     uint32_t width_out;
     uint32_t height_out;
     uint8_t *in_data[3];
+
+    enum AVPixelFormat src_fmt;
+    enum AVPixelFormat dst_fmt;
 } CliCtx;
 
 
@@ -40,6 +43,8 @@ int main(int argc, char **argv)
     ctx->width_in = getarg(352, "-w", "--width");
     ctx->height_in = getarg(288, "-h", "--height");
     ctx->frames = getarg(10, "-f", "--frames");
+    ctx->src_fmt = static_cast<enum AVPixelFormat>(getarg(25, "-src_fmt"));
+	ctx->dst_fmt = static_cast<enum AVPixelFormat>(getarg(0, "-dst_fmt"));
 
     cout << "input: " << in_path << endl
          << "output: " << out_path << endl
@@ -64,20 +69,20 @@ int main(int argc, char **argv)
     int src_linesize[4] = {0};
 
     pFrameYUV = av_frame_alloc();
-    ret = av_image_fill_linesizes(src_linesize, AV_PIX_FMT_NV12, ctx->width_in);
+    ret = av_image_fill_linesizes(src_linesize, ctx->src_fmt, ctx->width_in);
     if (ret < 0) {
         cout << "fill src linesize error ret " << ret << endl;
     }
 
-    uint32_t out_frame_size = av_image_get_buffer_size(AV_PIX_FMT_YUV420P, out_width, out_height, 1);
+    uint32_t out_frame_size = av_image_get_buffer_size(ctx->dst_fmt, out_width, out_height, 1);
     cout << "buffer size " << out_frame_size << endl;
     out_buffer = (unsigned char *)av_malloc(out_frame_size);
     av_image_fill_arrays(pFrameYUV->data, pFrameYUV->linesize, out_buffer,
-                         AV_PIX_FMT_YUV420P, out_width, out_height, 1);
+                         ctx->dst_fmt, out_width, out_height, 1);
 
     struct SwsContext *img_convert_ctx;
-    img_convert_ctx = sws_getContext(ctx->width_in, ctx->height_in, AV_PIX_FMT_NV12,
-                                     out_width, out_height, AV_PIX_FMT_YUV420P,
+    img_convert_ctx = sws_getContext(ctx->width_in, ctx->height_in, ctx->src_fmt,
+                                     out_width, out_height, ctx->dst_fmt,
                                      SWS_BICUBIC, NULL, NULL, NULL);
 
     uint32_t y_size = out_width * out_height;
