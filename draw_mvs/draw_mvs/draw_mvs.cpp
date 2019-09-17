@@ -15,9 +15,164 @@ using namespace std;
 #define SSCANF sscanf
 #endif
 
+/**
+ * Absolute value, Note, INT_MIN / INT64_MIN result in undefined behavior as they
+ * are not representable as absolute values of their type. This is the same
+ * as with *abs()
+ * @see FFNABS()
+ */
+#define FFABS(a) ((a) >= 0 ? (a) : (-(a)))
+
+#define FFSWAP(type,a,b) do{type SWAP_tmp= b; b= a; a= SWAP_tmp;}while(0)
+/* assume b>0 */
+#define ROUNDED_DIV(a,b) (((a)>0 ? (a) + ((b)>>1) : (a) - ((b)>>1))/(b))
 
 
-static void process_yuv(ProcCtx *ctx)
+/**
+ * Clip a signed integer value into the amin-amax range.
+ * @param a value to clip
+ * @param amin minimum value of the clip range
+ * @param amax maximum value of the clip range
+ * @return clipped value
+ */
+static int av_clip(int a, int amin, int amax)
+{
+#if defined(HAVE_AV_CONFIG_H) && defined(ASSERT_LEVEL) && ASSERT_LEVEL >= 2
+    if (amin > amax) abort();
+#endif
+    if      (a < amin) return amin;
+    else if (a > amax) return amax;
+    else               return a;
+}
+
+
+
+static int clip_line(int *sx, int *sy, int *ex, int *ey, int maxx)
+{
+    if(*sx > *ex)
+        return clip_line(ex, ey, sx, sy, maxx);
+
+    if (*sx < 0) {
+        if (*ex < 0)
+            return 1;
+        *sy = *ey + (*sy - *ey) * (int64_t)*ex / (*ex - *sx);
+        *sx = 0;
+    }
+
+    if (*ex > maxx) {
+        if (*sx > maxx)
+            return 1;
+        *ey = *sy + (*ey - *sy) * (int64_t)(maxx - *sx) / (*ex - *sx);
+        *ex = maxx;
+    }
+    return 0;
+}
+
+/**
+ * Draw a line from (ex, ey) -> (sx, sy).
+ * @param w width of the image
+ * @param h height of the image
+ * @param stride stride/linesize of the image
+ * @param color color of the arrow
+ */
+static void draw_line(uint8_t *buf, int sx, int sy, int ex, int ey,
+                      int w, int h, int stride, int color)
+{
+    int x, y, fr, f;
+
+    if (clip_line(&sx, &sy, &ex, &ey, w - 1))
+        return;
+    if (clip_line(&sy, &sx, &ey, &ex, h - 1))
+        return;
+
+    sx = av_clip(sx, 0, w - 1);
+    sy = av_clip(sy, 0, h - 1);
+    ex = av_clip(ex, 0, w - 1);
+    ey = av_clip(ey, 0, h - 1);
+
+    buf[sy * stride + sx] += color;
+
+    if (FFABS(ex - sx) > FFABS(ey - sy)) {
+        if (sx > ex) {
+            FFSWAP(int, sx, ex);
+            FFSWAP(int, sy, ey);
+        }
+        buf += sx + sy * stride;
+        ex  -= sx;
+        f    = ((ey - sy) << 16) / ex;
+        for (x = 0; x <= ex; x++) {
+            y  = (x * f) >> 16;
+            fr = (x * f) & 0xFFFF;
+                   buf[ y      * stride + x] += (color * (0x10000 - fr)) >> 16;
+            if(fr) buf[(y + 1) * stride + x] += (color *            fr ) >> 16;
+        }
+    } else {
+        if (sy > ey) {
+            FFSWAP(int, sx, ex);
+            FFSWAP(int, sy, ey);
+        }
+        buf += sx + sy * stride;
+        ey  -= sy;
+        if (ey)
+            f = ((ex - sx) << 16) / ey;
+        else
+            f = 0;
+        for(y= 0; y <= ey; y++){
+            x  = (y*f) >> 16;
+            fr = (y*f) & 0xFFFF;
+                   buf[y * stride + x    ] += (color * (0x10000 - fr)) >> 16;
+            if(fr) buf[y * stride + x + 1] += (color *            fr ) >> 16;
+        }
+    }
+}
+
+
+/**
+ * Draw an arrow from (ex, ey) -> (sx, sy).
+ * @param w width of the image
+ * @param h height of the image
+ * @param stride stride/linesize of the image
+ * @param color color of the arrow
+ */
+static void draw_arrow(uint8_t *buf, int sx, int sy, int ex,
+                       int ey, int w, int h, int stride, int color, int tail, int direction)
+{
+    int dx,dy;
+
+    if (direction) {
+        FFSWAP(int, sx, ex);
+        FFSWAP(int, sy, ey);
+    }
+
+    sx = av_clip(sx, -100, w + 100);
+    sy = av_clip(sy, -100, h + 100);
+    ex = av_clip(ex, -100, w + 100);
+    ey = av_clip(ey, -100, h + 100);
+
+    dx = ex - sx;
+    dy = ey - sy;
+
+    if (dx * dx + dy * dy > 3 * 3) {
+        int rx =  dx + dy;
+        int ry = -dx + dy;
+        int length = sqrt((rx * rx + ry * ry) << 8);
+
+        // FIXME subpixel accuracy
+        rx = ROUNDED_DIV(rx * 3 << 4, length);
+        ry = ROUNDED_DIV(ry * 3 << 4, length);
+
+        if (tail) {
+            rx = -rx;
+            ry = -ry;
+        }
+
+        draw_line(buf, sx, sy, sx + rx, sy + ry, w, h, stride, color);
+        draw_line(buf, sx, sy, sx - ry, sy + rx, w, h, stride, color);
+    }
+    draw_line(buf, sx, sy, ex, ey, w, h, stride, color);
+}
+
+static void draw_mvs_on_yuv(ProcCtx *ctx)
 {
     uint32_t luma_size = ctx->width * ctx->height;
     uint32_t chroma_size = luma_size / 2;
@@ -48,20 +203,10 @@ static void process_yuv(ProcCtx *ctx)
     ctx->ifs->read(buf, frame_size);
 
     do {
+        const int direction = 0;//mv->source > 0;
+        draw_arrow((uint8_t *)buf, 2, 2, 25, 25, ctx->width, ctx->height, ctx->width, 100, 0, direction);
         while (ctx->frame_read == frame_cnt) {
-            yuv_info->buf = buf;
-            yuv_info->width = ctx->width;
-            yuv_info->height = ctx->height;
-            rec_info.left = left;
-            rec_info.top = top;
-            rec_info.right = right;
-            rec_info.bottom = bottom;
-            rec_info.y_pixel = 76; /* Red */
-            rec_info.u_pixel = 84;
-            rec_info.v_pixel = 255;
-
             // TODO: draw arrows
-
 
             if (coord.getline(lines, 512)) {
                 int match_cnt = SSCANF(lines, "frame=%d, num=%d, idx=%d, left=%d, top=%d, right=%d, bottom=%d",
@@ -100,17 +245,17 @@ int main(int argc, char **argv)
      */
     cout << "----------Test-------------" << endl;
     bool help = getarg(false, "-H", "--help", "-?");
-    string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576.yuv", "-i", "--input");
-    string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\3903_720x576_hi_rk.yuv", "-o", "--output");
+    string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\spurs_highlight_720P_yuv420P.yuv", "-i", "--input");
+    string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\spurs_highlight_720P_yuv420P_mvs.yuv", "-o", "--output");
     ctx->coord_file = getarg("F:\\rkvenc_verify\\cfg\\3903_hisilicon.md", "-c", "--coordinate");
     ctx->sad_file = getarg("F:\\rkvenc_verify\\cfg\\3903_720x576_150_1.sad", "-s", "--sad");
-    ctx->width = getarg(720, "-w", "--width");
-    ctx->height = getarg(576, "-h", "--height");
+    ctx->width = getarg(1280, "-w", "--width");
+    ctx->height = getarg(720, "-h", "--height");
     ctx->left = getarg(10, "-l", "--left");
     ctx->top = getarg(20, "-t", "--top");
     ctx->right = getarg(50, "-r", "--right");
     ctx->bottom = getarg(80, "-b", "--bottom");
-    ctx->frames = getarg(2, "-f", "--frames");
+    ctx->frames = getarg(3, "-f", "--frames");
     ctx->motion_rate_thresh = getarg(50, "-m", "--motion_thresh");
     ctx->enable_draw_dot = getarg(1, "-dd", "--draw_dot");
     ctx->draw_blue_dot = getarg(1, "-dbd", "--draw_blue_dot");
@@ -132,7 +277,7 @@ int main(int argc, char **argv)
     ctx->ofs = &ofs;
     ofs.open(out_file.c_str(), ios::binary | ios::out);
 
-    process_yuv(ctx);
+    draw_mvs_on_yuv(ctx);
 
     if (ctx->ifs && ctx->ifs != &cin)
         delete ctx->ifs;
