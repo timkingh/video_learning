@@ -45,8 +45,6 @@ static int av_clip(int a, int amin, int amax)
     else               return a;
 }
 
-
-
 static int clip_line(int *sx, int *sy, int *ex, int *ey, int maxx)
 {
     if(*sx > *ex)
@@ -177,11 +175,8 @@ static void draw_mvs_on_yuv(ProcCtx *ctx)
     uint32_t luma_size = ctx->width * ctx->height;
     uint32_t chroma_size = luma_size / 2;
     uint32_t frame_size = luma_size + chroma_size;
-    uint32_t left = ctx->left;
-    uint32_t top = ctx->top;
-    uint32_t right = ctx->right;
-    uint32_t bottom = ctx->bottom;
-    uint32_t frame_cnt, region_num, region_idx;
+    uint32_t frame_cnt, cu_x, cu_y, cu_size;
+    int32_t mv_x, mv_y, start_x, start_y, end_x, end_y;
     ifstream coord(ctx->coord_file.c_str());
     ifstream sad_path(ctx->sad_file.c_str());
     YuvInfo *yuv_info = &ctx->yuv_info;
@@ -190,13 +185,12 @@ static void draw_mvs_on_yuv(ProcCtx *ctx)
     char *buf = new char[frame_size];
 
     if (coord.getline(lines, 512)) {
-        int match_cnt = SSCANF(lines, "frame=%d, num=%d, idx=%d, left=%d, top=%d, right=%d, bottom=%d",
-                               &frame_cnt, &region_num, &region_idx, &left, &top, &right, &bottom);
+        int match_cnt = SSCANF(lines, "frame=%d, cu_x=%d, cu_y=%d, cu_size=%d, mv_x=%d, mv_y=%d",
+                               &frame_cnt, &cu_x, &cu_y, &cu_size, &mv_x, &mv_y);
         if (match_cnt > 1) {
             cout << "match_cnt " << match_cnt << " frame_cnt " << frame_cnt
-                 << " region_num " << region_num << " region_idx " << region_idx
-                 << " left " << left << " top " << top
-                 << " right " << right << " bottom " << bottom << endl;
+                 << " cu_x " << cu_x << " cu_y " << cu_y << " cu_size " << cu_size
+                 << " mv_x " << mv_x << " mv_y " << mv_y << endl;
         }
     }
 
@@ -204,25 +198,27 @@ static void draw_mvs_on_yuv(ProcCtx *ctx)
 
     do {
         const int direction = 0;//mv->source > 0;
-        draw_arrow((uint8_t *)buf, 2, 2, 25, 25, ctx->width, ctx->height, ctx->width, 100, 0, direction);
         while (ctx->frame_read == frame_cnt) {
-            // TODO: draw arrows
+			if (frame_cnt > 0) {
+                start_x = cu_x * cu_size;
+                start_y = cu_y * cu_size;
+                end_x = start_x + mv_x;
+                end_y = start_y + mv_y;
+				draw_arrow((uint8_t *)buf, end_x, end_y, start_x, start_y, ctx->width, ctx->height, ctx->width, 100, 0, direction);
+			}
 
             if (coord.getline(lines, 512)) {
-                int match_cnt = SSCANF(lines, "frame=%d, num=%d, idx=%d, left=%d, top=%d, right=%d, bottom=%d",
-                                       &frame_cnt, &region_num, &region_idx, &left, &top, &right, &bottom);
+                int match_cnt = SSCANF(lines, "frame=%d, cu_x=%d, cu_y=%d, cu_size=%d, mv_x=%d, mv_y=%d",
+                                       &frame_cnt, &cu_x, &cu_y, &cu_size, &mv_x, &mv_y);
                 if (match_cnt > 1) {
-                    //cout << "match_cnt " << match_cnt << " frame_cnt " << frame_cnt
-                    //     << " region_num " << region_num << " region_idx " << region_idx
-                    //     << " left " << left << " top " << top
-                    //     << " right " << right << " bottom " << bottom << endl;
+					//cout << "match_cnt " << match_cnt << " frame_cnt " << frame_cnt
+					//	 << " cu_x " << cu_x << " cu_y " << cu_y << " cu_size " << cu_size
+					//	 << " mv_x " << mv_x << " mv_y " << mv_y << endl;
                 }
             } else {
-                cout << "No MD info now, exit!" << endl;
+                cout << "No MV info now, exit!" << endl;
                 break;
             }
-            cout << "finish frame " << frame_cnt
-                 << " region " << region_idx << endl;
         }
 
         ctx->ofs->write(buf, frame_size);
@@ -245,12 +241,12 @@ int main(int argc, char **argv)
      */
     cout << "----------Test-------------" << endl;
     bool help = getarg(false, "-H", "--help", "-?");
-    string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\spurs_highlight_720P_yuv420P.yuv", "-i", "--input");
-    string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\spurs_highlight_720P_yuv420P_mvs.yuv", "-o", "--output");
-    ctx->coord_file = getarg("F:\\rkvenc_verify\\cfg\\3903_hisilicon.md", "-c", "--coordinate");
+    string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\yuv\\Keiba_416x240_30.yuv", "-i", "--input");
+    string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\Keiba_416x240_30_mvs.yuv", "-o", "--output");
+    ctx->coord_file = getarg("F:\\rkvenc_verify\\cfg\\motion_estimate_info.txt", "-c", "--coordinate");
     ctx->sad_file = getarg("F:\\rkvenc_verify\\cfg\\3903_720x576_150_1.sad", "-s", "--sad");
-    ctx->width = getarg(1280, "-w", "--width");
-    ctx->height = getarg(720, "-h", "--height");
+    ctx->width = getarg(416, "-w", "--width");
+    ctx->height = getarg(240, "-h", "--height");
     ctx->left = getarg(10, "-l", "--left");
     ctx->top = getarg(20, "-t", "--top");
     ctx->right = getarg(50, "-r", "--right");
