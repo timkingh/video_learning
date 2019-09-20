@@ -170,6 +170,14 @@ static void draw_arrow(uint8_t *buf, int sx, int sy, int ex,
     draw_line(buf, sx, sy, ex, ey, w, h, stride, color);
 }
 
+static void scale_mv(int *sx, int *sy, int *ex, int *ey, int cu_size)
+{
+    while ((*ex - *sx) * (*ex - *sx) + (*ey - *sy) * (*ey - *sy) > cu_size * cu_size) {
+        *ex = (*ex + *sx + 1) / 2;
+        *ey = (*ey + *sy + 1) / 2;
+    }
+}
+
 static void draw_mvs_on_yuv(ProcCtx *ctx)
 {
     uint32_t luma_size = ctx->width * ctx->height;
@@ -199,11 +207,12 @@ static void draw_mvs_on_yuv(ProcCtx *ctx)
     do {
         const int direction = 0;//mv->source > 0;
         while (ctx->frame_read == frame_cnt) {
-			if (frame_cnt > 0) {
+			if (frame_cnt > 0 && cu_size == 32) {
                 start_x = cu_x * cu_size;
                 start_y = cu_y * cu_size;
                 end_x = start_x + mv_x;
                 end_y = start_y + mv_y;
+                //scale_mv(&start_x, &start_y, &end_x, &end_y, cu_size);
 				draw_arrow((uint8_t *)buf, end_x, end_y, start_x, start_y, ctx->width, ctx->height, ctx->width, 100, 0, direction);
 			}
 
@@ -241,12 +250,12 @@ int main(int argc, char **argv)
      */
     cout << "----------Test-------------" << endl;
     bool help = getarg(false, "-H", "--help", "-?");
-    string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\yuv\\Keiba_416x240_30.yuv", "-i", "--input");
-    string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\Keiba_416x240_30_mvs.yuv", "-o", "--output");
-    ctx->coord_file = getarg("F:\\rkvenc_verify\\cfg\\motion_estimate_info.txt", "-c", "--coordinate");
+    string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\yuv\\Tennis_1920x1080_24.yuv", "-i", "--input");
+    string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\Tennis_1920x1080_24_qp45_rime32.yuv", "-o", "--output");
+    ctx->coord_file = getarg("F:\\rkvenc_verify\\cfg\\motion_estimate_info_Tennis_1920x1080_24_qp45.txt", "-c", "--coordinate");
     ctx->sad_file = getarg("F:\\rkvenc_verify\\cfg\\3903_720x576_150_1.sad", "-s", "--sad");
-    ctx->width = getarg(416, "-w", "--width");
-    ctx->height = getarg(240, "-h", "--height");
+    ctx->width = getarg(1920, "-w", "--width");
+    ctx->height = getarg(1080, "-h", "--height");
     ctx->left = getarg(10, "-l", "--left");
     ctx->top = getarg(20, "-t", "--top");
     ctx->right = getarg(50, "-r", "--right");
