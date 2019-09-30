@@ -16,7 +16,7 @@ typedef struct {
 typedef struct ProcCtx {
     uint32_t width;
     uint32_t height;
-    uint32_t mb_size; /* default: 4 */
+    uint32_t cu_size; /* default: 16 */
     uint32_t left;
     uint32_t top;
     uint32_t right;

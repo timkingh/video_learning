@@ -207,7 +207,7 @@ static void draw_mvs_on_yuv(ProcCtx *ctx)
     do {
         const int direction = 0;//mv->source > 0;
         while (ctx->frame_read == frame_cnt) {
-			if (frame_cnt > 0 && cu_size == 32) {
+			if (frame_cnt > 0 && cu_size == ctx->cu_size) {
                 start_x = cu_x * cu_size;
                 start_y = cu_y * cu_size;
                 end_x = start_x + mv_x;
@@ -231,6 +231,7 @@ static void draw_mvs_on_yuv(ProcCtx *ctx)
         }
 
         ctx->ofs->write(buf, frame_size);
+        cout << "finished frame " << frame_cnt << endl;
 
         ctx->ifs->read(buf, frame_size);
         ctx->frame_read++;
@@ -250,9 +251,9 @@ int main(int argc, char **argv)
      */
     cout << "----------Test-------------" << endl;
     bool help = getarg(false, "-H", "--help", "-?");
-    string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\yuv\\Tennis_1920x1080_24.yuv", "-i", "--input");
-    string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\Tennis_1920x1080_24_qp45_rime32.yuv", "-o", "--output");
-    ctx->coord_file = getarg("F:\\rkvenc_verify\\cfg\\motion_estimate_info_Tennis_1920x1080_24_qp45.txt", "-c", "--coordinate");
+    string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\yuv\\Kimono1_1920x1080_24.yuv", "-i", "--input");
+    string out_file = getarg("F:\\rkvenc_verify\\debug\\1\\Kimono1_1920x1080_24_qp45_60frames_rime16_100_0.yuv", "-o", "--output");
+    ctx->coord_file = getarg("F:\\rkvenc_verify\\debug\\1\\mei_kimonol_qp45_3frames_100_0.txt", "-c", "--coordinate");
     ctx->sad_file = getarg("F:\\rkvenc_verify\\cfg\\3903_720x576_150_1.sad", "-s", "--sad");
     ctx->width = getarg(1920, "-w", "--width");
     ctx->height = getarg(1080, "-h", "--height");
@@ -261,15 +262,15 @@ int main(int argc, char **argv)
     ctx->right = getarg(50, "-r", "--right");
     ctx->bottom = getarg(80, "-b", "--bottom");
     ctx->frames = getarg(3, "-f", "--frames");
-    ctx->motion_rate_thresh = getarg(50, "-m", "--motion_thresh");
+    ctx->cu_size = getarg(16, "--cu_size");
     ctx->enable_draw_dot = getarg(1, "-dd", "--draw_dot");
     ctx->draw_blue_dot = getarg(1, "-dbd", "--draw_blue_dot");
     ctx->draw_blue_rect = getarg(0, "-dbr", "--draw_blue_rect");
 
-    if (help) {
+    if (help || argc < 2) {
         cout << "Usage:" << endl
-             << "./yuv_process -i=3903_720x576.yuv -o=3903_720x576_hi_rk.yuv "
-             << "-c=3903.md -s=3903_720x576_150.sad -f=2"
+             << "./draw_mvs -i=Kimono1_1920x1080_24.yuv -o=Kimono1_1920x1080_24_qp45_60frames_rime16_100_0.yuv "
+             << "-c=mei_kimonol_qp45_3frames_100_0.txt -w=1920 -h=1080 --frames=60 --cu_size=16"
              << endl;
         return 0;
     }
