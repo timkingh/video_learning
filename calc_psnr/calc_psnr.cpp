@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -17,19 +16,6 @@ unsigned char y_org[WIDTH_MAX * HEIGHT_MAX*2];
 unsigned char u_org[WIDTH_MAX * HEIGHT_MAX / 4];
 unsigned char v_org[WIDTH_MAX * HEIGHT_MAX / 4];
 
-int w = 960;
-int h = 448;
-int frame_num = 300;
-int frame_size = w*h * 3 / 2;
-int y_size = w*h;
-int u_size = w*h/4;
-int v_size = u_size;
-
-
-FILE *fp_yuv_in;
-FILE *fp_yuv_org;
-
-
 static double x264_psnr(double sqe, double size)
 {
 	double mse = sqe / (PIXEL_MAX * PIXEL_MAX * size);
@@ -41,6 +27,13 @@ static double x264_psnr(double sqe, double size)
 
 int main(int argc, char **argv)
 {
+    int w = 960;
+    int h = 448;
+    int frame_num = 300;
+    int frame_size = w*h * 3 / 2;
+    int y_size = w*h;
+    int u_size = w*h/4;
+    int v_size = u_size;
 	const char *input_file = NULL;
 	const char *output_file = NULL;
 	int j, i;
@@ -51,6 +44,8 @@ int main(int argc, char **argv)
 	long long ssd;
 	long long ssd_global = 0;
 	double psnr = 0;
+    FILE *fp_yuv_in;
+    FILE *fp_yuv_org;
 
 	for (i = 1; i < argc; ++i){
 		if (strcmp(argv[i], "-i") == 0){
@@ -102,7 +97,17 @@ int main(int argc, char **argv)
 	y_stride = w;
 	uv_stride = w / 2;
 	fp_yuv_in = fopen(input_file, "rb");
+    if (fp_yuv_in == NULL) {
+        perror("fopen input");
+        return 0;
+    }
+
 	fp_yuv_org = fopen(output_file, "rb");
+    if (fp_yuv_org == NULL) {
+        perror("fopen org");
+        return 0;
+    }
+
 	real_frm_cnt = 0;
 	frame_size = w*h * 3 / 2;
 	for (i = 0; i < frame_num; i++)
@@ -119,14 +124,9 @@ int main(int argc, char **argv)
 		for (j = 0; j < frame_size; j++)
 			ssd += (y_buf[j] - y_org[j])*(y_buf[j] - y_org[j]);
 
-		//if (0 == real_frm_cnt % 50)
-		//{
-		//	printf("end of frame %d\n", real_frm_cnt);
-		//}
-
 		ssd_global += ssd;
 	}
-	//printf("end of frame %d\n", real_frm_cnt);
+	printf("end of frame %d\n", real_frm_cnt);
 
 	psnr = x264_psnr((double)ssd_global / real_frm_cnt, frame_size);
 	FILE *fp = fopen("psnr.txt", "ab");
