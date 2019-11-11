@@ -3,6 +3,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#if _WIN32
+#include <sys/types.h>
+#include <sys/timeb.h>
+#else
+#include <sys/time.h>
+#endif
 
 #define WIDTH_MAX (3840)
 #define HEIGHT_MAX (2160)
@@ -15,6 +21,23 @@ unsigned char v_buf[WIDTH_MAX * HEIGHT_MAX / 4];
 unsigned char y_org[WIDTH_MAX * HEIGHT_MAX*2];
 unsigned char u_org[WIDTH_MAX * HEIGHT_MAX / 4];
 unsigned char v_org[WIDTH_MAX * HEIGHT_MAX / 4];
+
+#if _WIN32
+typedef long long int64_t;
+#endif
+
+int64_t time_mdate(void)
+{
+#if _WIN32
+    struct timeb tb;
+    ftime(&tb);
+    return ((int64_t)tb.time * 1000 + (int64_t)tb.millitm) * 1000;
+#else
+    struct timeval tv_date;
+    gettimeofday(&tv_date, NULL);
+    return (int64_t)tv_date.tv_sec * 1000000 + (int64_t)tv_date.tv_usec;
+#endif
+}
 
 static double x264_psnr(double sqe, double size)
 {
@@ -46,6 +69,8 @@ int main(int argc, char **argv)
 	double psnr = 0;
     FILE *fp_yuv_in;
     FILE *fp_yuv_org;
+    int64_t start_time = time_mdate();
+    int64_t end_time;
 
 	for (i = 1; i < argc; ++i){
 		if (strcmp(argv[i], "-i") == 0){
@@ -118,6 +143,7 @@ int main(int argc, char **argv)
 		{
 			break;
 		}
+        printf("fread frame %03d\n", real_frm_cnt);
 
 		real_frm_cnt++;
 		ssd = 0;
@@ -129,12 +155,14 @@ int main(int argc, char **argv)
 	printf("end of frame %d\n", real_frm_cnt);
 
 	psnr = x264_psnr((double)ssd_global / real_frm_cnt, frame_size);
+    end_time = time_mdate();
+
 	FILE *fp = fopen("psnr.txt", "ab");
-	fprintf(fp, input_file);
+	fprintf(fp, "%s", input_file);
 	fprintf(fp, "      %lf\n", psnr);
 	fclose(fp);
-	printf(input_file);
-	printf(" global psnr = %lf  \n", psnr);
+	printf("%s", input_file);
+	printf(" elapsed %.2fs, global psnr = %lf  \n", (float)(end_time - start_time) / 1000000, psnr);
 	fclose(fp_yuv_in);
 	fclose(fp_yuv_org);
 }
