@@ -2,6 +2,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 #include <math.h>
 #if _WIN32
 #include <sys/types.h>
@@ -9,22 +10,15 @@
 #else
 #include <sys/time.h>
 #endif
+#include "getopt.hpp"
 
-#define WIDTH_MAX (3840)
-#define HEIGHT_MAX (2160)
 #define PIXEL_MAX 255
-
-unsigned char y_buf[WIDTH_MAX * HEIGHT_MAX*2];
-unsigned char u_buf[WIDTH_MAX * HEIGHT_MAX / 4];
-unsigned char v_buf[WIDTH_MAX * HEIGHT_MAX / 4];
-
-unsigned char y_org[WIDTH_MAX * HEIGHT_MAX*2];
-unsigned char u_org[WIDTH_MAX * HEIGHT_MAX / 4];
-unsigned char v_org[WIDTH_MAX * HEIGHT_MAX / 4];
 
 #if _WIN32
 typedef long long int64_t;
 #endif
+
+using namespace std;
 
 int64_t time_mdate(void)
 {
@@ -50,15 +44,18 @@ static double x264_psnr(double sqe, double size)
 
 int main(int argc, char **argv)
 {
-    int w = 960;
-    int h = 448;
+    string in_file = getarg("Kimono1_1920x1080_24.yuv", "-i", "--input");
+    string out_file = getarg("Kimono1_1920x1080_24_qp45.yuv", "-o", "--output");
+    int w = getarg(1920, "-w", "--width");
+    int h = getarg(1080, "-h", "--height");
     int frame_num = 300;
     int frame_size = w*h * 3 / 2;
     int y_size = w*h;
     int u_size = w*h/4;
     int v_size = u_size;
-	const char *input_file = NULL;
-	const char *output_file = NULL;
+	const char *input_file = in_file.c_str();
+	const char *output_file = out_file.c_str();
+    unsigned char *y_org, *y_buf;
 	int j, i;
 	int y_stride = w;
 	int uv_stride = w / 2;
@@ -72,52 +69,6 @@ int main(int argc, char **argv)
     int64_t start_time = time_mdate();
     int64_t end_time;
 
-	for (i = 1; i < argc; ++i){
-		if (strcmp(argv[i], "-i") == 0){
-			input_file = argv[i + 1];
-			i++;
-			continue;
-		}
-
-		if (strcmp(argv[i], "-o") == 0){
-			output_file = argv[i + 1];
-			i++;
-			continue;
-		}
-
-		if (strcmp(argv[i], "-w") == 0) {
-			char *endptr;
-			w = strtol(argv[i + 1], &endptr, 10);
-			if (*endptr)
-			{
-				printf("Cannot parse width value: %s\n", argv[i + 1]);
-			}
-			i++;
-			continue;
-		}
-
-		if (strcmp(argv[i], "-h") == 0) {
-			char *endptr;
-			h = strtol(argv[i + 1], &endptr, 10);
-			if (*endptr)
-			{
-				printf("Cannot parse height value: %s\n", argv[i + 1]);
-			}
-			i++;
-			continue;
-		}
-
-		if (strcmp(argv[i], "-n") == 0) {
-			char *endptr;
-			frame_num = strtol(argv[i + 1], &endptr, 10);
-			if (*endptr)
-			{
-				printf("Cannot parse frame number value: %s\n", argv[i + 1]);
-			}
-			i++;
-			continue;
-		}
-	}
 
 	y_stride = w;
 	uv_stride = w / 2;
@@ -130,6 +81,18 @@ int main(int argc, char **argv)
 	fp_yuv_org = fopen(output_file, "rb");
     if (fp_yuv_org == NULL) {
         perror("fopen org");
+        return 0;
+    }
+
+    y_buf = (unsigned char *)malloc(w * h * 2);
+    if (y_buf == NULL) {
+        printf("malloc y_buf failed\n");
+        return 0;
+    }
+
+	y_org = (unsigned char *)malloc(w * h * 2);
+    if (y_org == NULL) {
+        printf("malloc y_org failed\n");
         return 0;
     }
 
@@ -165,6 +128,8 @@ int main(int argc, char **argv)
 	printf(" elapsed %.2fs, global psnr = %lf  \n", (float)(end_time - start_time) / 1000000, psnr);
 	fclose(fp_yuv_in);
 	fclose(fp_yuv_org);
+    free(y_buf);
+    free(y_org);
 }
 
 
