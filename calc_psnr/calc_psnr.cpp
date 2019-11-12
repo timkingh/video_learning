@@ -1,3 +1,4 @@
+#include <iostream>
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -44,21 +45,27 @@ static double x264_psnr(double sqe, double size)
 
 int main(int argc, char **argv)
 {
-    string in_file = getarg("Kimono1_1920x1080_24.yuv", "-i", "--input");
-    string out_file = getarg("Kimono1_1920x1080_24_qp45.yuv", "-o", "--output");
+    bool help = getarg(false, "-H", "--help", "-?");
+    string in_file = getarg("modify.yuv", "-i", "--input");
+    string out_file = getarg("origin.yuv", "-o", "--output");
+    string psnr_file = getarg("psnr.txt", "-p", "--psnr");
     int w = getarg(1920, "-w", "--width");
     int h = getarg(1080, "-h", "--height");
+
+    if (help || argc < 2) {
+        cout << "Usage:" << endl
+             << "./calc_psnr -i=modify.yuv -o=origin.yuv "
+             << "-w=1920 -h=1080 -p=psnr.txt"
+             << endl;
+        return 0;
+    }
+
     int frame_num = 300;
-    int frame_size = w*h * 3 / 2;
-    int y_size = w*h;
-    int u_size = w*h/4;
-    int v_size = u_size;
+    int frame_size = w * h * 3 / 2;
 	const char *input_file = in_file.c_str();
 	const char *output_file = out_file.c_str();
     unsigned char *y_org, *y_buf;
 	int j, i;
-	int y_stride = w;
-	int uv_stride = w / 2;
 	int ret_len_org, ret_len_chg;
 	int real_frm_cnt = 0;
 	long long ssd;
@@ -69,9 +76,6 @@ int main(int argc, char **argv)
     int64_t start_time = time_mdate();
     int64_t end_time;
 
-
-	y_stride = w;
-	uv_stride = w / 2;
 	fp_yuv_in = fopen(input_file, "rb");
     if (fp_yuv_in == NULL) {
         perror("fopen input");
@@ -97,7 +101,6 @@ int main(int argc, char **argv)
     }
 
 	real_frm_cnt = 0;
-	frame_size = w*h * 3 / 2;
 	for (i = 0; i < frame_num; i++)
 	{
 		ret_len_org = fread(y_buf, 1, frame_size, fp_yuv_in);
@@ -120,7 +123,7 @@ int main(int argc, char **argv)
 	psnr = x264_psnr((double)ssd_global / real_frm_cnt, frame_size);
     end_time = time_mdate();
 
-	FILE *fp = fopen("psnr.txt", "ab");
+	FILE *fp = fopen(psnr_file.c_str(), "ab");
 	fprintf(fp, "%s", input_file);
 	fprintf(fp, "      %lf\n", psnr);
 	fclose(fp);
@@ -131,5 +134,3 @@ int main(int argc, char **argv)
     free(y_buf);
     free(y_org);
 }
-
-
