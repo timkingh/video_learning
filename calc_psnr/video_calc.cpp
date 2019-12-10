@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <stdio.h>
 #include <errno.h>
@@ -179,7 +180,7 @@ static RET calc_ave(uint8_t *buf, FILE *fp, uint32_t len, float *ave)
 static float calc_variance(uint8_t *buf, uint32_t len, float ave)
 {		
 	double sum_square = 0;
-	for (int j = 0; j < len; j++) {
+	for (uint32_t j = 0; j < len; j++) {
 		sum_square += (buf[j] - ave) * (buf[j] - ave);
 	}
 
@@ -192,7 +193,7 @@ static RET calc_var(CalcCtx *ctx)
 	const char *input_file = ctx->input.c_str();
 	const char *output_file = ctx->output.c_str();
     uint8_t *buf;
-	int j, i, read_len;
+	uint32_t j, i;
 	uint32_t y_len = ctx->width * ctx->height;
 	uint32_t u_len = y_len / 4;
     FILE *fp_yuv_in;
@@ -223,7 +224,7 @@ static RET calc_var(CalcCtx *ctx)
 	for (i = 0; i < ctx->frames; i++) {
 		for (j = 0; j < 3; j++) {
 			if (RET_OK != calc_ave(buf, fp_yuv_in, (j == 0) ? y_len : u_len, &average[j])) {
-				printf("fread %s finished\n", (j == 0) ? "Luma" : ((j == 1) ? "Chroma U" : "Chroma V"));
+				printf("frame %d fread %s finished\n", i, (j == 0) ? "Luma" : ((j == 1) ? "Chroma U" : "Chroma V"));
 				break;
 			}
 			variance[j] = calc_variance(buf, (j == 0) ? y_len : u_len, average[j]);
@@ -236,6 +237,8 @@ static RET calc_var(CalcCtx *ctx)
 	FPCLOSE(fp_yuv_in);
 	FPCLOSE(fp_out);
     free(buf);
+
+    return RET_OK;
 }
 
 int main(int argc, char **argv)
