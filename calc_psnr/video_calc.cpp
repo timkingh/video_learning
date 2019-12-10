@@ -63,28 +63,15 @@ static double x264_psnr(double sqe, double size)
 
 	return -10.0 * log10(mse);
 }
-#if 0
-int main(int argc, char **argv)
-{
-    bool help = getarg(false, "-H", "--help", "-?");
-    string in_file = getarg("modify.yuv", "-i", "--input");
-    string out_file = getarg("origin.yuv", "-o", "--output");
-    string psnr_file = getarg("psnr.txt", "-p", "--psnr");
-    int w = getarg(1920, "-w", "--width");
-    int h = getarg(1080, "-h", "--height");
-	int frame_num = getarg(300, "-f", "--frames");;
 
-    if (help || argc < 2) {
-        cout << "Usage:" << endl
-             << "./calc_psnr -i=modify.yuv -o=origin.yuv "
-             << "-w=1920 -h=1080 --frames=300 -p=psnr.txt"
-             << endl;
-        return 0;
-    }
-    
+static RET calc_psnr(CalcCtx *ctx)
+{
+    int w = ctx->width;
+    int h = ctx->height;
+	int frame_num = ctx->frames;   
     int frame_size = w * h * 3 / 2;
-	const char *input_file = in_file.c_str();
-	const char *output_file = out_file.c_str();
+	const char *input_file = ctx->input.c_str();
+	const char *output_file = ctx->input_cmp.c_str();
     unsigned char *y_org, *y_buf;
 	int j, i;
 	int ret_len_org, ret_len_chg;
@@ -100,25 +87,25 @@ int main(int argc, char **argv)
 	fp_yuv_in = fopen(input_file, "rb");
     if (fp_yuv_in == NULL) {
         perror("fopen input");
-        return 0;
+        return RET_NOK;
     }
 
 	fp_yuv_org = fopen(output_file, "rb");
     if (fp_yuv_org == NULL) {
         perror("fopen org");
-        return 0;
+        return RET_NOK;
     }
 
     y_buf = (unsigned char *)malloc(w * h * 2);
     if (y_buf == NULL) {
         printf("malloc y_buf failed\n");
-        return 0;
+        return RET_NOK;
     }
 
 	y_org = (unsigned char *)malloc(w * h * 2);
     if (y_org == NULL) {
         printf("malloc y_org failed\n");
-        return 0;
+        return RET_NOK;
     }
 
 	real_frm_cnt = 0;
@@ -144,18 +131,19 @@ int main(int argc, char **argv)
 	psnr = x264_psnr((double)ssd_global / real_frm_cnt, frame_size);
     end_time = time_mdate();
 
-	FILE *fp = fopen(psnr_file.c_str(), "ab");
-	fprintf(fp, "%s", input_file);
-	fprintf(fp, "      %lf\n", psnr);
-	fclose(fp);
+	FILE *fp = fopen(ctx->output.c_str(), "ab");
+	FPRINT(fp, "%s", input_file);
+	FPRINT(fp, "      %lf\n", psnr);
+	FPCLOSE(fp);
 	printf("%s", input_file);
 	printf(" elapsed %.2fs, global psnr = %lf  \n", (float)(end_time - start_time) / 1000000, psnr);
-	fclose(fp_yuv_in);
-	fclose(fp_yuv_org);
+	FPCLOSE(fp_yuv_in);
+	FPCLOSE(fp_yuv_org);
     free(y_buf);
     free(y_org);
+
+    return RET_OK;
 }
-#endif
 
 static RET calc_ave(uint8_t *buf, FILE *fp, uint32_t len, float *ave)
 {	
@@ -271,7 +259,7 @@ int main(int argc, char **argv)
 	if (ctx->mode == CALC_VAR) {
     	calc_var(ctx);
     } else if (ctx->mode == CALC_PSNR) {
-
+		calc_psnr(ctx);
     }
 
 	return 0;
