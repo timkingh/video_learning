@@ -156,22 +156,51 @@ int main(int argc, char **argv)
 }
 #endif
 
+static RET calc_ave(uint8_t *buf, FILE *fp, uint32_t len, float *ave)
+{	
+	uint32_t read_len, j;
+	double sum = 0;
+	
+	read_len = fread(buf, 1, len, fp);
+	if (0 == read_len || read_len < len) {
+		printf("fread finished!\n");
+		return RET_NOK;
+	}
+
+	for (j = 0; j < len; j++) {
+		sum += buf[j];
+	}
+	
+	*ave = (sum) / len;
+	
+	return RET_OK;
+}
+
+static float calc_variance(uint8_t *buf, uint32_t len, float ave)
+{		
+	double sum_square = 0;
+	for (int j = 0; j < len; j++) {
+		sum_square += (buf[j] - ave) * (buf[j] - ave);
+	}
+
+	return (sum_square + len / 2) / len;
+}
+
 static RET calc_var(CalcCtx *ctx)
 {   
 	uint32_t frame_size = ctx->width * ctx->height;
 	const char *input_file = ctx->input.c_str();
 	const char *output_file = ctx->output.c_str();
-    unsigned char *y_buf;
-	int j, i;
-	int ret_len_org, ret_len_chg;
-	int real_frm_cnt = 0;
-	long long ssd;
-	long long ssd_global = 0;
-	double psnr = 0;
+    uint8_t *buf;
+	int j, i, read_len;
+	uint32_t y_len = ctx->width * ctx->height;
+	uint32_t u_len = y_len / 4;
     FILE *fp_yuv_in;
     FILE *fp_out;
     int64_t start_time = time_mdate();
     int64_t end_time;
+	float average[3] = {0};
+	float variance[3] = {0};
 
 	fp_yuv_in = fopen(input_file, "rb");
     if (fp_yuv_in == NULL) {
@@ -185,47 +214,28 @@ static RET calc_var(CalcCtx *ctx)
         return RET_NOK;
     }
 
-    y_buf = (unsigned char *)malloc(ctx->width * ctx->height * 2);
-    if (y_buf == NULL) {
-        printf("malloc y_buf failed\n");
+    buf = (uint8_t *)malloc(ctx->width * ctx->height * 2);
+    if (buf == NULL) {
+        printf("malloc buf failed\n");
         return RET_NOK;
     }
 
-	double sum = 0, sum_square = 0;
-	float average = 0, variance = 0;
-	real_frm_cnt = 0;
-	for (i = 0; i < ctx->frames; i++)
-	{
-		ret_len_org = fread(y_buf, 1, frame_size, fp_yuv_in);
-		if (0 == ret_len_org || ret_len_org < frame_size)
-		{
-			break;
+	for (i = 0; i < ctx->frames; i++) {
+		for (j = 0; j < 3; j++) {
+			if (RET_OK != calc_ave(buf, fp_yuv_in, (j == 0) ? y_len : u_len, &average[j])) {
+				printf("fread %s finished\n", (j == 0) ? "Luma" : ((j == 1) ? "Chroma U" : "Chroma V"));
+				break;
+			}
+			variance[j] = calc_variance(buf, (j == 0) ? y_len : u_len, average[j]);
+			fprintf(fp_out, "frame %d plane %d ave %f var %f\n", i, j, average[j], variance[j]);
 		}
-        printf("fread frame %03d\n", real_frm_cnt);
-
-		real_frm_cnt++;
-		ssd = 0;
-		for (j = 0; j < frame_size; j++) 
-		{
-			sum += y_buf[j];
-		}
-		average = (sum) / frame_size;
-
-		for (j = 0; j < frame_size; j++)
-		{
-			sum_square += (y_buf[j] - average) * (y_buf[j] - average);
-		}
-		variance = (sum_square + frame_size / 2) /frame_size;
-
-		ssd_global += ssd;
 	}
-	fprintf(fp_out, "end of frame %d ave %f var %f\n", real_frm_cnt - 1, average, variance);
     end_time = time_mdate();
 
-	printf("elapsed %.2fs\n", (float)(end_time - start_time) / 1000000);
+	printf("calc frame %d elapsed %.2fs\n", i, (float)(end_time - start_time) / 1000000);
 	FPCLOSE(fp_yuv_in);
 	FPCLOSE(fp_out);
-    free(y_buf);
+    free(buf);
 }
 
 int main(int argc, char **argv)
