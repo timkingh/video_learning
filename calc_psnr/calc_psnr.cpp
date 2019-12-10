@@ -5,6 +5,7 @@
 #include <string.h>
 #include <string>
 #include <math.h>
+#include <stdint.h>
 #if _WIN32
 #include <sys/types.h>
 #include <sys/timeb.h>
@@ -15,11 +16,30 @@
 
 #define PIXEL_MAX 255
 
-#if _WIN32
-typedef long long int64_t;
-#endif
-
 using namespace std;
+
+#define     FPRINT(fp, ...)  { if (fp) { fprintf(fp, ## __VA_ARGS__);} }
+#define     FPCLOSE(fp, ...) { if (fp) { fclose(fp); fp = NULL;} }
+
+enum MODE {
+	CALC_PSNR = 0,
+	CALC_VAR = 1,
+};
+
+enum RET {
+	RET_NOK = -1,
+	RET_OK = 0,
+};
+
+typedef struct {
+    string input;
+    string input_cmp;
+    string output;
+    uint32_t width;
+    uint32_t height;
+    uint32_t frames;
+    uint32_t mode;
+} CalcCtx;
 
 int64_t time_mdate(void)
 {
@@ -42,7 +62,7 @@ static double x264_psnr(double sqe, double size)
 
 	return -10.0 * log10(mse);
 }
-
+#if 0
 int main(int argc, char **argv)
 {
     bool help = getarg(false, "-H", "--help", "-?");
@@ -134,3 +154,113 @@ int main(int argc, char **argv)
     free(y_buf);
     free(y_org);
 }
+#endif
+
+static RET calc_var(CalcCtx *ctx)
+{   
+	uint32_t frame_size = ctx->width * ctx->height;
+	const char *input_file = ctx->input.c_str();
+	const char *output_file = ctx->output.c_str();
+    unsigned char *y_buf;
+	int j, i;
+	int ret_len_org, ret_len_chg;
+	int real_frm_cnt = 0;
+	long long ssd;
+	long long ssd_global = 0;
+	double psnr = 0;
+    FILE *fp_yuv_in;
+    FILE *fp_out;
+    int64_t start_time = time_mdate();
+    int64_t end_time;
+
+	fp_yuv_in = fopen(input_file, "rb");
+    if (fp_yuv_in == NULL) {
+        perror("fopen input");
+        return RET_NOK;
+    }
+
+	fp_out = fopen(output_file, "ab");
+    if (fp_out == NULL) {
+        perror("fopen org");
+        return RET_NOK;
+    }
+
+    y_buf = (unsigned char *)malloc(ctx->width * ctx->height * 2);
+    if (y_buf == NULL) {
+        printf("malloc y_buf failed\n");
+        return RET_NOK;
+    }
+
+	double sum = 0, sum_square = 0;
+	float average = 0, variance = 0;
+	real_frm_cnt = 0;
+	for (i = 0; i < ctx->frames; i++)
+	{
+		ret_len_org = fread(y_buf, 1, frame_size, fp_yuv_in);
+		if (0 == ret_len_org || ret_len_org < frame_size)
+		{
+			break;
+		}
+        printf("fread frame %03d\n", real_frm_cnt);
+
+		real_frm_cnt++;
+		ssd = 0;
+		for (j = 0; j < frame_size; j++) 
+		{
+			sum += y_buf[j];
+		}
+		average = (sum) / frame_size;
+
+		for (j = 0; j < frame_size; j++)
+		{
+			sum_square += (y_buf[j] - average) * (y_buf[j] - average);
+		}
+		variance = (sum_square + frame_size / 2) /frame_size;
+
+		ssd_global += ssd;
+	}
+	fprintf(fp_out, "end of frame %d ave %f var %f\n", real_frm_cnt - 1, average, variance);
+    end_time = time_mdate();
+
+	printf("elapsed %.2fs\n", (float)(end_time - start_time) / 1000000);
+	FPCLOSE(fp_yuv_in);
+	FPCLOSE(fp_out);
+    free(y_buf);
+}
+
+int main(int argc, char **argv)
+{
+	CalcCtx calc_ctx;
+	CalcCtx *ctx = &calc_ctx;
+	memset(ctx, 0, sizeof(CalcCtx));
+    bool help = getarg(false, "-H", "--help", "-?");
+    ctx->input = getarg("modify.yuv", "-i", "--input");
+    ctx->input_cmp = getarg("origin.yuv", "-o", "--output");
+    ctx->output = getarg("psnr.txt", "-p", "--psnr");
+    ctx->width = getarg(1920, "-w", "--width");
+    ctx->height = getarg(1080, "-h", "--height");
+	ctx->frames = getarg(300, "-f", "--frames");	
+	ctx->mode = getarg(0, "-m", "--mode");
+
+    if (help || argc < 2) {
+        cout << "Usage: calculate PSNR" << endl
+             << "./calc_psnr -i=modify.yuv -o=origin.yuv -m=0 "
+             << "-w=1920 -h=1080 --frames=300 -p=psnr.txt"
+             << endl;
+
+         cout << "Usage: calculate Variance" << endl
+             << "./calc_psnr -i=input.yuv -m=1 "
+             << "-w=1920 -h=1080 --frames=300 -p=variance.txt"
+             << endl;
+        return 0;
+    }
+
+	if (ctx->mode == CALC_VAR) {
+    	calc_var(ctx);
+    } else if (ctx->mode == CALC_PSNR) {
+
+    }
+
+	return 0;
+}
+
