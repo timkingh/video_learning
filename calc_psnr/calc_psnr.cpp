@@ -51,16 +51,16 @@ int main(int argc, char **argv)
     string psnr_file = getarg("psnr.txt", "-p", "--psnr");
     int w = getarg(1920, "-w", "--width");
     int h = getarg(1080, "-h", "--height");
+	int frame_num = getarg(300, "-f", "--frames");;
 
     if (help || argc < 2) {
         cout << "Usage:" << endl
              << "./calc_psnr -i=modify.yuv -o=origin.yuv "
-             << "-w=1920 -h=1080 -p=psnr.txt"
+             << "-w=1920 -h=1080 --frames=300 -p=psnr.txt"
              << endl;
         return 0;
     }
-
-    int frame_num = 300;
+    
     int frame_size = w * h * 3 / 2;
 	const char *input_file = in_file.c_str();
 	const char *output_file = out_file.c_str();
