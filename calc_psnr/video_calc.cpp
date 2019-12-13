@@ -191,8 +191,8 @@ static RET calc_var(CalcCtx *ctx)
     int64_t end_time;
 	float average[3] = {0};
 	float variance[3] = {0};
-	float *var_buf = NULL;
-	uint32_t var_idx = 0;
+	float *var_buf = NULL, *mean_buf = NULL;
+	uint32_t var_idx = 0, mean_idx = 0;
 
 	fp_yuv_in = fopen(input_file, "rb");
     if (fp_yuv_in == NULL) {
@@ -217,6 +217,12 @@ static RET calc_var(CalcCtx *ctx)
 		printf("malloc var_buf failed\n");
 		return RET_NOK;
 	}
+	
+	mean_buf = (float *)malloc(ctx->frames * 3 * sizeof(float));
+	if (mean_buf == NULL) {
+		printf("malloc mean_buf failed\n");
+		return RET_NOK;
+	}
 
 	for (i = 0; i < ctx->frames; i++) {
 		for (j = 0; j < 3; j++) {
@@ -228,16 +234,23 @@ static RET calc_var(CalcCtx *ctx)
 			fprintf(fp_out, "frame %d plane %d ave %f var %f\n", i, j, average[j], variance[j]);
 
 			var_buf[var_idx++] = variance[j];
+			mean_buf[mean_idx++] = average[j];
 		}
 	}
 
 	if (ctx->var_ratio_flg) {
 		float ratio[3] = {0};
+		float mean_ratio[3] = {0};
 		for (i = 0; i < ctx->frames - 1; i++) {
 			ratio[0] = sqrtf(var_buf[(i + 1) * 3 + 0] / var_buf[i * 3 + 0]);
 			ratio[1] = sqrtf(var_buf[(i + 1) * 3 + 1] / var_buf[i * 3 + 1]);
 			ratio[2] = sqrtf(var_buf[(i + 1) * 3 + 2] / var_buf[i * 3 + 2]);
 			FPRINT(fp_out, "frame %d ratio %f %f %f\n", i + 1, ratio[0], ratio[1], ratio[2]);
+			
+			mean_ratio[0] = mean_buf[(i + 1) * 3 + 0] / mean_buf[i * 3 + 0];
+			mean_ratio[1] = mean_buf[(i + 1) * 3 + 1] / mean_buf[i * 3 + 1];
+			mean_ratio[2] = mean_buf[(i + 1) * 3 + 2] / mean_buf[i * 3 + 2];
+			FPRINT(fp_out, "frame %d mean_ratio %f %f %f\n", i + 1, mean_ratio[0], mean_ratio[1], mean_ratio[2]);
 		}
 	}
 	
@@ -248,6 +261,7 @@ static RET calc_var(CalcCtx *ctx)
 	FPCLOSE(fp_out);
     free(buf);
     free(var_buf);
+    free(mean_buf);
 
     return RET_OK;
 }
