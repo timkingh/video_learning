@@ -40,6 +40,7 @@ typedef struct {
     uint32_t height;
     uint32_t frames;
     uint32_t mode;
+    uint32_t var_ratio_flg;
 } CalcCtx;
 
 int64_t time_mdate(void)
@@ -190,6 +191,8 @@ static RET calc_var(CalcCtx *ctx)
     int64_t end_time;
 	float average[3] = {0};
 	float variance[3] = {0};
+	float *var_buf = NULL;
+	uint32_t var_idx = 0;
 
 	fp_yuv_in = fopen(input_file, "rb");
     if (fp_yuv_in == NULL) {
@@ -209,6 +212,12 @@ static RET calc_var(CalcCtx *ctx)
         return RET_NOK;
     }
 
+	var_buf = (float *)malloc(ctx->frames * 3 * sizeof(float));
+	if (var_buf == NULL) {
+		printf("malloc var_buf failed\n");
+		return RET_NOK;
+	}
+
 	for (i = 0; i < ctx->frames; i++) {
 		for (j = 0; j < 3; j++) {
 			if (RET_OK != calc_ave(buf, fp_yuv_in, (j == 0) ? y_len : u_len, &average[j])) {
@@ -217,14 +226,28 @@ static RET calc_var(CalcCtx *ctx)
 			}
 			variance[j] = calc_variance(buf, (j == 0) ? y_len : u_len, average[j]);
 			fprintf(fp_out, "frame %d plane %d ave %f var %f\n", i, j, average[j], variance[j]);
+
+			var_buf[var_idx++] = variance[j];
 		}
 	}
+
+	if (ctx->var_ratio_flg) {
+		float ratio[3] = {0};
+		for (i = 0; i < ctx->frames - 1; i++) {
+			ratio[0] = sqrtf(var_buf[(i + 1) * 3 + 0] / var_buf[i * 3 + 0]);
+			ratio[1] = sqrtf(var_buf[(i + 1) * 3 + 1] / var_buf[i * 3 + 1]);
+			ratio[2] = sqrtf(var_buf[(i + 1) * 3 + 2] / var_buf[i * 3 + 2]);
+			FPRINT(fp_out, "frame %d ratio %f %f %f\n", i + 1, ratio[0], ratio[1], ratio[2]);
+		}
+	}
+	
     end_time = time_mdate();
 
-	printf("calc frame %d elapsed %.2fs\n", i, (float)(end_time - start_time) / 1000000);
+	printf("calc frame %d elapsed %.2fs\n", ctx->frames, (float)(end_time - start_time) / 1000000);
 	FPCLOSE(fp_yuv_in);
 	FPCLOSE(fp_out);
     free(buf);
+    free(var_buf);
 
     return RET_OK;
 }
@@ -242,15 +265,16 @@ int main(int argc, char **argv)
     ctx->height = getarg(1080, "-h", "--height");
 	ctx->frames = getarg(300, "-f", "--frames");	
 	ctx->mode = getarg(0, "-m", "--mode");
+	ctx->var_ratio_flg = getarg(0, "--var_ratio_flg");
 
     if (help || argc < 2) {
         cout << "Usage: calculate PSNR" << endl
-             << "./calc_psnr -i=modify.yuv -o=origin.yuv -m=0 "
+             << "./video_calc -i=modify.yuv -o=origin.yuv -m=0 "
              << "-w=1920 -h=1080 --frames=300 -p=psnr.txt"
              << endl;
 
          cout << "Usage: calculate Variance" << endl
-             << "./calc_psnr -i=input.yuv -m=1 "
+             << "./video_calc -i=input.yuv -m=1 --var_ratio_flg=1"
              << "-w=1920 -h=1080 --frames=300 -p=variance.txt"
              << endl;
         return 0;
@@ -264,4 +288,3 @@ int main(int argc, char **argv)
 
 	return 0;
 }
-
