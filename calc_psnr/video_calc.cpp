@@ -43,6 +43,8 @@ typedef struct {
     uint32_t var_ratio_flg;
 } CalcCtx;
 
+typedef RET(*func)(CalcCtx *);
+
 int64_t time_mdate(void)
 {
 #if _WIN32
@@ -294,11 +296,13 @@ int main(int argc, char **argv)
         return 0;
     }
 
-	if (ctx->mode == CALC_VAR) {
-    	calc_var(ctx);
-    } else if (ctx->mode == CALC_PSNR) {
-		calc_psnr(ctx);
-    }
+	/* Functions' order must match with enum MODE */
+	func demo[] = {
+		calc_psnr,
+		calc_var,
+	};
+
+	demo[ctx->mode](ctx);
 
 	return 0;
 }
