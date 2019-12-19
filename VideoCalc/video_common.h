@@ -29,6 +29,7 @@ typedef struct {
 	uint32_t frames;
 	uint32_t mode;
 	uint32_t var_ratio_flg;
+	uint32_t log_frames;
 } CalcCtx;
 
 typedef RET(*func)(CalcCtx *);

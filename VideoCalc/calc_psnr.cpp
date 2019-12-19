@@ -56,6 +56,10 @@ RET calc_psnr(CalcCtx *ctx)
 		return RET_NOK;
 	}
 
+	if (ctx->log_frames == 0) {
+		ctx->log_frames = 1;
+	}
+
 	real_frm_cnt = 0;
 	for (i = 0; i < frame_num; i++)
 	{
@@ -65,7 +69,10 @@ RET calc_psnr(CalcCtx *ctx)
 		{
 			break;
 		}
-		printf("fread frame %03d\n", real_frm_cnt);
+		
+		if ((real_frm_cnt % ctx->log_frames) == (ctx->log_frames - 1)) {
+			printf("fread frame %03d\n", real_frm_cnt);
+		}
 
 		real_frm_cnt++;
 		ssd = 0;

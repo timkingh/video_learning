@@ -25,15 +25,16 @@ int main(int argc, char **argv)
 	ctx->frames = getarg(300, "-f", "--frames");	
 	ctx->mode = getarg(0, "-m", "--mode");
 	ctx->var_ratio_flg = getarg(0, "--var_ratio_flg");
+	ctx->log_frames = getarg(1, "--log_frames");
 
     if (help || argc < 2) {
         cout << "Usage: calculate PSNR" << endl
-             << "./video_calc -i=modify.yuv -o=origin.yuv -m=0 "
-             << "-w=1920 -h=1080 --frames=300 -p=psnr.txt"
+             << "./VidoeCalc -i=modify.yuv -o=origin.yuv -m=0 "
+             << "-w=1920 -h=1080 --frames=300 -p=psnr.txt --log_frames=10"
              << endl;
 
          cout << "Usage: calculate Variance" << endl
-             << "./video_calc -i=input.yuv -m=1 --var_ratio_flg=1"
+             << "./VideoCalc -i=input.yuv -m=1 --var_ratio_flg=1 "
              << "-w=1920 -h=1080 --frames=300 -p=variance.txt"
              << endl;
         return 0;
