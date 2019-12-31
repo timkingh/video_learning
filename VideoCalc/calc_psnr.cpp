@@ -22,7 +22,7 @@ RET calc_psnr(CalcCtx *ctx)
 	const char *output_file = ctx->input_cmp.c_str();
 	unsigned char *y_org, *y_buf;
 	int j, i;
-	int ret_len_org, ret_len_chg;
+	size_t ret_len_org, ret_len_chg;
 	int real_frm_cnt = 0;
 	long long ssd;
 	long long ssd_global = 0;
