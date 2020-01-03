@@ -26,10 +26,57 @@ static RET calc_hist(uint8_t *buf, FILE *fp, uint32_t len, vector<int> &hist)
 	return RET_OK;
 }
 
-static void disp_hist(vector<int> &hist, FILE *fp)
+static void disp_hist(CalcCtx *ctx, FILE *fp)
 {
-	for (int i = 0; i < hist.size(); i++) {
-		FPRINT(fp, "pixel %3d --- %8d\n", i, hist[i]);
+	for (uint32_t i = 0; i < ctx->frames; i++) {
+		for (uint32_t j = 0; j < 3; j++) {
+			vector<int> vec = ctx->hist_org[i * 3 + j];
+			FPRINT(fp, "frame %3d plane %d\n", i, j);
+
+			for (int k = 0; k < vec.size(); k++) {
+				FPRINT(fp, "pixel %3d --- %8d\n", k, vec[k]);
+			}
+		}
+	}
+}
+
+static void scale_hist(vector<int> &hist_in, vector<int> &hist_out)
+{
+	uint32_t weight = 1, denom = 0, offset = 8;
+	hist_out.clear();
+	hist_out.resize(hist_in.size());
+	uint32_t div_offset = (denom == 0) ? 0 : 1 << (denom - 1);
+
+	for (uint32_t i = 0; i < hist_in.size(); i++) {
+		uint32_t j = ((weight * i + div_offset) >> denom) + offset;
+		j = video_clip3(j, 0, 255);
+		hist_out[j] += hist_in[i];
+	}
+}
+
+static uint32_t calc_hist_distortion(vector<int> &vec1, vector<int> &vec2)
+{
+	uint32_t dist = 0;
+	assert(vec1.size() == vec2.size());
+
+	for (int i = 0; i < vec1.size(); i++) {
+		dist += abs(vec1[i] - vec2[i]);
+	}
+	return dist;
+}
+
+static void calc_frame_distortion(CalcCtx *ctx, FILE *fp)
+{
+	uint32_t dist;
+	for (uint32_t i = 0; i < ctx->frames - 1; i++) {
+		for (uint32_t j = 0; j < 3; j++) {
+			vector<int> ref = ctx->hist_org[i * 3 + j];
+			vector<int> cur = ctx->hist_org[(i + 1) * 3 + j];
+			vector<int> weight;
+			scale_hist(ref, weight);
+			dist = calc_hist_distortion(weight, cur);
+			FPRINT(fp, "frame %d plane %d dist %d\n", i + 1, j, dist);
+		}
 	}
 }
 
@@ -46,12 +93,6 @@ RET calc_histogram(CalcCtx *ctx)
 	FILE *fp_out;
 	int64_t start_time = time_mdate();
 	int64_t end_time;
-	float average[3] = { 0 };
-	float variance[3] = { 0 };	
-	uint64_t madi[3] = { 0 };
-	float *var_buf = NULL, *mean_buf = NULL;
-	uint64_t *mad_buf = NULL;
-	uint32_t var_idx = 0, mean_idx = 0, mad_idx = 0;
 	vector<int> hist;
 
 	fp_yuv_in = fopen(input_file, "rb");
@@ -72,24 +113,6 @@ RET calc_histogram(CalcCtx *ctx)
 		return RET_NOK;
 	}
 
-	var_buf = (float *)malloc(ctx->frames * 3 * sizeof(float));
-	if (var_buf == NULL) {
-		printf("malloc var_buf failed\n");
-		return RET_NOK;
-	}
-
-	mean_buf = (float *)malloc(ctx->frames * 3 * sizeof(float));
-	if (mean_buf == NULL) {
-		printf("malloc mean_buf failed\n");
-		return RET_NOK;
-	}
-
-	mad_buf = (uint64_t *)malloc(ctx->frames * 3 * sizeof(uint64_t));
-	if (mad_buf == NULL) {
-		printf("malloc mad_buf failed\n");
-		return RET_NOK;
-	}
-
 	for (i = 0; i < ctx->frames; i++) {
 		for (j = 0; j < 3; j++) {
 			if (RET_OK != calc_hist(buf, fp_yuv_in, (j == 0) ? y_len : u_len, hist)) {
@@ -102,24 +125,15 @@ RET calc_histogram(CalcCtx *ctx)
 	}
 
 	assert(ctx->frames * 3 <= ctx->hist_org.size());
-
-	for (i = 0; i < ctx->frames; i++) {
-		for (j = 0; j < 3; j++) {
-			vector<int> vec = ctx->hist_org[i * 3 + j];
-			FPRINT(fp_out, "frame %3d plane %d\n", i, j);
-			disp_hist(vec, fp_out);
-		}
-	}
+	//disp_hist(ctx, fp_out);
+	calc_frame_distortion(ctx, fp_out);
 
 	end_time = time_mdate();
 
-	printf("calc histogram %d elapsed %.2fs\n", ctx->frames, (float)(end_time - start_time) / 1000000);
+	printf("calc frame %d elapsed %.2fs\n", ctx->frames, (float)(end_time - start_time) / 1000000);
 	FPCLOSE(fp_yuv_in);
 	FPCLOSE(fp_out);
 	free(buf);
-	free(var_buf);
-	free(mean_buf);
-	free(mad_buf);
 
 	return RET_OK;
 }

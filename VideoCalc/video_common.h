@@ -33,9 +33,15 @@ typedef struct {
 	uint32_t var_ratio_flg;
 	uint32_t log_frames;
 	vector<vector<int>> hist_org; /* Plane 0 1 2 */
+	vector<vector<int>> hist_weight;
 } CalcCtx;
 
 typedef RET(*func)(CalcCtx *);
+
+static inline int video_clip3( int v, int i_min, int i_max )
+{
+    return ( (v < i_min) ? i_min : (v > i_max) ? i_max : v );
+}
 
 int64_t time_mdate(void);
 
