@@ -1,11 +1,15 @@
 #define _CRT_SECURE_NO_WARNINGS
-#include "calc_var.h"
+#include "calc_histogram.h"
 
-static RET calc_ave(uint8_t *buf, FILE *fp, uint32_t len, float *ave)
+#define MAX_HIST_LEN  (256)
+
+static RET calc_hist(uint8_t *buf, FILE *fp, uint32_t len, vector<int> &hist)
 {
 	size_t read_len;
 	uint32_t j;
-	double sum = 0;
+	int32_t value;
+	hist.clear();
+	hist.resize(MAX_HIST_LEN);
 
 	read_len = fread(buf, 1, len, fp);
 	if (0 == read_len || read_len < len) {
@@ -14,35 +18,22 @@ static RET calc_ave(uint8_t *buf, FILE *fp, uint32_t len, float *ave)
 	}
 
 	for (j = 0; j < len; j++) {
-		sum += buf[j];
+		value = buf[j];
+		value = value < 0 ? 0 : ((value > 255) ? 255 : value);
+		hist[value]++;
 	}
-
-	*ave = (float)((sum) / len);
 
 	return RET_OK;
 }
 
-static float calc_variance(uint8_t *buf, uint32_t len, float ave)
+static void disp_hist(vector<int> &hist, FILE *fp)
 {
-	double sum_square = 0;
-	for (uint32_t j = 0; j < len; j++) {
-		sum_square += (buf[j] - ave) * (buf[j] - ave);
+	for (int i = 0; i < hist.size(); i++) {
+		FPRINT(fp, "pixel %3d --- %8d\n", i, hist[i]);
 	}
-
-	return (float)((sum_square + len / 2) / len);
 }
 
-static uint64_t calc_madi(uint8_t *buf, uint32_t len, uint8_t ave)
-{
-	uint64_t madi = 0;
-	for (uint32_t j = 0; j < len; j++) {
-		madi += abs(buf[j] - ave);
-	}
-
-	return madi;
-}
-
-RET calc_var(CalcCtx *ctx)
+RET calc_histogram(CalcCtx *ctx)
 {
 	uint32_t frame_size = ctx->width * ctx->height;
 	const char *input_file = ctx->input.c_str();
@@ -61,6 +52,7 @@ RET calc_var(CalcCtx *ctx)
 	float *var_buf = NULL, *mean_buf = NULL;
 	uint64_t *mad_buf = NULL;
 	uint32_t var_idx = 0, mean_idx = 0, mad_idx = 0;
+	vector<int> hist;
 
 	fp_yuv_in = fopen(input_file, "rb");
 	if (fp_yuv_in == NULL) {
@@ -100,47 +92,28 @@ RET calc_var(CalcCtx *ctx)
 
 	for (i = 0; i < ctx->frames; i++) {
 		for (j = 0; j < 3; j++) {
-			if (RET_OK != calc_ave(buf, fp_yuv_in, (j == 0) ? y_len : u_len, &average[j])) {
+			if (RET_OK != calc_hist(buf, fp_yuv_in, (j == 0) ? y_len : u_len, hist)) {
 				printf("frame %d fread %s finished\n", i, (j == 0) ? "Luma" : ((j == 1) ? "Chroma U" : "Chroma V"));
 				break;
 			}
-			variance[j] = calc_variance(buf, (j == 0) ? y_len : u_len, average[j]);
 
-			madi[j] = calc_madi(buf, (j == 0) ? y_len : u_len, (uint8_t)average[j]);
-			fprintf(fp_out, "frame %d plane %d ave %f var %f madi %d\n", i, j, average[j], variance[j], madi[j]);
-
-			var_buf[var_idx++] = variance[j];
-			mean_buf[mean_idx++] = average[j];
-			mad_buf[mad_idx++] = madi[j];
+			ctx->hist_org.push_back(hist);
 		}
 	}
 
-	if (ctx->var_ratio_flg) {
-		float var_ratio[3] = { 0 };
-		float mean_ratio[3] = { 0 };
-		float mad_ratio[3] = { 0 };
-		for (i = 0; i < ctx->frames - 1; i++) {
-			for (j = 0; j < 3; j++) {
-				float numer = var_buf[(i + 1) * 3 + j] + !var_buf[i * 3 + j];
-				float denom = var_buf[i * 3 + j]       + !var_buf[i * 3 + j];
-				var_ratio[j] = sqrtf(numer / denom);
+	assert(ctx->frames * 3 <= ctx->hist_org.size());
 
-				numer = mean_buf[(i + 1) * 3 + j] + !mean_buf[i * 3 + j];
-				denom = mean_buf[i * 3 + j]       + !mean_buf[i * 3 + j];
-				mean_ratio[j] = numer / denom;
-
-				numer = (float)mad_buf[(i + 1) * 3 + j] + !mad_buf[i * 3 + j];
-				denom = (float)mad_buf[i * 3 + j]       + !mad_buf[i * 3 + j];
-				mad_ratio[j] = numer / denom;
-				FPRINT(fp_out, "frame %d plane %d mean_ratio %f var_ratio %f mad_ratio %f\n", i + 1, j, 
-								mean_ratio[j], var_ratio[j], mad_ratio[j]);
-			}
+	for (i = 0; i < ctx->frames; i++) {
+		for (j = 0; j < 3; j++) {
+			vector<int> vec = ctx->hist_org[i * 3 + j];
+			FPRINT(fp_out, "frame %3d plane %d\n", i, j);
+			disp_hist(vec, fp_out);
 		}
 	}
 
 	end_time = time_mdate();
 
-	printf("calc frame %d elapsed %.2fs\n", ctx->frames, (float)(end_time - start_time) / 1000000);
+	printf("calc histogram %d elapsed %.2fs\n", ctx->frames, (float)(end_time - start_time) / 1000000);
 	FPCLOSE(fp_yuv_in);
 	FPCLOSE(fp_out);
 	free(buf);

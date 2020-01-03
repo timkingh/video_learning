@@ -9,6 +9,8 @@
 #include <string>
 #include <math.h>
 #include <stdint.h>
+#include <assert.h>
+#include <vector>
 
 using namespace std;
 
@@ -30,10 +32,10 @@ typedef struct {
 	uint32_t mode;
 	uint32_t var_ratio_flg;
 	uint32_t log_frames;
+	vector<vector<int>> hist_org; /* Plane 0 1 2 */
 } CalcCtx;
 
 typedef RET(*func)(CalcCtx *);
-
 
 int64_t time_mdate(void);
 

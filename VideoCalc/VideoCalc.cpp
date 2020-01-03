@@ -3,12 +3,14 @@
 #include "getopt.hpp"
 #include "calc_var.h"
 #include "calc_psnr.h"
+#include "calc_histogram.h"
 
 using namespace std;
 
 enum MODE {
 	CALC_PSNR = 0,
 	CALC_VAR = 1,
+	CALC_HIST = 2, /* Histogram */
 };
 
 int main(int argc, char **argv)
@@ -44,6 +46,7 @@ int main(int argc, char **argv)
 	func demo[] = {
 		calc_psnr,
 		calc_var,
+		calc_histogram
 	};
 
 	demo[ctx->mode](ctx);
