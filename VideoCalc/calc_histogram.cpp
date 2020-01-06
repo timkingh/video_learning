@@ -3,6 +3,12 @@
 
 #define MAX_HIST_LEN  (256)
 
+typedef struct {
+	int32_t scale;
+	int32_t denom;
+	int32_t offset;
+}weight_t;
+
 static RET calc_hist(uint8_t *buf, FILE *fp, uint32_t len, vector<int> &hist)
 {
 	size_t read_len;
@@ -40,9 +46,9 @@ static void disp_hist(CalcCtx *ctx, FILE *fp)
 	}
 }
 
-static void scale_hist(vector<int> &hist_in, vector<int> &hist_out)
+static void scale_hist(vector<int> &hist_in, vector<int> &hist_out, weight_t &w)
 {
-	uint32_t weight = 1, denom = 0, offset = 8;
+	uint32_t weight = w.scale, denom = w.denom, offset = w.offset;
 	hist_out.clear();
 	hist_out.resize(hist_in.size());
 	uint32_t div_offset = (denom == 0) ? 0 : 1 << (denom - 1);
@@ -67,15 +73,33 @@ static uint32_t calc_hist_distortion(vector<int> &vec1, vector<int> &vec2)
 
 static void calc_frame_distortion(CalcCtx *ctx, FILE *fp)
 {
-	uint32_t dist;
+	uint32_t dist, min_dist = 0xFFFFFFFF;
+	weight_t w, best_w;
 	for (uint32_t i = 0; i < ctx->frames - 1; i++) {
 		for (uint32_t j = 0; j < 3; j++) {
 			vector<int> ref = ctx->hist_org[i * 3 + j];
 			vector<int> cur = ctx->hist_org[(i + 1) * 3 + j];
 			vector<int> weight;
-			scale_hist(ref, weight);
-			dist = calc_hist_distortion(weight, cur);
-			FPRINT(fp, "frame %d plane %d dist %d\n", i + 1, j, dist);
+
+			for (int32_t denom = 0; denom < 8; denom++) {
+				for (int32_t scale = 0; scale < 128; scale++) {
+					for (int32_t offset = -128; offset < 128; offset++) {
+						w.denom = denom;
+						w.scale = scale;
+						w.offset = offset;
+						
+						scale_hist(ref, weight, w);
+						dist = calc_hist_distortion(weight, cur);
+						if (dist  < min_dist) {
+							best_w = w;
+							min_dist = dist;
+						}
+					}
+				}
+			}
+			
+			FPRINT(fp, "frame %d plane %d minscale %d mindenom %d minoff %d\n", i + 1, j, 
+							best_w.scale, best_w.denom, best_w.offset);
 		}
 	}
 }
