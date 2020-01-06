@@ -48,13 +48,13 @@ static void disp_hist(CalcCtx *ctx, FILE *fp)
 
 static void scale_hist(vector<int> &hist_in, vector<int> &hist_out, weight_t &w)
 {
-	uint32_t weight = w.scale, denom = w.denom, offset = w.offset;
+	int32_t weight = w.scale, denom = w.denom, offset = w.offset;
 	hist_out.clear();
 	hist_out.resize(hist_in.size());
 	uint32_t div_offset = (denom == 0) ? 0 : 1 << (denom - 1);
 
 	for (uint32_t i = 0; i < hist_in.size(); i++) {
-		uint32_t j = ((weight * i + div_offset) >> denom) + offset;
+		int32_t j = ((weight * i + div_offset) >> denom) + offset;
 		j = video_clip3(j, 0, 255);
 		hist_out[j] += hist_in[i];
 	}
@@ -94,6 +94,8 @@ static void calc_frame_distortion(CalcCtx *ctx, FILE *fp)
 							best_w = w;
 							min_dist = dist;
 						}
+						//FPRINT(fp, "frame %d plane %d dist %d scale %d denom %d off %d\n", i + 1, j, 
+									//	dist, w.scale, w.denom, w.offset);
 					}
 				}
 			}
