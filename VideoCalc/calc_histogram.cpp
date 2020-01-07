@@ -73,7 +73,7 @@ static uint32_t calc_hist_distortion(vector<int> &vec1, vector<int> &vec2)
 
 static void calc_frame_distortion(CalcCtx *ctx, FILE *fp)
 {
-	uint32_t dist, min_dist = 0xFFFFFFFF;
+	uint32_t dist, min_dist;
 	weight_t w, best_w;
 	for (uint32_t i = 0; i < ctx->frames - 1; i++) {
 		for (uint32_t j = 0; j < 3; j++) {
@@ -81,6 +81,10 @@ static void calc_frame_distortion(CalcCtx *ctx, FILE *fp)
 			vector<int> cur = ctx->hist_org[(i + 1) * 3 + j];
 			vector<int> weight;
 
+			min_dist =  0xFFFFFFFF;
+			best_w.denom = -128;
+			best_w.scale = -128;
+			best_w.offset = -128;
 			for (int32_t denom = 0; denom < 8; denom++) {
 				for (int32_t scale = 0; scale < 128; scale++) {
 					for (int32_t offset = -128; offset < 128; offset++) {
@@ -94,8 +98,8 @@ static void calc_frame_distortion(CalcCtx *ctx, FILE *fp)
 							best_w = w;
 							min_dist = dist;
 						}
-						//FPRINT(fp, "frame %d plane %d dist %d scale %d denom %d off %d\n", i + 1, j, 
-									//	dist, w.scale, w.denom, w.offset);
+						//FPRINT(fp, "frame %d plane %d dist %d min_dist %d scale %d denom %d off %d\n", i + 1, j, 
+							//			dist, min_dist, w.scale, w.denom, w.offset);
 					}
 				}
 			}
@@ -151,8 +155,8 @@ RET calc_histogram(CalcCtx *ctx)
 	}
 
 	assert(ctx->frames * 3 <= ctx->hist_org.size());
-	disp_hist(ctx, fp_out);
-	//calc_frame_distortion(ctx, fp_out);
+	//disp_hist(ctx, fp_out);
+	calc_frame_distortion(ctx, fp_out);
 
 	end_time = time_mdate();
 
