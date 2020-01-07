@@ -3,6 +3,5 @@
 
 #include "video_common.h"
 
-RET calc_histogram(CalcCtx *ctx);
-
+RET weight_yuv(CalcCtx *ctx);
 #endif

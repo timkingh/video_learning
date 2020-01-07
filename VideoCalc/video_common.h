@@ -10,12 +10,20 @@
 #include <math.h>
 #include <stdint.h>
 #include <assert.h>
+
 #include <vector>
+#include <fstream>
 
 using namespace std;
 
 #define     FPRINT(fp, ...)  { if (fp) { fprintf(fp, ## __VA_ARGS__);} }
 #define     FPCLOSE(fp, ...) { if (fp) { fclose(fp); fp = NULL;} }
+
+#ifdef _WIN32
+#define SSCANF sscanf_s
+#else
+#define SSCANF sscanf
+#endif
 
 enum RET {
 	RET_NOK = -1,

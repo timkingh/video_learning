@@ -4,6 +4,7 @@
 #include "calc_var.h"
 #include "calc_psnr.h"
 #include "calc_histogram.h"
+#include "weight_yuv.h"
 
 using namespace std;
 
@@ -11,7 +12,31 @@ enum MODE {
 	CALC_PSNR = 0,
 	CALC_VAR = 1,
 	CALC_HIST = 2, /* Histogram */
+	WEIGHT_YUV = 3,
 };
+
+static void show_help()
+{       
+	cout << "Usage: calculate PSNR" << endl
+         << "VidoeCalc -i=modify.yuv -o=origin.yuv -m=0 "
+         << "-w=1920 -h=1080 --frames=300 -p=psnr.txt --log_frames=10"
+         << endl;
+
+    cout << "Usage: calculate Variance" << endl
+         << "VideoCalc -i=input.yuv -m=1 --var_ratio_flg=1 "
+         << "-w=1920 -h=1080 --frames=300 -p=variance.txt"
+         << endl;
+
+	cout << "Usage: calculate histogram" << endl
+         << "VidoeCalc -i=modify.yuv -m=2 "
+         << "-w=1920 -h=1080 --frames=300 -p=hist.txt"
+         << endl;
+
+    cout << "Usage: calculate weighted yuv" << endl
+         << "VideoCalc -i=input.yuv -o=weighted.yuv -m=3 "
+         << "-w=1920 -h=1080 --frames=300 "
+         << endl;	 
+}
 
 int main(int argc, char **argv)
 {
@@ -30,15 +55,7 @@ int main(int argc, char **argv)
 	ctx->log_frames = getarg(1, "--log_frames");
 
     if (help || argc < 2) {
-        cout << "Usage: calculate PSNR" << endl
-             << "./VidoeCalc -i=modify.yuv -o=origin.yuv -m=0 "
-             << "-w=1920 -h=1080 --frames=300 -p=psnr.txt --log_frames=10"
-             << endl;
-
-         cout << "Usage: calculate Variance" << endl
-             << "./VideoCalc -i=input.yuv -m=1 --var_ratio_flg=1 "
-             << "-w=1920 -h=1080 --frames=300 -p=variance.txt"
-             << endl;
+		show_help();
         return 0;
     }
 
@@ -46,7 +63,8 @@ int main(int argc, char **argv)
 	func demo[] = {
 		calc_psnr,
 		calc_var,
-		calc_histogram
+		calc_histogram,
+		weight_yuv
 	};
 
 	demo[ctx->mode](ctx);
