@@ -34,6 +34,7 @@ typedef struct {
 	string input;
 	string input_cmp;
 	string output;
+	string out_yuv;
 	uint32_t width;
 	uint32_t height;
 	uint32_t frames;

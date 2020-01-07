@@ -42,18 +42,35 @@ static RET output_weighted_yuv(uint8_t *buf, FILE *fp, uint32_t len)
 	return RET_OK;
 }
 
+static RET output_combo_yuv(uint8_t *buf0, uint8_t *buf1, FILE *fp, uint32_t len)
+{
+	size_t w_len;
+	w_len = fwrite(buf0, 1, len, fp);
+	if (w_len != len) {
+		perror("output original yuv");
+	}
+
+	w_len = fwrite(buf1, 1, len, fp);
+	if (w_len != len) {
+		perror("output weighted yuv");
+	}
+
+	return RET_OK;
+}
+
 RET weight_yuv(CalcCtx *ctx)
 {
 	uint32_t frame_size = ctx->width * ctx->height;
 	const char *input_file = ctx->input.c_str();
 	const char *output_file = ctx->input_cmp.c_str();
+	const char *combo_file = ctx->out_yuv.c_str();
     ifstream param(ctx->output.c_str());
 	uint8_t *buf, *buf_out;
 	uint32_t j, i;
 	uint32_t y_len = ctx->width * ctx->height;
 	uint32_t u_len = y_len / 4;
 	FILE *fp_yuv_in;
-	FILE *fp_out;
+	FILE *fp_out, *fp_combo;
 	int64_t start_time = time_mdate();
 	int64_t end_time;
 	weight_t w;
@@ -69,6 +86,12 @@ RET weight_yuv(CalcCtx *ctx)
 	if (fp_out == NULL) {
 		perror("fopen org");
 		return RET_NOK;
+	}	
+
+	fp_combo = fopen(combo_file, "wb");
+	if (fp_combo == NULL) {
+		perror("fopen combo");
+		return RET_NOK;
 	}
 
 	buf = (uint8_t *)malloc(ctx->width * ctx->height * 2);
@@ -83,7 +106,10 @@ RET weight_yuv(CalcCtx *ctx)
 		return RET_NOK;
 	}
 
-	for (i = 0; i < ctx->frames; i++) {
+	for (i = 0; i < ctx->frames; i++) {			
+		uint8_t *p0 = buf;
+		uint8_t *p1 = buf_out;
+
 		for (j = 0; j < 3; j++) {
 			uint32_t len = (j == 0) ? y_len : u_len;
 			
@@ -95,13 +121,17 @@ RET weight_yuv(CalcCtx *ctx)
 		        }
 		    }
 			
-			if (RET_OK != handle_weight(buf, fp_yuv_in, len, w, buf_out)) {
+			if (RET_OK != handle_weight(p0, fp_yuv_in, len, w, p1)) {
 				printf("frame %d fread %s finished\n", i, (j == 0) ? "Luma" : ((j == 1) ? "Chroma U" : "Chroma V"));
 				break;
 			}
 
-			output_weighted_yuv(buf_out, fp_out, len);
+			p0 += len;
+			p1 += len;
 		}
+		
+		output_weighted_yuv(buf_out, fp_out, y_len + u_len * 2);
+		output_combo_yuv(buf, buf_out, fp_combo, y_len + u_len * 2);
 	}
 
 	end_time = time_mdate();
@@ -109,6 +139,7 @@ RET weight_yuv(CalcCtx *ctx)
 	printf("weight frame %d elapsed %.2fs\n", ctx->frames, (float)(end_time - start_time) / 1000000);
 	FPCLOSE(fp_yuv_in);
 	FPCLOSE(fp_out);
+	FPCLOSE(fp_combo);
 	free(buf);
 	free(buf_out);
 

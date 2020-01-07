@@ -34,7 +34,7 @@ static void show_help()
 
     cout << "Usage: calculate weighted yuv" << endl
          << "VideoCalc -i=input.yuv -o=weighted.yuv -m=3 "
-         << "-w=1920 -h=1080 --frames=300 "
+         << "-w=1920 -h=1080 --frames=300 -p=param.txt --combo_yuv=combo.yuv "
          << endl;	 
 }
 
@@ -47,6 +47,7 @@ int main(int argc, char **argv)
     ctx->input = getarg("modify.yuv", "-i", "--input");
     ctx->input_cmp = getarg("origin.yuv", "-o", "--output");
     ctx->output = getarg("psnr.txt", "-p", "--psnr");
+    ctx->out_yuv = getarg("combo.yuv", "-q", "--combo_yuv");
     ctx->width = getarg(1920, "-w", "--width");
     ctx->height = getarg(1080, "-h", "--height");
 	ctx->frames = getarg(300, "-f", "--frames");	
