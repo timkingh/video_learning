@@ -107,6 +107,10 @@ static void calc_frame_distortion(CalcCtx *ctx, FILE *fp)
 			FPRINT(fp, "frame %d plane %d minscale %d mindenom %d minoff %d\n", i + 1, j, 
 							best_w.scale, best_w.denom, best_w.offset);
 		}
+
+		if ((i % ctx->log_frames) == (ctx->log_frames - 1)) {
+			printf("calculate distortion frame %03d\n", i);
+		}
 	}
 }
 
@@ -151,6 +155,10 @@ RET calc_histogram(CalcCtx *ctx)
 			}
 
 			ctx->hist_org.push_back(hist);
+		}
+
+		if ((i % ctx->log_frames) == (ctx->log_frames - 1)) {
+			printf("calculate histogram frame %03d\n", i);
 		}
 	}
 
