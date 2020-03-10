@@ -42,6 +42,8 @@ typedef struct {
 	uint32_t var_ratio_flg;
 	uint32_t log_frames;
     uint32_t rand_cnt;
+    uint32_t rand_seq;
+    uint32_t seed;
 	vector<vector<int>> hist_org; /* Plane 0 1 2 */
 	vector<vector<int>> hist_weight;
     uint8_t cqm_4iy[16];

@@ -38,6 +38,10 @@ static void show_help()
          << "VideoCalc -i=input.yuv -o=weighted.yuv -m=3 "
          << "-w=1920 -h=1080 --frames=300 -p=param.txt --combo_yuv=combo.yuv "
          << endl;	 
+
+    cout << "Usage: calculate quant matrix" << endl
+         << "VideoCalc -m=4 -p=quant.txt --rand_cnt=10 "
+         << endl;
 }
 
 int main(int argc, char **argv)
