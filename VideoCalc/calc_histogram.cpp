@@ -99,17 +99,17 @@ static void calc_frame_distortion(CalcCtx *ctx, FILE *fp)
 							min_dist = dist;
 						}
 						//FPRINT(fp, "frame %d plane %d dist %d min_dist %d scale %d denom %d off %d\n", i + 1, j, 
-							//			dist, min_dist, w.scale, w.denom, w.offset);
+										//dist, min_dist, w.scale, w.denom, w.offset);
 					}
 				}
 			}
 			
-			FPRINT(fp, "frame %d plane %d minscale %d mindenom %d minoff %d\n", i + 1, j, 
-							best_w.scale, best_w.denom, best_w.offset);
+			FPRINT(fp, "frame %d plane %d minscale %d mindenom %d minoff %d mindist %d\n", i + 1, j, 
+							best_w.scale, best_w.denom, best_w.offset, min_dist);
 		}
 
 		if ((i % ctx->log_frames) == (ctx->log_frames - 1)) {
-			printf("calculate distortion frame %03d\n", i);
+			printf("calculate distortion frame %03d\n", i + 1);
 		}
 	}
 }
