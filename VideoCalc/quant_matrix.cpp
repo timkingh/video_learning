@@ -160,8 +160,10 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
 		}
 	}
 
-    FPRINT(fp, "rand %d quant4x4 diff %d/%d\n", ctx->rand_seq, diff_cnt, 52*16);  
-
+    if (diff_cnt) {
+        FPRINT(fp, "rand %d quant4x4 diff %d/%d\n", ctx->rand_seq, diff_cnt, 52*16);  
+    }
+    
     diff_cnt = 0;
 	for (qp = 1; qp < 52; qp++) {
 		for (i = 0; i < 64; i++) {
@@ -183,8 +185,11 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
 			quant8_mf_lu[i] = mf = H264E_SHIFT(mf, qp / 6);
 		}
 	}
-    FPRINT(fp, "rand %d quant8x8 diff %d/%d\n", ctx->rand_seq, diff_cnt, 52*64);  
 
+    if (diff_cnt) {
+        FPRINT(fp, "rand %d quant8x8 diff %d/%d\n", ctx->rand_seq, diff_cnt, 52*64);  
+    }
+    
     return RET_OK;
 }
 
@@ -226,7 +231,7 @@ RET calc_quant_matrix(CalcCtx *ctx)
         quant_matrix_research(ctx, fp);
     }
 
-    FPRINT(fp, "rand %d sum_diff %lld\n", ctx->rand_cnt, ctx->sum_diff);
+    FPRINT(fp, "mf_fixed_point_bits %d rand %d sum_diff %lld\n", ctx->mf_fixed_point_bits, ctx->rand_cnt, ctx->sum_diff);
    	end_time = time_mdate();
 
 	printf("rand %d elapsed %.2fs\n", ctx->rand_cnt, (float)(end_time - start_time) / 1000000); 
