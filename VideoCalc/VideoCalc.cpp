@@ -40,7 +40,9 @@ static void show_help()
          << endl;	 
 
     cout << "Usage: calculate quant matrix" << endl
-         << "VideoCalc -m=4 -p=quant.txt --rand_cnt=10 "
+         << "VideoCalc -m=4 -p=quant.txt --rand_cnt=10 --log_frames=3 "
+         << "--mf_diff_thresh=2 --mf_fixed_point_bits=23 --dump_matrix=1 "
+         << "--default_matrix=0"
          << endl;
 }
 
@@ -61,7 +63,11 @@ int main(int argc, char **argv)
 	ctx->var_ratio_flg = getarg(0, "--var_ratio_flg");
 	ctx->log_frames = getarg(1, "--log_frames");
 	ctx->rand_cnt = getarg(10, "--rand_cnt");
-
+	ctx->dump_matrix = getarg(0, "--dump_matrix");
+	ctx->mf_fixed_point_bits = getarg(22, "--mf_fixed_point_bits");    
+    ctx->mf_diff_thresh = getarg(1, "--mf_diff_thresh");   
+    ctx->default_matrix = getarg(1, "--default_matrix");
+        
     if (help || argc < 2) {
 		show_help();
         return 0;
