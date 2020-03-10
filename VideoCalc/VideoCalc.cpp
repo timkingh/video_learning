@@ -5,6 +5,7 @@
 #include "calc_psnr.h"
 #include "calc_histogram.h"
 #include "weight_yuv.h"
+#include "quant_matrix.h"
 
 using namespace std;
 
@@ -13,6 +14,7 @@ enum MODE {
 	CALC_VAR = 1,
 	CALC_HIST = 2, /* Histogram */
 	WEIGHT_YUV = 3,
+	QUANT_MATRIX = 4,
 };
 
 static void show_help()
@@ -54,6 +56,7 @@ int main(int argc, char **argv)
 	ctx->mode = getarg(0, "-m", "--mode");
 	ctx->var_ratio_flg = getarg(0, "--var_ratio_flg");
 	ctx->log_frames = getarg(1, "--log_frames");
+	ctx->rand_cnt = getarg(10, "--rand_cnt");
 
     if (help || argc < 2) {
 		show_help();
@@ -65,7 +68,8 @@ int main(int argc, char **argv)
 		calc_psnr,
 		calc_var,
 		calc_histogram,
-		weight_yuv
+		weight_yuv,
+		calc_quant_matrix
 	};
 
 	demo[ctx->mode](ctx);
