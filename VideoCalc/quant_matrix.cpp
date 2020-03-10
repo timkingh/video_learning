@@ -145,6 +145,7 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
 
             mf_float = H264E_DIV((h264e_quant4_scale[qp % 6][k] * 16), ctx->cqm_4iy[i]);
             if (mf != mf_float) {
+                ctx->sum_diff += abs(mf - mf_float);
                 diff_cnt++;
                 if (abs(mf - mf_float) >= (int)ctx->mf_diff_thresh) {
                     FPRINT(fp, "quant4x4 qp %d i %d mf %d %d\n", qp, i, mf, mf_float);
@@ -172,6 +173,7 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
 
             mf_float = H264E_DIV((h264e_quant8_scale[qp % 6][k] * 16), ctx->cqm_8iy[i]);
             if (mf != mf_float) {
+                ctx->sum_diff += abs(mf - mf_float);
                 diff_cnt++;                
                 if (abs(mf - mf_float) >= (int)ctx->mf_diff_thresh) {
                     FPRINT(fp, "quant8x8 qp %d i %d mf %d %d\n", qp, i, mf, mf_float);
@@ -223,7 +225,8 @@ RET calc_quant_matrix(CalcCtx *ctx)
         
         quant_matrix_research(ctx, fp);
     }
-    
+
+    FPRINT(fp, "rand %d sum_diff %lld\n", ctx->rand_cnt, ctx->sum_diff);
    	end_time = time_mdate();
 
 	printf("rand %d elapsed %.2fs\n", ctx->rand_cnt, (float)(end_time - start_time) / 1000000); 
