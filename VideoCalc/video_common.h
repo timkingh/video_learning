@@ -55,6 +55,7 @@ typedef struct {
     uint32_t real_fixed_bits;
     uint32_t real_bias_fixed_bits;
     uint32_t mf_diff_thresh;
+    uint32_t bias;
     uint64_t sum_diff;
     uint64_t sum_diff_bias;
     uint8_t dump_matrix;
