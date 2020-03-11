@@ -209,8 +209,8 @@ RET calc_quant_matrix(CalcCtx *ctx)
         FPRINT(fp, "default matrix result:\n");
     }
 
-    if (ctx->mf_fixed_point_bits < 22) {
-        printf("mf_fixed_point_bits %d error, should be greater than 21\n", ctx->mf_fixed_point_bits);
+    if (ctx->mf_fixed_point_bits < 22 || ctx->mf_fixed_point_bits > 45) {
+        printf("mf_fixed_point_bits %d error, should be in range [22,45]\n", ctx->mf_fixed_point_bits);
         return RET_NOK;
     }
 
