@@ -65,6 +65,7 @@ int main(int argc, char **argv)
 	ctx->rand_cnt = getarg(10, "--rand_cnt");
 	ctx->dump_matrix = getarg(0, "--dump_matrix");
 	ctx->mf_fixed_point_bits = getarg(22, "--mf_fixed_point_bits");    
+	ctx->bias_fixed_point_bits = getarg(24, "--bias_fixed_point_bits");    
     ctx->mf_diff_thresh = getarg(1, "--mf_diff_thresh");   
     ctx->default_matrix = getarg(1, "--default_matrix");
         

@@ -128,11 +128,17 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
 {
 	int mf, k, i, mf_float;
 	int qp = 1;
-	uint64_t scale_fixed_point;
+    int bias[4] = { 683, 341, 683, 341 };
+	uint64_t scale_fixed_point, bias_fixed_point;
 	uint64_t mf_left_shift = ((uint64_t)1 << ctx->real_fixed_bits);
 	uint8_t right_shift_bits = ctx->real_fixed_bits;
+    uint64_t bias_left_shift = ((uint64_t)1 << ctx->real_bias_fixed_bits);
+    uint8_t bias_precision_bits = 5;
     uint16_t quant4_mf_lu[16];
     uint16_t quant8_mf_lu[64];
+    uint16_t quant4_bias_lu[16];
+    uint16_t quant8_bias_lu[64];
+    uint16_t bias_float;
     uint32_t diff_cnt = 0;
 
 	for (qp = 1; qp < 52; qp++) {
@@ -157,6 +163,15 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
 			 *		 q=0 will not be used in reality, ignore it.(2018.07.12)
 			 */
 			quant4_mf_lu[i]  = mf = H264E_SHIFT(mf, qp / 6 - 1);
+
+            bias_fixed_point = H264E_DIV(bias_left_shift, mf);
+            quant4_bias_lu[i] = (uint16_t)(((bias[0] << bias_precision_bits) *
+                                           bias_fixed_point + bias_left_shift / 2)
+                                           >> ctx->real_bias_fixed_bits);
+            bias_float = H264E_DIV(bias[0] << bias_precision_bits, mf);
+            if (quant4_bias_lu[i] != bias_float) {
+                ctx->sum_diff_bias += abs(quant4_bias_lu[i] - bias_float);
+            }
 		}
 	}
 
@@ -183,6 +198,15 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
             }
                    
 			quant8_mf_lu[i] = mf = H264E_SHIFT(mf, qp / 6);
+
+            bias_fixed_point = bias_left_shift / mf + 1;
+            quant8_bias_lu[i] = (uint16_t)(((bias[0] << bias_precision_bits) *
+                                           bias_fixed_point + bias_left_shift / 2)
+                                           >> ctx->real_bias_fixed_bits);
+            bias_float = H264E_DIV(bias[0] << bias_precision_bits, mf);
+            if (quant8_bias_lu[i] != bias_float) {
+                ctx->sum_diff_bias += abs(quant8_bias_lu[i] - bias_float);
+            }
 		}
 	}
 
@@ -214,9 +238,11 @@ RET calc_quant_matrix(CalcCtx *ctx)
         return RET_NOK;
     }
 
-    for (bits = 22; bits <= ctx->mf_fixed_point_bits; bits++) {
-        ctx->real_fixed_bits = bits;
+    for (bits = 24; bits <= ctx->bias_fixed_point_bits; bits++) {
+        ctx->real_fixed_bits = 28;
+        ctx->real_bias_fixed_bits = bits;
         ctx->sum_diff = 0;
+        ctx->sum_diff_bias = 0;
         FPRINT(fp, "mf_fixed_point_bits %d\n", ctx->real_fixed_bits);    
         ctx->seed = (uint32_t)time(NULL);
 
@@ -239,7 +265,8 @@ RET calc_quant_matrix(CalcCtx *ctx)
             quant_matrix_research(ctx, fp);
         }
 
-        FPRINT(fp, "mf_fixed_point_bits %d rand %d sum_diff %lld\n", ctx->real_fixed_bits, ctx->rand_cnt, ctx->sum_diff);
+        //FPRINT(fp, "mf_fixed_point_bits %d rand %d sum_diff %lld\n", ctx->real_fixed_bits, ctx->rand_cnt, ctx->sum_diff);
+        FPRINT(fp, "bias_fixed_point_bits %d sum_diff_bias %lld\n", ctx->real_bias_fixed_bits, ctx->sum_diff_bias);
     }
     
    	end_time = time_mdate();

@@ -41,15 +41,22 @@ typedef struct {
 	uint32_t mode;
 	uint32_t var_ratio_flg;
 	uint32_t log_frames;
+
+    /* histogram */
+	vector<vector<int>> hist_org; /* Plane 0 1 2 */
+	vector<vector<int>> hist_weight;
+
+    /* quant matrix */
     uint32_t rand_cnt;
     uint32_t rand_seq;
     uint32_t seed;
     uint32_t mf_fixed_point_bits;
+    uint32_t bias_fixed_point_bits;
     uint32_t real_fixed_bits;
+    uint32_t real_bias_fixed_bits;
     uint32_t mf_diff_thresh;
     uint64_t sum_diff;
-	vector<vector<int>> hist_org; /* Plane 0 1 2 */
-	vector<vector<int>> hist_weight;
+    uint64_t sum_diff_bias;
     uint8_t dump_matrix;
     uint8_t default_matrix;
     uint8_t cqm_4iy[16];
