@@ -113,13 +113,13 @@ static void generate_scaling_list(CalcCtx *ctx)
     
     for (i = 0; i < 16; i++) {
         srand(ctx->seed);
-        ctx->cqm_4iy[i] = rand() % 255 + 1;
+        ctx->cqm_4iy[i] = ctx->rand_seq + 1;//rand() % 255 + 1;
         ctx->seed = (uint32_t)(ctx->cqm_4iy[i] * ctx->seed);
     }
 
     for (i = 0; i < 64; i++) {
         srand(ctx->seed);
-        ctx->cqm_8iy[i] = rand() % 255 + 1;
+        ctx->cqm_8iy[i] = ctx->rand_seq + 1;//rand() % 255 + 1;
         ctx->seed = (uint32_t)(ctx->cqm_8iy[i] * ctx->seed);
     }
 }
@@ -129,8 +129,8 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
 	int mf, k, i, mf_float;
 	int qp = 1;
 	uint64_t scale_fixed_point;
-	uint64_t mf_left_shift = (1 << ctx->mf_fixed_point_bits);
-	uint8_t right_shift_bits = ctx->mf_fixed_point_bits;
+	uint64_t mf_left_shift = ((uint64_t)1 << ctx->real_fixed_bits);
+	uint8_t right_shift_bits = ctx->real_fixed_bits;
     uint16_t quant4_mf_lu[16];
     uint16_t quant8_mf_lu[64];
     uint32_t diff_cnt = 0;
@@ -141,7 +141,7 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
 
 			scale_fixed_point = H264E_DIV(mf_left_shift, ctx->cqm_4iy[i]);
 			mf = (int32_t)((h264e_quant4_scale[qp % 6][k] * 16 * scale_fixed_point +
-					(uint64_t)(1 << (right_shift_bits - 1))) >> right_shift_bits);
+					((uint64_t)1 << (right_shift_bits - 1))) >> right_shift_bits);
 
             mf_float = H264E_DIV((h264e_quant4_scale[qp % 6][k] * 16), ctx->cqm_4iy[i]);
             if (mf != mf_float) {
@@ -161,7 +161,7 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
 	}
 
     if (diff_cnt) {
-        FPRINT(fp, "rand %d quant4x4 diff %d/%d\n", ctx->rand_seq, diff_cnt, 52*16);  
+        //FPRINT(fp, "rand %d quant4x4 diff %d/%d\n", ctx->rand_seq, diff_cnt, 52*16);  
     }
     
     diff_cnt = 0;
@@ -171,7 +171,7 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
 
 			scale_fixed_point = H264E_DIV(mf_left_shift, ctx->cqm_8iy[i]);
 			mf = (int32_t)((h264e_quant8_scale[qp % 6][k] * 16 * scale_fixed_point +
-				   (uint64_t)(1 << (right_shift_bits - 1))) >> right_shift_bits);
+				   ((uint64_t)1 << (right_shift_bits - 1))) >> right_shift_bits);
 
             mf_float = H264E_DIV((h264e_quant8_scale[qp % 6][k] * 16), ctx->cqm_8iy[i]);
             if (mf != mf_float) {
@@ -187,7 +187,7 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
 	}
 
     if (diff_cnt) {
-        FPRINT(fp, "rand %d quant8x8 diff %d/%d\n", ctx->rand_seq, diff_cnt, 52*64);  
+        //FPRINT(fp, "rand %d quant8x8 diff %d/%d\n", ctx->rand_seq, diff_cnt, 52*64);  
     }
     
     return RET_OK;
@@ -195,7 +195,7 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
 
 RET calc_quant_matrix(CalcCtx *ctx)
 {
-    uint32_t idx = 0;
+    uint32_t idx = 0, bits = 22;
 	int64_t start_time = time_mdate();
 	int64_t end_time;
 	const char *output_file = ctx->output.c_str();
@@ -209,31 +209,41 @@ RET calc_quant_matrix(CalcCtx *ctx)
         FPRINT(fp, "default matrix result:\n");
     }
 
-    FPRINT(fp, "mf_fixed_point_bits %d\n", ctx->mf_fixed_point_bits);    
-    ctx->seed = (uint32_t)time(NULL);
-
-    for (idx = 0; idx < ctx->rand_cnt; idx++) {
-        if (idx % ctx->log_frames == (ctx->log_frames - 1)) {
-            printf("rand seq %d\n", idx);
-        }
-    
-        ctx->rand_seq = idx;
-        if (ctx->default_matrix) {
-            copy_default_matrix(ctx);
-        } else {
-            generate_scaling_list(ctx);
-        }
-
-        if (ctx->dump_matrix) {
-            dump_scaling_list(ctx, fp);
-        }
-        
-        quant_matrix_research(ctx, fp);
+    if (ctx->mf_fixed_point_bits < 22) {
+        printf("mf_fixed_point_bits %d error, should be greater than 21\n", ctx->mf_fixed_point_bits);
+        return RET_NOK;
     }
 
-    FPRINT(fp, "mf_fixed_point_bits %d rand %d sum_diff %lld\n", ctx->mf_fixed_point_bits, ctx->rand_cnt, ctx->sum_diff);
-   	end_time = time_mdate();
+    for (bits = 22; bits <= ctx->mf_fixed_point_bits; bits++) {
+        ctx->real_fixed_bits = bits;
+        ctx->sum_diff = 0;
+        FPRINT(fp, "mf_fixed_point_bits %d\n", ctx->real_fixed_bits);    
+        ctx->seed = (uint32_t)time(NULL);
 
+        for (idx = 0; idx < ctx->rand_cnt; idx++) {
+            if (idx % ctx->log_frames == (ctx->log_frames - 1)) {
+                printf("rand seq %d\n", idx);
+            }
+        
+            ctx->rand_seq = idx;
+            if (ctx->default_matrix) {
+                copy_default_matrix(ctx);
+            } else {
+                generate_scaling_list(ctx);
+            }
+
+            if (ctx->dump_matrix) {
+                dump_scaling_list(ctx, fp);
+            }
+            
+            quant_matrix_research(ctx, fp);
+        }
+
+        FPRINT(fp, "mf_fixed_point_bits %d rand %d sum_diff %lld\n", ctx->real_fixed_bits, ctx->rand_cnt, ctx->sum_diff);
+    }
+    
+   	end_time = time_mdate();
+    
 	printf("rand %d elapsed %.2fs\n", ctx->rand_cnt, (float)(end_time - start_time) / 1000000); 
     FPCLOSE(fp);
 	return RET_OK;

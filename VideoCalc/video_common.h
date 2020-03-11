@@ -45,6 +45,7 @@ typedef struct {
     uint32_t rand_seq;
     uint32_t seed;
     uint32_t mf_fixed_point_bits;
+    uint32_t real_fixed_bits;
     uint32_t mf_diff_thresh;
     uint64_t sum_diff;
 	vector<vector<int>> hist_org; /* Plane 0 1 2 */
