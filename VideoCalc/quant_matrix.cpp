@@ -139,6 +139,9 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
     uint16_t quant8_bias_lu[64];
     uint16_t bias_float;
     uint32_t diff_cnt = 0;
+    static int max_mf = 0;
+    static int max_quant4_mf = 0;
+    static int max_quant4_bias = 0;
 
 	for (qp = 1; qp < 52; qp++) {
 		for (i = 0; i < 16; i++) {
@@ -157,11 +160,20 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
                 }
             }
 
+            if (mf > max_mf) {
+                max_mf = mf;
+                FPRINT(fp, "max_mf %d qp %d i %d scale %d\n", max_mf, qp, i, ctx->cqm_4iy[i]);
+            }
+
 			/* Note: quant4_mf_lu's type is uint16_t, which is not enough to store
 			 *		 mf when q is zero(because quant4_mf_lu(i = 0) is 69898). However,
 			 *		 q=0 will not be used in reality, ignore it.(2018.07.12)
 			 */
 			quant4_mf_lu[i]  = mf = H264E_SHIFT(mf, qp / 6 - 1);
+            if (quant4_mf_lu[i] > max_quant4_mf) {
+                max_quant4_mf = quant4_mf_lu[i];
+                FPRINT(fp, "max_quant_mf %d qp %d i %d scale %d\n", max_quant4_mf, qp, i, ctx->cqm_4iy[i]);
+            }
 
             bias_fixed_point = H264E_DIV(bias_left_shift, mf);
             quant4_bias_lu[i] = (uint16_t)(((ctx->bias << bias_precision_bits) *
@@ -170,6 +182,11 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
             bias_float = H264E_DIV(ctx->bias << bias_precision_bits, mf);
             if (quant4_bias_lu[i] != bias_float) {
                 ctx->sum_diff_bias += abs(quant4_bias_lu[i] - bias_float);
+            }
+
+            if (quant4_bias_lu[i] > max_quant4_bias) {
+                max_quant4_bias = quant4_bias_lu[i];
+                FPRINT(fp, "max_quant_bias %d qp %d i %d scale %d\n", max_quant4_bias, qp, i, ctx->cqm_4iy[i]);
             }
 		}
 	}
@@ -195,8 +212,17 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
                     FPRINT(fp, "quant8x8 qp %d i %d mf %d %d\n", qp, i, mf, mf_float);
                 }
             }
-                   
+            
+            if (mf > max_mf) {
+                max_mf = mf;
+                FPRINT(fp, "max_mf_8 %d qp %d i %d scale %d\n", max_mf, qp, i, ctx->cqm_8iy[i]);
+            }
+            
 			quant8_mf_lu[i] = mf = H264E_SHIFT(mf, qp / 6);
+            if (quant8_mf_lu[i] > max_quant4_mf) {
+                max_quant4_mf = quant8_mf_lu[i];
+                FPRINT(fp, "max_quant8_mf %d qp %d i %d scale %d\n", max_quant4_mf, qp, i, ctx->cqm_8iy[i]);
+            }
 
             bias_fixed_point = H264E_DIV(bias_left_shift, mf);
             //bias_fixed_point = bias_left_shift / mf + 1;
@@ -207,12 +233,21 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
             if (quant8_bias_lu[i] != bias_float) {
                 ctx->sum_diff_bias += abs(quant8_bias_lu[i] - bias_float);
             }
+
+            if (quant8_bias_lu[i] > max_quant4_bias) {
+                max_quant4_bias = quant8_bias_lu[i];
+                FPRINT(fp, "max_quant8_bias %d qp %d i %d scale %d\n", max_quant4_bias, qp, i, ctx->cqm_8iy[i]);
+            }   
 		}
 	}
 
     if (diff_cnt) {
         //FPRINT(fp, "rand %d quant8x8 diff %d/%d\n", ctx->rand_seq, diff_cnt, 52*64);  
     }
+
+    ctx->max_mf = max_mf;
+    ctx->max_quant_mf = max_quant4_mf;
+    ctx->max_quant_bias = max_quant4_bias;
     
     return RET_OK;
 }
@@ -238,7 +273,7 @@ RET calc_quant_matrix(CalcCtx *ctx)
         return RET_NOK;
     }
 
-    for (bits = 24; bits <= ctx->bias_fixed_point_bits; bits++) {
+    for (bits = 25; bits <= ctx->bias_fixed_point_bits; bits++) {
         ctx->real_fixed_bits = 28;
         ctx->real_bias_fixed_bits = bits;
         ctx->sum_diff = 0;
@@ -266,8 +301,9 @@ RET calc_quant_matrix(CalcCtx *ctx)
         }
 
         //FPRINT(fp, "mf_fixed_point_bits %d rand %d sum_diff %lld\n", ctx->real_fixed_bits, ctx->rand_cnt, ctx->sum_diff);
-        FPRINT(fp, "bias %d bias_fixed_point_bits %d sum_diff_bias %lld\n", ctx->bias, 
-                    ctx->real_bias_fixed_bits, ctx->sum_diff_bias);
+        //FPRINT(fp, "bias %d bias_fixed_point_bits %d sum_diff_bias %lld\n", ctx->bias, 
+         //         ctx->real_bias_fixed_bits, ctx->sum_diff_bias);
+        FPRINT(fp, "max_mf %d max_quant_mf %d max_quant_bias %d\n", ctx->max_mf, ctx->max_quant_mf, ctx->max_quant_bias); 
     }
     
    	end_time = time_mdate();

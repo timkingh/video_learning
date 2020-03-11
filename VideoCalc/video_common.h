@@ -58,6 +58,9 @@ typedef struct {
     uint32_t bias;
     uint64_t sum_diff;
     uint64_t sum_diff_bias;
+    int32_t max_mf;
+    int32_t max_quant_mf;
+    int32_t max_quant_bias;    
     uint8_t dump_matrix;
     uint8_t default_matrix;
     uint8_t cqm_4iy[16];
