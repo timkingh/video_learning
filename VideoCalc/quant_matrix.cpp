@@ -139,6 +139,7 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
     uint16_t quant8_bias_lu[64];
     uint16_t bias_float;
     uint32_t diff_cnt = 0;
+    static int min_mf = 0xFFFF;
     static int max_mf = 0;
     static int max_quant4_mf = 0;
     static int max_quant4_bias = 0;
@@ -186,7 +187,7 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
 
             if (quant4_bias_lu[i] > max_quant4_bias) {
                 max_quant4_bias = quant4_bias_lu[i];
-                FPRINT(fp, "max_quant_bias %d qp %d i %d scale %d\n", max_quant4_bias, qp, i, ctx->cqm_4iy[i]);
+                FPRINT(fp, "max_quant_bias %d qp %d i %d scale %d mf %d\n", max_quant4_bias, qp, i, ctx->cqm_4iy[i], mf);
             }
 		}
 	}
@@ -236,7 +237,7 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
 
             if (quant8_bias_lu[i] > max_quant4_bias) {
                 max_quant4_bias = quant8_bias_lu[i];
-                FPRINT(fp, "max_quant8_bias %d qp %d i %d scale %d\n", max_quant4_bias, qp, i, ctx->cqm_8iy[i]);
+                FPRINT(fp, "max_quant8_bias %d qp %d i %d scale %d\n mf %d", max_quant4_bias, qp, i, ctx->cqm_8iy[i], mf);
             }   
 		}
 	}
