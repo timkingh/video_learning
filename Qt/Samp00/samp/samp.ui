@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QWDialog</class>
- <widget class="QDialog" name="QWDialog">
+ <class>sampClass</class>
+ <widget class="QDialog" name="sampClass">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -127,5 +127,22 @@
  <resources>
   <include location="samp.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>chkBoxUnder</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>sampClass</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>324</x>
+     <y>199</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>542</x>
+     <y>385</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
