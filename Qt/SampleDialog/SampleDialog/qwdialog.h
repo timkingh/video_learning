@@ -15,6 +15,9 @@ public:
     explicit QWDialog(QWidget *parent = 0);
     ~QWDialog();
 
+private slots:
+    void on_chkBoxUnder_clicked(bool checked);
+
 private:
     Ui::QWDialog *ui;
 };
