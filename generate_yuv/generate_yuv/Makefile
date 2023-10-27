@@ -1,10 +1,10 @@
 CC=g++
 OBJS=generate_yuv.o
 
-md_test:$(OBJS)
+generate_yuv:$(OBJS)
 	${CC} -o generate_yuv $(OBJS)
 
-md_test.o: generate_yuv.cpp generate_yuv.h getopt.hpp
+generate_yuv.o: generate_yuv.cpp generate_yuv.h getopt.hpp
 	${CC} -c generate_yuv.cpp -std=c++11 -g
 
 clean:

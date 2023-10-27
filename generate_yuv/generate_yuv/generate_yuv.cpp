@@ -126,13 +126,64 @@ static void gen_blocks_info(GenCtx *ctx, vector<BlkInfo> &blocks)
     }
 }
 
+/* jpeg 8x8 DCT */
+static void fill_0_to_255_for_jpeg_dct(GenCtx *ctx, char *buf)
+{
+    int width = ctx->width, height = ctx->height;
+    int stride = ctx->width;
+    uint8_t *buf_y;
+    const int cu_blk_size = 16;
+    const int blk_size = 8;
+    int row, col, m, n;
+    uint8_t value = 0;
+
+    for (row = 0; row < height / cu_blk_size; row++) {
+        for (col = 0; col < width / cu_blk_size; col++) {
+            /* blk8_0 */
+            buf_y = (uint8_t *)buf + row * cu_blk_size * stride + col * cu_blk_size;
+            for (m = 0; m < blk_size; m++) {
+                for (n = 0; n < blk_size; n++) {
+                    *(buf_y + m * stride + n) = (m == 0 && n == 0) ? value : 0;
+                }
+            }
+            value++;
+
+            /* blk8_1 */
+            buf_y = (uint8_t *)buf + row * cu_blk_size * stride + col * cu_blk_size + blk_size;
+            for (m = 0; m < blk_size; m++) {
+                for (n = 0; n < blk_size; n++) {
+                    *(buf_y + m * stride + n) = (m == 0 && n == 0) ? value : 0;
+                }
+            }
+            value++;
+
+            /* blk8_2 */
+            buf_y = (uint8_t *)buf + (row * cu_blk_size + blk_size) * stride + col * cu_blk_size;
+            for (m = 0; m < blk_size; m++) {
+                for (n = 0; n < blk_size; n++) {
+                    *(buf_y + m * stride + n) = (m == 0 && n == 0) ? value : 0;
+                }
+            }
+            value++;
+
+            /* blk8_3 */
+            buf_y = (uint8_t *)buf + (row * cu_blk_size + blk_size) * stride +
+                                      col * cu_blk_size + blk_size;
+            for (m = 0; m < blk_size; m++) {
+                for (n = 0; n < blk_size; n++) {
+                    *(buf_y + m * stride + n) = (m == 0 && n == 0) ? value : 0;
+                }
+            }
+            value++;
+        }
+    }
+}
+
 static void handle_one_frame(GenCtx *ctx, char *buf)
 {
     switch(ctx->frame_read) {
         case 0 :{
-            vector<BlkInfo> blocks;
-            gen_blocks_info(ctx, blocks);
-            fill_blocks(ctx, buf, blocks);
+            fill_0_to_255_for_jpeg_dct(ctx, buf);
             break;
         } case 1 : case 3 :{
             memset(buf, 0, ctx->frame_size);
@@ -141,6 +192,9 @@ static void handle_one_frame(GenCtx *ctx, char *buf)
             memset(buf, 255, ctx->frame_size);
             break;
         } default :{
+            vector<BlkInfo> blocks;
+            gen_blocks_info(ctx, blocks);
+            fill_blocks(ctx, buf, blocks);
         }
     }
 
