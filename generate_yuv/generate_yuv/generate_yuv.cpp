@@ -198,11 +198,11 @@ int main(int argc, char **argv)
 
     cout << "----------Test-------------" << endl;
     bool help = getarg(false, "-H", "--help", "-?");
-    string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\Bus_352x288_25.yuv", "-i", "--input");
-    string out_file = getarg("F:\\rkvenc_verify\\input_yuv\\Bus_352x288_25_out.yuv", "-o", "--output");
-    ctx->width = getarg(352, "-w", "--width");
-    ctx->height = getarg(288, "-h", "--height");
-    ctx->frames = getarg(15, "-f", "--frames");
+    string in_file = getarg("/home/timkingh/yuv/street_720p_250frames.yuv", "-i", "--input");
+    string out_file = getarg("/home/timkingh/yuv/street_720p_out.yuv", "-o", "--output");
+    ctx->width = getarg(1280, "-w", "--width");
+    ctx->height = getarg(720, "-h", "--height");
+    ctx->frames = getarg(1, "-f", "--frames");
     ctx->mb_size = 16;
 
     if (help) {
