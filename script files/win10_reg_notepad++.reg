@@ -1,8 +1,0 @@
-Windows Registry Editor Version 5.00
-
-[HKEY_CLASSES_ROOT\*\shell\NotePad++]
-@="Edit with &Notepad++"
-"Icon"="G:\\06.Tools\\npp.7.bin.x64\\notepad++.exe"
-
-[HKEY_CLASSES_ROOT\*\shell\NotePad++\Command]
-@="G:\\06.Tools\\npp.7.bin.x64\\notepad++.exe \"%1\""
