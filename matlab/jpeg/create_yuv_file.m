@@ -62,14 +62,14 @@ pic_blk8x8 = [
 ];
 
 
-%y_mtx = gen_yuv_for_dc_coef_test(width, height, -1024);
+y_mtx = gen_yuv_for_dc_coef_test_blk8(width, height, -1024);
 %y_mtx = gen_yuv_from_blk8(width, height);
 %y_mtx = randi([0, 255], height, width);
-y_mtx = gen_yuv_for_coef_test(width, height, -23);
+%y_mtx = gen_yuv_for_coef_test(width, height, -23);
 uv_mtx = randi([0, 255], height / 2, width);
 
 count = fwrite(fid, y_mtx', 'uint8');
-count = count + fwrite(fid, uv_mtx', 'uint8');
+%count = count + fwrite(fid, uv_mtx', 'uint8');
 
 fprintf("fwrite %d bytes\n", count);
 
