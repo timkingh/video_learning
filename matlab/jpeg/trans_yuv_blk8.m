@@ -4,7 +4,7 @@ clc
 width = 1280;
 height = 720;
 
-fid = fopen("F:\nfs\street_720p_out_4.yuv", "r");
+fid = fopen("F:\nfs\random_720p.yuv", "r");
 
 y_mtx = fread(fid, [width, height]);
 
@@ -22,7 +22,7 @@ for m = 1:8:height
     end
 end
 
-fid_yuv = fopen("F:\nfs\street_720p_gray_1.yuv", "w");
+fid_yuv = fopen("F:\nfs\random_720p_gray.yuv", "w");
 
 count = fwrite(fid_yuv, out_yuv', 'uint8');
 fprintf("fwrite %d bytes\n", count);
