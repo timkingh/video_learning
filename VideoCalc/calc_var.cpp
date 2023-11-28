@@ -24,18 +24,18 @@ static RET calc_ave(uint8_t *buf, FILE *fp, uint32_t len, float *ave)
 	return RET_OK;
 }
 
-static float calc_ave_block(uint8_t *buf, int stride)
+static int calc_ave_block(uint8_t *buf, int stride, int blk_size)
 {
 	int i, j;
-	double sum = 0;
+	int sum = 0;
 
-	for (i = 0; i < bsize; i++) {
-		for (j = 0; j < bsize; j++) {
+	for (i = 0; i < blk_size; i++) {
+		for (j = 0; j < blk_size; j++) {
 			sum += buf[j + i * stride];
 		}
 	}
 
-	return (float)(sum / (bsize * bsize));
+	return (sum / (blk_size * blk_size));
 }
 
 static float calc_variance(uint8_t *buf, uint32_t len, float ave)
@@ -48,18 +48,18 @@ static float calc_variance(uint8_t *buf, uint32_t len, float ave)
 	return (float)((sum_square + len / 2) / len);
 }
 
-static float calc_variance_blcok(uint8_t *buf, int stride, float ave)
+static int calc_variance_blcok(uint8_t *buf, int stride, int ave, int blk_size)
 {
 	int i, j;
-	double sum_square = 0;
+	int sum_square = 0;
 
-	for (i = 0; i < bsize; i++) {
-		for (j = 0; j < bsize; j++) {
+	for (i = 0; i < blk_size; i++) {
+		for (j = 0; j < blk_size; j++) {
 			sum_square += (buf[j + i * stride] - ave) * (buf[j + i * stride] - ave);
 		}
 	}
 
-	return (float)((sum_square + (bsize * bsize) / 2) / (bsize * bsize));
+	return ((sum_square + (blk_size * blk_size) / 2) / (blk_size * blk_size));
 }
 
 static uint64_t calc_madi(uint8_t *buf, uint32_t len, uint8_t ave)
@@ -72,13 +72,13 @@ static uint64_t calc_madi(uint8_t *buf, uint32_t len, uint8_t ave)
 	return madi;
 }
 
-static uint64_t calc_madi_block(uint8_t *buf, int stride, float ave)
+static uint64_t calc_madi_block(uint8_t *buf, int stride, int ave, int blk_size)
 {
 	int i, j;
 	uint64_t madi = 0;
 
-	for (i = 0; i < bsize; i++) {
-		for (j = 0; j < bsize; j++) {
+	for (i = 0; i < blk_size; i++) {
+		for (j = 0; j < blk_size; j++) {
 			madi += abs(buf[j + i * stride] - ave);
 		}
 	}
@@ -108,32 +108,37 @@ static RET calc_block_var(CalcCtx *ctx, uint8_t *buf, FILE *fp_out)
 	uint8_t * src = NULL;
 	int i, j, k;
     int stride_y = width, stride_uv = width / 2;
-	float average[6] = { 0 };
-	float variance[6] = { 0 };
-	uint64_t madi[6] = { 0 };
+	int average[6 + 1] = { 0 };
+	int variance[6 + 1] = { 0 };
+	uint64_t madi[6 + 1] = { 0 };
 
 	for (i = 0; i < height; i += 16) {
 		for (j = 0; j < width; j += 16) {
             for (k = 0; k < 4; k++) {
                 src = buf + j + (k % 2) * 8 + (i + k / 2 * 8) * stride_y;
-                average[k] = calc_ave_block(src, stride_y);
-                variance[k] = calc_variance_blcok(src, stride_y, average[k]);
-                madi[k] = calc_madi_block(src, stride_y, average[k]);
+                average[k] = calc_ave_block(src, stride_y, bsize);
+                variance[k] = calc_variance_blcok(src, stride_y, average[k], bsize);
+                madi[k] = calc_madi_block(src, stride_y, average[k], bsize);
             }
 
             src = buf + width * height + j / 2 + i / 2 * stride_uv;
-            average[4] = calc_ave_block(src, stride_uv);
-            variance[4] = calc_variance_blcok(src, stride_uv, average[4]);
-            madi[4] = calc_madi_block(src, stride_uv, average[4]);
+            average[4] = calc_ave_block(src, stride_uv, bsize);
+            variance[4] = calc_variance_blcok(src, stride_uv, average[4], bsize);
+            madi[4] = calc_madi_block(src, stride_uv, average[4], bsize);
 
             src = buf + width * height * 5 / 4 + j / 2 + i / 2 * stride_uv;
-            average[5] = calc_ave_block(src, stride_uv);
-            variance[5] = calc_variance_blcok(src, stride_uv, average[5]);
-            madi[5] = calc_madi_block(src, stride_uv, average[5]);
+            average[5] = calc_ave_block(src, stride_uv, bsize);
+            variance[5] = calc_variance_blcok(src, stride_uv, average[5], bsize);
+            madi[5] = calc_madi_block(src, stride_uv, average[5], bsize);
 
-            fprintf(fp_out, "\npos(%4d, %4d)\n", j, i);
-            for (k = 0; k < 6; k++) {
-            fprintf(fp_out, "idx %d ave %f var %f madi %llu\n",
+            src = buf + j + i * stride_y;
+            average[6] = calc_ave_block(src, stride_y, bsize * 2);
+            variance[6] = calc_variance_blcok(src, stride_y, average[6], bsize * 2);
+            madi[6] = calc_madi_block(src, stride_y, average[6], bsize * 2);
+
+            fprintf(fp_out, "\npos(%d, %d)\n", j, i);
+            for (k = 0; k < 7; k++) {
+            fprintf(fp_out, "idx %d ave %4d var %4d madi %llu\n",
                     k, average[k], variance[k], (unsigned long long)madi[k]);
             }
         }
