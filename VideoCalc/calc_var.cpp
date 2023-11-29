@@ -3,6 +3,15 @@
 
 const int bsize = 8;
 
+enum {
+    AVE_Y = 0,
+    VAR_Y = 1,
+    MADI_Y = 2,
+    AVE_UV = 3,
+    VAR_UV = 4,
+    MADI_UV = 5,
+};
+
 static RET calc_ave(uint8_t *buf, FILE *fp, uint32_t len, float *ave)
 {
 	size_t read_len;
@@ -112,18 +121,23 @@ static void print_calc_result(CalcCtx *ctx, FILE *fp_out)
     for (i = 0; i < lines; i++) {
         for (j = 0; j < stride; j++) {
             value = *(ctx->frm_buf0 + j + i * stride);
-            FPRINT(ctx->fp_out0, "%4d ", value);
+            FPRINT(ctx->fp_out[0], "%d ", value);
 
             value = *(ctx->frm_buf1 + j + i * stride);
-            FPRINT(ctx->fp_out1, "%4d ", value);
+            FPRINT(ctx->fp_out[1], "%d ", value);
 
             value = *(ctx->frm_buf2 + j + i * stride);
-            FPRINT(ctx->fp_out2, "%4d ", value);
+            FPRINT(ctx->fp_out[2], "%d ", value);
+
+            for (int k = 3; k < 6; k++) {
+                value = *(ctx->frm_buf[k] + j + i * stride);
+                FPRINT(ctx->fp_out[k], "%d ", value);
+            }
         }
 
-        FPRINT(ctx->fp_out0, "\n");
-        FPRINT(ctx->fp_out1, "\n");
-        FPRINT(ctx->fp_out2, "\n");
+        for (int k = 0; k < 6; k++) {
+            FPRINT(ctx->fp_out[k], "\n");
+        }
     }
 }
 
@@ -134,7 +148,7 @@ static RET store_calc_result(CalcCtx *ctx, int pos_x, int pos_y,
     int offset, k;
     uint32_t *dst;
 
-    for (k = 0; k < 4; k++) {
+    for (k = 0; k < 4; k++) { /* Y0 ~ Y3 in blk16x16 */
         dst = ctx->frm_buf0 + pos_x / 8 + (k % 2) + (k / 2 + pos_y / 8) * stride;
         *dst = ave[k];
 
@@ -144,6 +158,24 @@ static RET store_calc_result(CalcCtx *ctx, int pos_x, int pos_y,
         dst = ctx->frm_buf2 + pos_x / 8 + (k % 2) + (k / 2 + pos_y / 8) * stride;
         *dst = madi[k];
     }
+
+    dst = ctx->frm_buf[3] + pos_x / 8 + pos_y / 8 * stride;
+    *dst = ave[4]; /* U */
+
+    dst = ctx->frm_buf[3] + pos_x / 8 + 1 + pos_y / 8 * stride;
+    *dst = ave[5]; /* V */
+
+    dst = ctx->frm_buf[4] + pos_x / 8 + pos_y / 8 * stride;
+    *dst = var[4]; /* U */
+
+    dst = ctx->frm_buf[4] + pos_x / 8 + 1 + pos_y / 8 * stride;
+    *dst = var[5]; /* V */
+
+    dst = ctx->frm_buf[5] + pos_x / 8 + pos_y / 8 * stride;
+    *dst = madi[4]; /* U */
+
+    dst = ctx->frm_buf[5] + pos_x / 8 + 1 + pos_y / 8 * stride;
+    *dst = madi[5]; /* V */
 
     return RET_OK;
 }

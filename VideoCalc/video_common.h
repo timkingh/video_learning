@@ -20,6 +20,8 @@ using namespace std;
 #define     FPCLOSE(fp, ...) { if (fp) { fclose(fp); fp = NULL;} }
 #define     FREE(p) { if (p) { free(p); p = NULL; } }
 
+#define  FILE_NUM   (7)
+
 #ifdef _WIN32
 #define SSCANF sscanf_s
 #else
@@ -39,6 +41,7 @@ typedef struct {
     string out_file0;
     string out_file1;
     string out_file2;
+    string out_file[FILE_NUM];
 	uint32_t width;
 	uint32_t height;
 	uint32_t frames;
@@ -73,10 +76,12 @@ typedef struct {
     uint32_t *frm_buf0;
     uint32_t *frm_buf1;
     uint32_t *frm_buf2;
+    uint32_t *frm_buf[FILE_NUM];
 
     FILE *fp_out0;
     FILE *fp_out1;
     FILE *fp_out2;
+    FILE *fp_out[FILE_NUM];
 } CalcCtx;
 
 typedef RET(*func)(CalcCtx *);

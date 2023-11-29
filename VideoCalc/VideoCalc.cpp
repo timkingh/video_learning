@@ -50,13 +50,21 @@ static RET buf_init(CalcCtx *ctx)
 {
     int buf_len = ctx->width * ctx->height * 2;
 
-    ctx->frm_buf0 = (uint32_t *)malloc(buf_len);
-    ctx->frm_buf1 = (uint32_t *)malloc(buf_len);
-    ctx->frm_buf2 = (uint32_t *)malloc(buf_len);
+    ctx->frm_buf0 = (uint32_t *)calloc(buf_len, sizeof(uint32_t));
+    ctx->frm_buf1 = (uint32_t *)calloc(buf_len, sizeof(uint32_t));
+    ctx->frm_buf2 = (uint32_t *)calloc(buf_len, sizeof(uint32_t));
     if (ctx->frm_buf0 == NULL || ctx->frm_buf1 == NULL ||
         ctx->frm_buf2 == NULL) {
         printf("malloc %d failed\n", buf_len);
         return RET_NOK;
+    }
+
+    for (int k = 0; k < FILE_NUM; k++) {
+        ctx->frm_buf[k] = (uint32_t *)calloc(buf_len, sizeof(uint32_t));
+        if (ctx->frm_buf[k] == NULL) {
+            printf("idx %d malloc %d failed\n", k, buf_len);
+            return RET_NOK;
+        }
     }
 
     return RET_OK;
@@ -67,18 +75,20 @@ static void buf_deinit(CalcCtx *ctx)
     FREE(ctx->frm_buf0);
     FREE(ctx->frm_buf1);
     FREE(ctx->frm_buf2);
+
+    for (int k = 0; k < FILE_NUM; k++) {
+        FREE(ctx->frm_buf[k]);
+    }
 }
 
 static RET open_file(CalcCtx *ctx)
 {
-    ctx->fp_out0 = fopen(ctx->out_file0.c_str(), "wb");
-    ctx->fp_out1 = fopen(ctx->out_file1.c_str(), "wb");
-    ctx->fp_out2 = fopen(ctx->out_file2.c_str(), "wb");
-
-    if (ctx->fp_out0 == NULL || ctx->fp_out1 == NULL ||
-        ctx->fp_out2 == NULL) {
-        printf("fopen output files failed\n");
-        return RET_NOK;
+    for (int k = 0; k < FILE_NUM; k++) {
+        ctx->fp_out[k] = fopen(ctx->out_file[k].c_str(), "wb");
+        if (ctx->fp_out[k] == NULL) {
+            printf("fopen output files failed\n");
+            return RET_NOK;
+        }
     }
 
     return RET_OK;
@@ -86,9 +96,9 @@ static RET open_file(CalcCtx *ctx)
 
 static void close_file(CalcCtx *ctx)
 {
-    FPCLOSE(ctx->fp_out0);
-    FPCLOSE(ctx->fp_out1);
-    FPCLOSE(ctx->fp_out2);
+    for (int k = 0; k < FILE_NUM; k++) {
+        FPCLOSE(ctx->fp_out[k]);
+    }
 }
 
 int main(int argc, char **argv)
@@ -101,9 +111,13 @@ int main(int argc, char **argv)
     ctx->input_cmp = getarg("origin.yuv", "-o", "--output");
     ctx->output = getarg("psnr.txt", "-p", "--psnr");
     ctx->out_yuv = getarg("combo.yuv", "-q", "--combo_yuv");
-    ctx->out_file0 = getarg("ave.txt", "--out_file0");
-    ctx->out_file1 = getarg("var.txt", "--out_file1");
-    ctx->out_file2 = getarg("madi.txt", "--out_file2");
+    ctx->out_file[0] = getarg("/mnt/shared/ave.txt", "--out_file0");
+    ctx->out_file[1] = getarg("/mnt/shared/var.txt", "--out_file1");
+    ctx->out_file[2] = getarg("/mnt/shared/madi.txt", "--out_file2");
+    ctx->out_file[3] = getarg("/mnt/shared/ave_uv.txt", "--out_file3");
+    ctx->out_file[4] = getarg("/mnt/shared/var_uv.txt", "--out_file4");
+    ctx->out_file[5] = getarg("/mnt/shared/madi_uv.txt", "--out_file5");
+    ctx->out_file[6] = getarg("/mnt/shared/tmp.txt", "--out_file6");
     ctx->width = getarg(1920, "-w", "--width");
     ctx->height = getarg(1080, "-h", "--height");
 	ctx->frames = getarg(300, "-f", "--frames");
