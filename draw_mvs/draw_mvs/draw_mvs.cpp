@@ -6,6 +6,7 @@
 #include "getopt.hpp"
 #include "common.h"
 #include "draw_mvs.h"
+#include "math.h"
 
 using namespace std;
 
@@ -251,9 +252,9 @@ int main(int argc, char **argv)
      */
     cout << "----------Test-------------" << endl;
     bool help = getarg(false, "-H", "--help", "-?");
-    string in_file = getarg("F:\\rkvenc_verify\\input_yuv\\yuv\\Kimono1_1920x1080_24.yuv", "-i", "--input");
-    string out_file = getarg("F:\\rkvenc_verify\\debug\\1\\Kimono1_1920x1080_24_qp45_60frames_rime16_100_0.yuv", "-o", "--output");
-    ctx->coord_file = getarg("F:\\rkvenc_verify\\debug\\1\\mei_kimonol_qp45_3frames_100_0.txt", "-c", "--coordinate");
+    string in_file = getarg("/home/timkingh/yuv/Kimono1_1920x1080_24.yuv", "-i", "--input");
+    string out_file = getarg("/mnt/shared/Kimono1_1920x1080_24_qp45_60frames_rime16_100_0.yuv", "-o", "--output");
+    ctx->coord_file = getarg("/mnt/shared/mei_kimonol_qp45_3frames_100_0.txt", "-c", "--coordinate");
     ctx->sad_file = getarg("F:\\rkvenc_verify\\cfg\\3903_720x576_150_1.sad", "-s", "--sad");
     ctx->width = getarg(1920, "-w", "--width");
     ctx->height = getarg(1080, "-h", "--height");
