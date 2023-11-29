@@ -18,6 +18,7 @@ using namespace std;
 
 #define     FPRINT(fp, ...)  { if (fp) { fprintf(fp, ## __VA_ARGS__);} }
 #define     FPCLOSE(fp, ...) { if (fp) { fclose(fp); fp = NULL;} }
+#define     FREE(p) { if (p) { free(p); p = NULL; } }
 
 #ifdef _WIN32
 #define SSCANF sscanf_s
@@ -35,6 +36,9 @@ typedef struct {
 	string input_cmp;
 	string output;
 	string out_yuv;
+    string out_file0;
+    string out_file1;
+    string out_file2;
 	uint32_t width;
 	uint32_t height;
 	uint32_t frames;
@@ -60,11 +64,19 @@ typedef struct {
     uint64_t sum_diff_bias;
     int32_t max_mf;
     int32_t max_quant_mf;
-    int32_t max_quant_bias;    
+    int32_t max_quant_bias;
     uint8_t dump_matrix;
     uint8_t default_matrix;
     uint8_t cqm_4iy[16];
     uint8_t cqm_8iy[64];
+
+    uint32_t *frm_buf0;
+    uint32_t *frm_buf1;
+    uint32_t *frm_buf2;
+
+    FILE *fp_out0;
+    FILE *fp_out1;
+    FILE *fp_out2;
 } CalcCtx;
 
 typedef RET(*func)(CalcCtx *);

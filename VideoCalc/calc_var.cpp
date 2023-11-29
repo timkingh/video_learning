@@ -72,10 +72,10 @@ static uint64_t calc_madi(uint8_t *buf, uint32_t len, uint8_t ave)
 	return madi;
 }
 
-static uint64_t calc_madi_block(uint8_t *buf, int stride, int ave, int blk_size)
+static int calc_madi_block(uint8_t *buf, int stride, int ave, int blk_size)
 {
 	int i, j;
-	uint64_t madi = 0;
+	int madi = 0;
 
 	for (i = 0; i < blk_size; i++) {
 		for (j = 0; j < blk_size; j++) {
@@ -102,6 +102,52 @@ static RET read_frame_from_file(CalcCtx *ctx, FILE *fp, uint8_t *buf)
 	return RET_OK;
 }
 
+static void print_calc_result(CalcCtx *ctx, FILE *fp_out)
+{
+    int stride = ctx->width / 8;
+    int lines = ctx->height / 8;
+    int i, j;
+    uint32_t value;
+
+    for (i = 0; i < lines; i++) {
+        for (j = 0; j < stride; j++) {
+            value = *(ctx->frm_buf0 + j + i * stride);
+            FPRINT(ctx->fp_out0, "%4d ", value);
+
+            value = *(ctx->frm_buf1 + j + i * stride);
+            FPRINT(ctx->fp_out1, "%4d ", value);
+
+            value = *(ctx->frm_buf2 + j + i * stride);
+            FPRINT(ctx->fp_out2, "%4d ", value);
+        }
+
+        FPRINT(ctx->fp_out0, "\n");
+        FPRINT(ctx->fp_out1, "\n");
+        FPRINT(ctx->fp_out2, "\n");
+    }
+}
+
+static RET store_calc_result(CalcCtx *ctx, int pos_x, int pos_y,
+                             int ave[7], int var[7], int madi[7])
+{
+    int stride = ctx->width / 8;
+    int offset, k;
+    uint32_t *dst;
+
+    for (k = 0; k < 4; k++) {
+        dst = ctx->frm_buf0 + pos_x / 8 + (k % 2) + (k / 2 + pos_y / 8) * stride;
+        *dst = ave[k];
+
+        dst = ctx->frm_buf1 + pos_x / 8 + (k % 2) + (k / 2 + pos_y / 8) * stride;
+        *dst = var[k];
+
+        dst = ctx->frm_buf2 + pos_x / 8 + (k % 2) + (k / 2 + pos_y / 8) * stride;
+        *dst = madi[k];
+    }
+
+    return RET_OK;
+}
+
 static RET calc_block_var(CalcCtx *ctx, uint8_t *buf, FILE *fp_out)
 {
 	int width = ctx->width, height = ctx->height;
@@ -110,7 +156,7 @@ static RET calc_block_var(CalcCtx *ctx, uint8_t *buf, FILE *fp_out)
     int stride_y = width, stride_uv = width / 2;
 	int average[6 + 1] = { 0 };
 	int variance[6 + 1] = { 0 };
-	uint64_t madi[6 + 1] = { 0 };
+	int madi[6 + 1] = { 0 };
 
 	for (i = 0; i < height; i += 16) {
 		for (j = 0; j < width; j += 16) {
@@ -136,11 +182,13 @@ static RET calc_block_var(CalcCtx *ctx, uint8_t *buf, FILE *fp_out)
             variance[6] = calc_variance_blcok(src, stride_y, average[6], bsize * 2);
             madi[6] = calc_madi_block(src, stride_y, average[6], bsize * 2);
 
-            fprintf(fp_out, "\npos(%d, %d)\n", j, i);
-            for (k = 0; k < 7; k++) {
-            fprintf(fp_out, "idx %d ave %4d var %4d madi %llu\n",
-                    k, average[k], variance[k], (unsigned long long)madi[k]);
-            }
+            store_calc_result(ctx, j, i, average, variance, madi);
+
+            // fprintf(fp_out, "\npos(%d, %d)\n", j, i);
+            // for (k = 0; k < 7; k++) {
+            // fprintf(fp_out, "idx %d ave %4d var %4d madi %llu\n",
+            //         k, average[k], variance[k], (unsigned long long)madi[k]);
+            // }
         }
     }
 
@@ -224,6 +272,8 @@ RET calc_var(CalcCtx *ctx)
 		calc_block_var(ctx, buf, fp_out);
 #endif
 	}
+
+    print_calc_result(ctx, fp_out);
 
 	if (ctx->var_ratio_flg) {
 		float var_ratio[3] = { 0 };
