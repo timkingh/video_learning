@@ -16,7 +16,7 @@ zsantoraster = [
 ];
 
 fid_roi0 = fopen('jpg_dec_street_hisi_r4_m3_roi0_raster.txt', 'r');
-fid_roi1 = fopen('jpg_dec_street_hisi_r4_m3_roi1_raster.txt', 'r');
+fid_roi1 = fopen('jpg_dec_street_hisi_r4_m3_roilvl3_raster.txt', 'r');
 fid_out = fopen('dct_cmp_out.txt', 'w');
 
 blk_num = 0;
@@ -52,8 +52,18 @@ for row = 1:16:height
                     end
                 end
             else
-                if isequal(coef0, coef1) ~= 1
-                    fprintf("roi luma error");
+%                 if isequal(coef0, coef1) ~= 1
+%                     fprintf("roi luma error");
+%                 end
+                for m = 1:64
+                    r_idx = zsantoraster(1, m) + 1;
+                    if m <= 9 && (coef0_r(r_idx, 1) ~= coef1_r(r_idx, 1))
+                        fprintf("non-roi luma error-1\n");
+                    end
+
+                    if m > 9 && (coef1_r(r_idx, 1) ~= 0)
+                        fprintf("non-roi luma error-2\n");
+                    end
                 end
             end
         end
