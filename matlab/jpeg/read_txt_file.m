@@ -1,20 +1,21 @@
 clear all
 clc
 
-fid = fopen('jpg_dec_rk_cities.txt', 'r');
-fid_hisi = fopen('jpg_dec_hisi_cities.txt', 'r');
+width = 1280;
+height = 720;
 
-rk_coef = fscanf(fid, '%d');
-hi_coef = fscanf(fid_hisi, '%d');
-length = size(rk_coef);
+fid_dering1 = fopen('jpg_dec_street_hisi_r7_m3_deringlvl1_dct_only.txt', 'r');
+fid_dering0 = fopen('jpg_dec_street_hisi_r7_m3_deringlvl0.txt', 'r');
 
-for k = 1:length(1, 1)
-   if abs(rk_coef(k, 1) - hi_coef(k, 1)) ~= 0
-       fprintf("idx %d %d %d\n", k, rk_coef(k, 1), hi_coef(k, 1));
-   end
+
+for k = 1:4
+    coef0 = fscanf(fid_dering0, '%d', [8, 8]);
+    coef1 = fscanf(fid_dering1, '%d', [8, 8]);
+    if coef0 == coef1
+        fprintf("same matrix!\n");
+    end
 end
 
-fprintf("cmp %d coefs\n", k);
 
-fclose(fid);
-fclose(fid_hisi);
+fclose(fid_dering0);
+fclose(fid_dering1);
