@@ -18,7 +18,7 @@ for row = 1:16:height
             coef0 = fscanf(fid_dering0, '%d', [8, 8]);
             coef1 = fscanf(fid_dering1, '%d', [8, 8]);
             if isequal(coef0, coef1) ~= 1
-                fprintf(fid_out, "frame=0, cu_x=%d, cu_y=%d, cu_size=8, mv_x=0, mv_y=-1\n", ...
+                fprintf(fid_out, "frame=0, cu_x=%d, cu_y=%d, cu_size=8, mv_x=0, mv_y=-2\n", ...
                         pos_x / 8, pos_y / 8);
                 blk_num = blk_num + 1;
             end
