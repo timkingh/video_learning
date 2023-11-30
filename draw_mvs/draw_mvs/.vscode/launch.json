@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/draw_mvs",
             "args": [
-                "-w=1920", "-h=1080"
+                "-w=1280", "-h=720", "-f=1"
             ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

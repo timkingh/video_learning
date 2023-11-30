@@ -208,22 +208,22 @@ static void draw_mvs_on_yuv(ProcCtx *ctx)
     do {
         const int direction = 0;//mv->source > 0;
         while (ctx->frame_read == frame_cnt) {
-			if (frame_cnt > 0 && cu_size == ctx->cu_size) {
-                start_x = cu_x * cu_size;
-                start_y = cu_y * cu_size;
+            if (frame_cnt >= 0 && cu_size == ctx->cu_size) {
+                start_x = cu_x * cu_size + 3;
+                start_y = cu_y * cu_size + 6;
                 end_x = start_x + mv_x;
-                end_y = start_y + mv_y;
+                end_y = start_y + mv_y * 2;
                 //scale_mv(&start_x, &start_y, &end_x, &end_y, cu_size);
-				draw_arrow((uint8_t *)buf, end_x, end_y, start_x, start_y, ctx->width, ctx->height, ctx->width, 100, 0, direction);
-			}
+                draw_arrow((uint8_t *)buf, end_x, end_y, start_x, start_y, ctx->width, ctx->height, ctx->width, 100, 0, direction);
+            }
 
             if (coord.getline(lines, 512)) {
                 int match_cnt = SSCANF(lines, "frame=%d, cu_x=%d, cu_y=%d, cu_size=%d, mv_x=%d, mv_y=%d",
                                        &frame_cnt, &cu_x, &cu_y, &cu_size, &mv_x, &mv_y);
                 if (match_cnt > 1) {
-					//cout << "match_cnt " << match_cnt << " frame_cnt " << frame_cnt
-					//	 << " cu_x " << cu_x << " cu_y " << cu_y << " cu_size " << cu_size
-					//	 << " mv_x " << mv_x << " mv_y " << mv_y << endl;
+                    //cout << "match_cnt " << match_cnt << " frame_cnt " << frame_cnt
+                    //	 << " cu_x " << cu_x << " cu_y " << cu_y << " cu_size " << cu_size
+                    //	 << " mv_x " << mv_x << " mv_y " << mv_y << endl;
                 }
             } else {
                 cout << "No MV info now, exit!" << endl;
@@ -252,9 +252,9 @@ int main(int argc, char **argv)
      */
     cout << "----------Test-------------" << endl;
     bool help = getarg(false, "-H", "--help", "-?");
-    string in_file = getarg("/home/timkingh/yuv/Kimono1_1920x1080_24.yuv", "-i", "--input");
-    string out_file = getarg("/mnt/shared/Kimono1_1920x1080_24_qp45_60frames_rime16_100_0.yuv", "-o", "--output");
-    ctx->coord_file = getarg("/mnt/shared/mei_kimonol_qp45_3frames_100_0.txt", "-c", "--coordinate");
+    string in_file = getarg("/home/timkingh/yuv/street_720p_250frames.yuv", "-i", "--input");
+    string out_file = getarg("/mnt/shared/street_1280x720_out.yuv", "-o", "--output");
+    ctx->coord_file = getarg("/mnt/shared/dct_cmp_out.txt", "-c", "--coordinate");
     ctx->sad_file = getarg("F:\\rkvenc_verify\\cfg\\3903_720x576_150_1.sad", "-s", "--sad");
     ctx->width = getarg(1920, "-w", "--width");
     ctx->height = getarg(1080, "-h", "--height");
@@ -263,7 +263,7 @@ int main(int argc, char **argv)
     ctx->right = getarg(50, "-r", "--right");
     ctx->bottom = getarg(80, "-b", "--bottom");
     ctx->frames = getarg(3, "-f", "--frames");
-    ctx->cu_size = getarg(16, "--cu_size");
+    ctx->cu_size = getarg(8, "--cu_size");
     ctx->enable_draw_dot = getarg(1, "-dd", "--draw_dot");
     ctx->draw_blue_dot = getarg(1, "-dbd", "--draw_blue_dot");
     ctx->draw_blue_rect = getarg(0, "-dbr", "--draw_blue_rect");
