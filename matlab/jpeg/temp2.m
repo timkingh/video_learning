@@ -1,25 +1,20 @@
 clear all
 clc
 
+min_v = 0;
+max_v = 255;
+
 blk8 = [
-  255   255   255   255   255   255   255   255
-   255   255   255   255   255   255   255   255
-   255   255   255   255   255   255   255   255
-   255   255   255   255   255   255   255   255
-   255   255   255   255   255   255   255   255
-   255   255   255   255   255   255   255   255
-   142   142   142   142   142   142   142   142
-   128   128   128   128   128   128   128   128 
+   min_v   max_v   min_v   max_v   min_v   max_v   min_v   max_v
+   max_v   min_v   max_v   min_v   max_v   min_v   max_v   min_v
+   min_v   max_v   min_v   max_v   min_v   max_v   min_v   max_v
+   max_v   min_v   max_v   min_v   max_v   min_v   max_v   min_v
+   min_v   max_v   min_v   max_v   min_v   max_v   min_v   max_v
+   max_v   min_v   max_v   min_v   max_v   min_v   max_v   min_v
+   min_v   max_v   min_v   max_v   min_v   max_v   min_v   max_v
+   max_v   min_v   max_v   min_v   max_v   min_v   max_v   min_v
 ];
 
-blk8_1 =  get_yuv_blk8_from_dc_coef(777);
+T = dctmtx(8);
 
-sum = 0;
-
-for m = 1:8
-    for n = 1:8
-        sum = sum + blk8(m, n) - 128;
-    end
-end
-
-disp(sum);
+coef = T * (blk8 - 128) * T'
