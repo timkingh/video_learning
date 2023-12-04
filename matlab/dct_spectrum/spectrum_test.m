@@ -7,7 +7,7 @@ T = dctmtx(8);
 min_v = 0;
 max_v = 255;
 value = [ min_v, max_v ];
-iter_num = 100;
+iter_num = 200000000;
 target_coef = 0;
 
 coef_min_max = ones(5, 2);
@@ -25,6 +25,10 @@ coord = [ 1, 1;
           8, 8;
         ];
 
+running_rate = zeros(1, 8);
+for m = 1:8
+    running_rate(1, m) = iter_num * m / 8;
+end
 
 for m = 1:iter_num
     blk8 = [ value(1, randi(2)) value(1, randi(2)) value(1, randi(2)) value(1, randi(2)) value(1, randi(2)) value(1, randi(2)) value(1, randi(2)) value(1, randi(2))
@@ -53,6 +57,13 @@ for m = 1:iter_num
             coef_min_max(n, 2) = target_coef;
             ret_mtx(:, :, (n - 1) * 4 + 2) = blk8;
             ret_mtx(:, :, (n - 1) * 4 + 4) = coef;
+        end
+    end
+    
+    for hh = 1:8
+        if m == running_rate(1, hh)
+            fprintf("running %f\n", m / iter_num);
+            break;
         end
     end
 end

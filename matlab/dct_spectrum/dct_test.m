@@ -1,19 +1,18 @@
 clear all
 clc
 
-min_v = 0;
-max_v = 255;
+min_v = 255;
+max_v = 0;
 
-blk8 = [
-  255     0     0     0   255   255   255     0 
-    0     0     0   255   255     0   255     0 
-    0   255   255     0     0     0     0   255 
-    0   255   255     0     0     0   255   255 
-    0     0     0   255   255     0   255   255 
-    0     0   255   255     0     0   255   255 
-    0     0     0   255     0     0   255     0 
-  255   255     0     0   255   255   255   255
-];
+blk8 = [   min_v   max_v   min_v   max_v   min_v   max_v   min_v   max_v
+           max_v   min_v   max_v   min_v   max_v   min_v   max_v   min_v
+           min_v   max_v   min_v   max_v   min_v   max_v   min_v   max_v
+           max_v   min_v   max_v   min_v   max_v   min_v   max_v   min_v
+           min_v   max_v   min_v   max_v   min_v   max_v   min_v   max_v
+           max_v   min_v   max_v   min_v   max_v   min_v   max_v   min_v
+           min_v   max_v   min_v   max_v   min_v   max_v   min_v   max_v
+           max_v   min_v   max_v   min_v   max_v   min_v   max_v   min_v
+        ];
 
 T = dctmtx(8);
 
