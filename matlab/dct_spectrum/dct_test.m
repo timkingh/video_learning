@@ -4,14 +4,15 @@ clc
 min_v = 255;
 max_v = 0;
 
-blk8 = [   min_v   max_v   min_v   max_v   min_v   max_v   min_v   max_v
-           max_v   min_v   max_v   min_v   max_v   min_v   max_v   min_v
-           min_v   max_v   min_v   max_v   min_v   max_v   min_v   max_v
-           max_v   min_v   max_v   min_v   max_v   min_v   max_v   min_v
-           min_v   max_v   min_v   max_v   min_v   max_v   min_v   max_v
-           max_v   min_v   max_v   min_v   max_v   min_v   max_v   min_v
-           min_v   max_v   min_v   max_v   min_v   max_v   min_v   max_v
-           max_v   min_v   max_v   min_v   max_v   min_v   max_v   min_v
+blk8 = [ 
+    0     0   255   255     0     0   255   255
+    0     0   255     0     0     0     0   255
+  255     0     0   255   255   255     0     0
+  255     0     0     0   255   255     0     0
+  255     0     0   255   255   255   255     0
+    0   255     0     0   255   255   255     0
+    0   255   255     0     0     0   255     0
+    0   255   255   255     0     0   255   255
         ];
 
 T = dctmtx(8);
