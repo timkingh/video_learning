@@ -4,8 +4,8 @@ clc
 width = 1280;
 height = 720;
 
-fid_dering0 = fopen('jpg_dec_street_hisi_r7_m3_deringlvl0.txt', 'r');
-fid_dering1 = fopen('jpg_dec_street_hisi_r7_m3_deringlvl1_dct_only.txt', 'r');
+fid_dering0 = fopen('jpg_dec_street_out27_hisi_r15_dering0.txt', 'r');
+fid_dering1 = fopen('jpg_dec_street_out27_hisi_r15_dering1.txt', 'r');
 fid_out = fopen('dct_cmp_out.txt', 'w');
 
 blk_num = 0;
