@@ -11,7 +11,7 @@
             "program": "${workspaceFolder}/VideoCalc",
             "args": [
                 "-i=/home/timkingh/yuv/street_720p_250frames.yuv",
-                "-m=1", "--var_ratio_flg=1", "-w=1280", "-h=720",
+                "-m=5", "--var_ratio_flg=1", "-w=1280", "-h=720",
                 "--frames=1", "-p=out.txt"
             ],
             "stopAtEntry": false,

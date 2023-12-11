@@ -92,5 +92,6 @@ static inline int video_clip3( int v, int i_min, int i_max )
 }
 
 int64_t time_mdate(void);
+RET read_frame_from_file(CalcCtx *ctx, FILE *fp, uint8_t *buf);
 
 #endif

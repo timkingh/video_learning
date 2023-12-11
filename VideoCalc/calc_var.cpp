@@ -95,22 +95,6 @@ static int calc_madi_block(uint8_t *buf, int stride, int ave, int blk_size)
 	return madi;
 }
 
-static RET read_frame_from_file(CalcCtx *ctx, FILE *fp, uint8_t *buf)
-{
-	size_t read_len;
-	uint32_t len;
-
-	len = ctx->width * ctx->height * 3 / 2;
-
-	read_len = fread(buf, 1, len, fp);
-	if (0 == read_len || read_len < len) {
-		printf("fread finished!\n");
-		return RET_NOK;
-	}
-
-	return RET_OK;
-}
-
 static void print_calc_result(CalcCtx *ctx, FILE *fp_out)
 {
     int stride = ctx->width / 8;

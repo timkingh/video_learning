@@ -13,7 +13,7 @@ static const uint8_t x264_cqm_jvt4i[16] =
     20, 28, 32, 37,
     28, 32, 37, 42
 };
-    
+
 static const uint8_t x264_cqm_jvt4p[16] =
 {
     10, 14, 20, 24,
@@ -21,7 +21,7 @@ static const uint8_t x264_cqm_jvt4p[16] =
     20, 24, 27, 30,
     24, 27, 30, 34
 };
-    
+
 static const uint8_t x264_cqm_jvt8i[64] =
 {
     6, 10, 13, 16, 18, 23, 25, 27,
@@ -33,7 +33,7 @@ static const uint8_t x264_cqm_jvt8i[64] =
     25, 27, 29, 31, 33, 36, 38, 40,
     27, 29, 31, 33, 36, 38, 40, 42
 };
-    
+
 static const uint8_t x264_cqm_jvt8p[64] =
 {
     9, 13, 15, 17, 19, 21, 22, 24,
@@ -55,7 +55,7 @@ uint16_t h264e_quant4_scale[6][3] =
     {  8192, 5243, 3355 },
     {  7282, 4559, 2893 },
 };
-    
+
 uint8_t h264e_quant8_scan[16] =
 {
     0, 3, 4, 3, 3, 1, 5, 1, 4, 5, 2, 5, 3, 1, 5, 1
@@ -74,8 +74,8 @@ uint16_t h264e_quant8_scale[6][6] =
 static void dump_scaling_list(CalcCtx *ctx, FILE *fp)
 {
     uint32_t i;
-    
-    FPRINT(fp, "dump quant matrix %003d\n", ctx->rand_seq);
+
+    FPRINT(fp, "dump quant matrix %03d\n", ctx->rand_seq);
     FPRINT(fp, "matrix 4x4:\n");
     for (i = 0; i < 16; i++) {
         FPRINT(fp, "%3d ", ctx->cqm_4iy[i]);
@@ -99,10 +99,10 @@ static void dump_scaling_list(CalcCtx *ctx, FILE *fp)
 static void copy_default_matrix(CalcCtx *ctx)
 {
     if (ctx->rand_seq == 0) {
-        memcpy(ctx->cqm_4iy, x264_cqm_jvt4i, sizeof(uint8_t) * 16);        
+        memcpy(ctx->cqm_4iy, x264_cqm_jvt4i, sizeof(uint8_t) * 16);
         memcpy(ctx->cqm_8iy, x264_cqm_jvt8i, sizeof(uint8_t) * 64);
     } else {
-        memcpy(ctx->cqm_4iy, x264_cqm_jvt4p, sizeof(uint8_t) * 16);        
+        memcpy(ctx->cqm_4iy, x264_cqm_jvt4p, sizeof(uint8_t) * 16);
         memcpy(ctx->cqm_8iy, x264_cqm_jvt8p, sizeof(uint8_t) * 64);
     }
 }
@@ -110,7 +110,7 @@ static void copy_default_matrix(CalcCtx *ctx)
 static void generate_scaling_list(CalcCtx *ctx)
 {
     uint32_t i;
-    
+
     for (i = 0; i < 16; i++) {
         srand(ctx->seed);
         ctx->cqm_4iy[i] = ctx->rand_seq + 1;//rand() % 255 + 1;
@@ -193,9 +193,9 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
 	}
 
     if (diff_cnt) {
-        //FPRINT(fp, "rand %d quant4x4 diff %d/%d\n", ctx->rand_seq, diff_cnt, 52*16);  
+        //FPRINT(fp, "rand %d quant4x4 diff %d/%d\n", ctx->rand_seq, diff_cnt, 52*16);
     }
-    
+
     diff_cnt = 0;
 	for (qp = 1; qp < 52; qp++) {
 		for (i = 0; i < 64; i++) {
@@ -208,17 +208,17 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
             mf_float = H264E_DIV((h264e_quant8_scale[qp % 6][k] * 16), ctx->cqm_8iy[i]);
             if (mf != mf_float) {
                 ctx->sum_diff += abs(mf - mf_float);
-                diff_cnt++;                
+                diff_cnt++;
                 if (abs(mf - mf_float) >= (int)ctx->mf_diff_thresh) {
                     FPRINT(fp, "quant8x8 qp %d i %d mf %d %d\n", qp, i, mf, mf_float);
                 }
             }
-            
+
             if (mf > max_mf) {
                 max_mf = mf;
                 FPRINT(fp, "max_mf_8 %d qp %d i %d scale %d\n", max_mf, qp, i, ctx->cqm_8iy[i]);
             }
-            
+
 			quant8_mf_lu[i] = mf = H264E_SHIFT(mf, qp / 6);
             if (quant8_mf_lu[i] > max_quant4_mf) {
                 max_quant4_mf = quant8_mf_lu[i];
@@ -238,18 +238,18 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
             if (quant8_bias_lu[i] > max_quant4_bias) {
                 max_quant4_bias = quant8_bias_lu[i];
                 FPRINT(fp, "max_quant8_bias %d qp %d i %d scale %d\n mf %d", max_quant4_bias, qp, i, ctx->cqm_8iy[i], mf);
-            }   
+            }
 		}
 	}
 
     if (diff_cnt) {
-        //FPRINT(fp, "rand %d quant8x8 diff %d/%d\n", ctx->rand_seq, diff_cnt, 52*64);  
+        //FPRINT(fp, "rand %d quant8x8 diff %d/%d\n", ctx->rand_seq, diff_cnt, 52*64);
     }
 
     ctx->max_mf = max_mf;
     ctx->max_quant_mf = max_quant4_mf;
     ctx->max_quant_bias = max_quant4_bias;
-    
+
     return RET_OK;
 }
 
@@ -279,14 +279,14 @@ RET calc_quant_matrix(CalcCtx *ctx)
         ctx->real_bias_fixed_bits = bits;
         ctx->sum_diff = 0;
         ctx->sum_diff_bias = 0;
-        FPRINT(fp, "mf_fixed_point_bits %d\n", ctx->real_fixed_bits);    
+        FPRINT(fp, "mf_fixed_point_bits %d\n", ctx->real_fixed_bits);
         ctx->seed = (uint32_t)time(NULL);
 
         for (idx = 0; idx < ctx->rand_cnt; idx++) {
             if (idx % ctx->log_frames == (ctx->log_frames - 1)) {
                 printf("rand seq %d\n", idx);
             }
-        
+
             ctx->rand_seq = idx;
             if (ctx->default_matrix) {
                 copy_default_matrix(ctx);
@@ -297,19 +297,19 @@ RET calc_quant_matrix(CalcCtx *ctx)
             if (ctx->dump_matrix) {
                 dump_scaling_list(ctx, fp);
             }
-            
+
             quant_matrix_research(ctx, fp);
         }
 
         //FPRINT(fp, "mf_fixed_point_bits %d rand %d sum_diff %lld\n", ctx->real_fixed_bits, ctx->rand_cnt, ctx->sum_diff);
-        //FPRINT(fp, "bias %d bias_fixed_point_bits %d sum_diff_bias %lld\n", ctx->bias, 
+        //FPRINT(fp, "bias %d bias_fixed_point_bits %d sum_diff_bias %lld\n", ctx->bias,
          //         ctx->real_bias_fixed_bits, ctx->sum_diff_bias);
-        FPRINT(fp, "max_mf %d max_quant_mf %d max_quant_bias %d\n", ctx->max_mf, ctx->max_quant_mf, ctx->max_quant_bias); 
+        FPRINT(fp, "max_mf %d max_quant_mf %d max_quant_bias %d\n", ctx->max_mf, ctx->max_quant_mf, ctx->max_quant_bias);
     }
-    
+
    	end_time = time_mdate();
-    
-	printf("rand %d elapsed %.2fs\n", ctx->rand_cnt, (float)(end_time - start_time) / 1000000); 
+
+	printf("rand %d elapsed %.2fs\n", ctx->rand_cnt, (float)(end_time - start_time) / 1000000);
     FPCLOSE(fp);
 	return RET_OK;
 }
