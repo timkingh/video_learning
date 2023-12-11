@@ -9,17 +9,19 @@
 
 using namespace std;
 
+extern RET cdef_find_dir(CalcCtx *ctx);
+
 enum MODE {
-	CALC_PSNR = 0,
-	CALC_VAR = 1,
-	CALC_HIST = 2, /* Histogram */
-	WEIGHT_YUV = 3,
-	QUANT_MATRIX = 4,
+    CALC_PSNR = 0,
+    CALC_VAR = 1,
+    CALC_HIST = 2, /* Histogram */
+    WEIGHT_YUV = 3,
+    QUANT_MATRIX = 4,
 };
 
 static void show_help()
 {
-	cout << "Usage: calculate PSNR" << endl
+    cout << "Usage: calculate PSNR" << endl
          << "VidoeCalc -i=modify.yuv -o=origin.yuv -m=0 "
          << "-w=1920 -h=1080 --frames=300 -p=psnr.txt --log_frames=10"
          << endl;
@@ -29,7 +31,7 @@ static void show_help()
          << "-w=1920 -h=1080 --frames=300 -p=variance.txt"
          << endl;
 
-	cout << "Usage: calculate histogram" << endl
+    cout << "Usage: calculate histogram" << endl
          << "VidoeCalc -i=modify.yuv -m=2 "
          << "-w=1920 -h=1080 --frames=300 -p=hist.txt"
          << endl;
@@ -84,10 +86,12 @@ static void buf_deinit(CalcCtx *ctx)
 static RET open_file(CalcCtx *ctx)
 {
     for (int k = 0; k < FILE_NUM; k++) {
-        ctx->fp_out[k] = fopen(ctx->out_file[k].c_str(), "wb");
-        if (ctx->fp_out[k] == NULL) {
-            printf("fopen output files failed\n");
-            return RET_NOK;
+        if (ctx->out_file[k].c_str()) {
+            ctx->fp_out[k] = fopen(ctx->out_file[k].c_str(), "wb");
+            if (ctx->fp_out[k] == NULL) {
+                printf("fopen output files failed\n");
+                return RET_NOK;
+            }
         }
     }
 
@@ -103,58 +107,63 @@ static void close_file(CalcCtx *ctx)
 
 int main(int argc, char **argv)
 {
-	CalcCtx calc_ctx;
-	CalcCtx *ctx = &calc_ctx;
-	memset(ctx, 0, sizeof(CalcCtx));
+    CalcCtx calc_ctx;
+    CalcCtx *ctx = &calc_ctx;
+    memset(ctx, 0, sizeof(CalcCtx));
     bool help = getarg(false, "-H", "--help", "-?");
     ctx->input = getarg("modify.yuv", "-i", "--input");
     ctx->input_cmp = getarg("origin.yuv", "-o", "--output");
     ctx->output = getarg("psnr.txt", "-p", "--psnr");
     ctx->out_yuv = getarg("combo.yuv", "-q", "--combo_yuv");
-    ctx->out_file[0] = getarg("/mnt/shared/ave.txt", "--out_file0");
-    ctx->out_file[1] = getarg("/mnt/shared/var.txt", "--out_file1");
-    ctx->out_file[2] = getarg("/mnt/shared/madi.txt", "--out_file2");
-    ctx->out_file[3] = getarg("/mnt/shared/ave_uv.txt", "--out_file3");
-    ctx->out_file[4] = getarg("/mnt/shared/var_uv.txt", "--out_file4");
-    ctx->out_file[5] = getarg("/mnt/shared/madi_uv.txt", "--out_file5");
-    ctx->out_file[6] = getarg("/mnt/shared/tmp.txt", "--out_file6");
+
     ctx->width = getarg(1920, "-w", "--width");
     ctx->height = getarg(1080, "-h", "--height");
-	ctx->frames = getarg(300, "-f", "--frames");
-	ctx->mode = getarg(0, "-m", "--mode");
-	ctx->var_ratio_flg = getarg(0, "--var_ratio_flg");
-	ctx->log_frames = getarg(1, "--log_frames");
+    ctx->frames = getarg(300, "-f", "--frames");
+    ctx->mode = getarg(0, "-m", "--mode");
+    ctx->var_ratio_flg = getarg(0, "--var_ratio_flg");
+    ctx->log_frames = getarg(1, "--log_frames");
+
+    if (ctx->mode == 1) {
+        ctx->out_file[0] = getarg("/mnt/shared/ave.txt", "--out_file0");
+        ctx->out_file[1] = getarg("/mnt/shared/var.txt", "--out_file1");
+        ctx->out_file[2] = getarg("/mnt/shared/madi.txt", "--out_file2");
+        ctx->out_file[3] = getarg("/mnt/shared/ave_uv.txt", "--out_file3");
+        ctx->out_file[4] = getarg("/mnt/shared/var_uv.txt", "--out_file4");
+        ctx->out_file[5] = getarg("/mnt/shared/madi_uv.txt", "--out_file5");
+        ctx->out_file[6] = getarg("/mnt/shared/tmp.txt", "--out_file6");
+    }
 
     /* quant matrix */
-	ctx->rand_cnt = getarg(10, "--rand_cnt");
-	ctx->dump_matrix = getarg(0, "--dump_matrix");
-	ctx->mf_fixed_point_bits = getarg(22, "--mf_fixed_point_bits");
-	ctx->bias_fixed_point_bits = getarg(24, "--bias_fixed_point_bits");
+    ctx->rand_cnt = getarg(10, "--rand_cnt");
+    ctx->dump_matrix = getarg(0, "--dump_matrix");
+    ctx->mf_fixed_point_bits = getarg(22, "--mf_fixed_point_bits");
+    ctx->bias_fixed_point_bits = getarg(24, "--bias_fixed_point_bits");
     ctx->mf_diff_thresh = getarg(1, "--mf_diff_thresh");
     ctx->default_matrix = getarg(1, "--default_matrix");
     ctx->bias = getarg(1, "--bias");
 
     if (help || argc < 2) {
-		show_help();
+        show_help();
         return 0;
     }
 
-	/* Functions' order must match with enum MODE */
-	func demo[] = {
-		calc_psnr,
-		calc_var,
-		calc_histogram,
-		weight_yuv,
-		calc_quant_matrix
-	};
+    /* Functions' order must match with enum MODE */
+    func demo[] = {
+        calc_psnr,
+        calc_var,
+        calc_histogram,
+        weight_yuv,
+        calc_quant_matrix,
+        cdef_find_dir
+    };
 
     open_file(ctx);
     buf_init(ctx);
 
-	demo[ctx->mode](ctx);
+    demo[ctx->mode](ctx);
 
     buf_deinit(ctx);
     close_file(ctx);
 
-	return 0;
+    return 0;
 }
