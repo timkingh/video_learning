@@ -82,7 +82,10 @@ RET cdef_find_dir(CalcCtx *ctx)
 {
     const char *input_file = ctx->input.c_str();
     FILE *fp_yuv_in;
-    int k, blk_var;
+    FILE *fp_log_out;
+    int k, blk_var, dir, b8_idx;
+    int width = ctx->width, height = ctx->height;
+    int b16_w = width / 16, b16_h = height / 16;
 
     fp_yuv_in = fopen(input_file, "rb");
     if (fp_yuv_in == NULL) {
@@ -90,12 +93,35 @@ RET cdef_find_dir(CalcCtx *ctx)
         return RET_NOK;
     }
 
+    fp_log_out = fopen(ctx->output.c_str(), "ab");
+    if (fp_log_out == NULL) {
+        perror("fopen output");
+        return RET_NOK;
+    }
+
     for (k = 0; k < ctx->frames; k++) {
         read_frame_from_file(ctx, fp_yuv_in, (uint8_t *)ctx->frm_buf0);
-        cdef_find_dir_c((uint8_t *)ctx->frm_buf0, ctx->width, &blk_var, 0);
+
+        for (int b16_y = 0; b16_y < b16_h; b16_y++) {
+            for (int b16_x = 0; b16_x < b16_w; b16_x++) {
+                for (b8_idx = 0; b8_idx < 4; b8_idx++) {
+                    int pos_x = b16_x * 16 + (b8_idx % 2) * 8;
+                    int pos_y = b16_y * 16 + (b8_idx / 2) * 8;
+                    uint8_t * src = (uint8_t *)ctx->frm_buf0 + pos_x + pos_y * width;
+
+                    dir = cdef_find_dir_c(src, ctx->width, &blk_var, 0);
+                    FPRINT(fp_log_out, "%d\n", blk_var);
+                    // FPRINT(fp_log_out, "pos(%4d, %4d) dir %d var %d\n",
+                    //        pos_x, pos_y, dir, blk_var);
+                }
+            }
+        }
     }
 
     FPCLOSE(fp_yuv_in);
+    FPCLOSE(fp_log_out);
+
+    printf("cdef_dir finished %d frames(s)\n", ctx->frames);
 
     return RET_OK;
 }
