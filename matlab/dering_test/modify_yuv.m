@@ -5,7 +5,7 @@ width = 1280;
 height = 720;
 
 fid = fopen("F:\nfs\street_720p.yuv", "r");
-fid_out = fopen("F:\nfs\street_720p_out_41.yuv", "w");
+fid_out = fopen("F:\nfs\street_720p_out_43.yuv", "w");
 
 %y_mtx = fread(fid, [width, height]);
 y_mtx = zeros(width, height);
@@ -84,6 +84,16 @@ for m = 1:16:height
                         out_mtx(m + j, n + k) = val_sets(j + k + 1, 1);
                     else 
                         out_mtx(m + j, n + k) = val_sets(j - k + 16, 1);
+                    end
+                end
+            end
+        elseif m < 136
+            for j = 0:7
+                for k = 0:7
+                    if rem(j, 2) == 0
+                        out_mtx(m + j, n + k) = 255;
+                    else
+                        out_mtx(m + j, n + k) = 0;
                     end
                 end
             end
