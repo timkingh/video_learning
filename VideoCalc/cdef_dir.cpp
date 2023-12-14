@@ -110,8 +110,8 @@ RET cdef_find_dir(CalcCtx *ctx)
                     uint8_t * src = (uint8_t *)ctx->frm_buf0 + pos_x + pos_y * width;
 
                     dir = cdef_find_dir_c(src, ctx->width, &blk_var, 0);
-                    FPRINT(fp_log_out, "%d\n", blk_var);
-                    // FPRINT(fp_log_out, "pos(%4d, %4d) dir %d var %d\n",
+                    FPRINT(fp_log_out, "%d\n", dir);
+                    // FPRINT(fp_log_out, "pos(%d, %d) dir %d var %d\n",
                     //        pos_x, pos_y, dir, blk_var);
                 }
             }

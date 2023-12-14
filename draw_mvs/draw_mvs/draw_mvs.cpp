@@ -209,10 +209,18 @@ static void draw_mvs_on_yuv(ProcCtx *ctx)
         const int direction = 0;//mv->source > 0;
         while (ctx->frame_read == frame_cnt) {
             if (frame_cnt >= 0 && cu_size == ctx->cu_size) {
-                start_x = cu_x * cu_size + 3;
-                start_y = cu_y * cu_size + 6;
-                end_x = start_x + mv_x;
-                end_y = start_y + mv_y * 2;
+                if (mv_x == 0) { /* vertical */
+                    start_x = cu_x * cu_size + 3;
+                    start_y = cu_y * cu_size + 6;
+                    end_x = start_x + mv_x;
+                    end_y = start_y + mv_y * 2;
+                } else { /* horizon */
+                    start_x = cu_x * cu_size + 1;
+                    start_y = cu_y * cu_size + 3;
+                    end_x = start_x + mv_x * 2;
+                    end_y = start_y + mv_y;
+                }
+
                 //scale_mv(&start_x, &start_y, &end_x, &end_y, cu_size);
                 draw_arrow((uint8_t *)buf, end_x, end_y, start_x, start_y, ctx->width, ctx->height, ctx->width, 100, 0, direction);
             }
@@ -254,7 +262,7 @@ int main(int argc, char **argv)
     bool help = getarg(false, "-H", "--help", "-?");
     string in_file = getarg("/home/timkingh/yuv/street_720p_250frames.yuv", "-i", "--input");
     string out_file = getarg("/mnt/shared/street_1280x720_out.yuv", "-o", "--output");
-    ctx->coord_file = getarg("/mnt/shared/dct_cmp_out.txt", "-c", "--coordinate");
+    ctx->coord_file = getarg("/mnt/shared/dir_out.txt", "-c", "--coordinate");
     ctx->sad_file = getarg("F:\\rkvenc_verify\\cfg\\3903_720x576_150_1.sad", "-s", "--sad");
     ctx->width = getarg(1920, "-w", "--width");
     ctx->height = getarg(1080, "-h", "--height");
