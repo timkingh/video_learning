@@ -5,21 +5,13 @@ tic
 width = 1280;
 height = 720;
 
-fid_dering0 = fopen('jpg_dec_street_out40_hisi_r15_dering0.txt', 'r');
-fid_dering1 = fopen('jpg_dec_street_out40_hisi_r15_dering1.txt', 'r');
-fid_var = fopen('out_var_1.txt', 'r');
-fid_out = fopen('dct_parse_out.txt', 'w');
+fid_dering0 = fopen('jpg_dec_street_720p_hisi_r23_q90_dering0_only.txt', 'r');
+fid_dering1 = fopen('jpg_dec_street_720p_hisi_r23_q90_dering1_only.txt', 'r');
+fid_var = fopen('out_var_street_720p.txt', 'r');
+fid_out = fopen('dir_out.txt', 'w');
+fid_out_0 = fopen('dering0.txt', 'w');
+fid_out_1 = fopen('dering1.txt', 'w');
 
-qtable = [
-     3   2   2   3   5   8  10  12
-     2   2   3   4   5  12  12  11
-     3   3   3   5   8  11  14  11
-     3   3   4   6  10  17  16  12
-     4   4   7  11  14  22  21  15
-     5   7  11  13  16  21  23  18
-    10  13  16  17  21  24  24  20
-    14  18  19  20  22  20  21  20
-];
 
 blk_num = 0;
 out_mtx = zeros(8, 8);
@@ -31,27 +23,24 @@ for row = 1:16:height
             pos_y = row - 1 + floor(idx / 2) * 8;
             coef0 = fscanf(fid_dering0, '%d', [8, 8]);
             coef1 = fscanf(fid_dering1, '%d', [8, 8]);
-            blk8_var = fscanf(fid_var, '%d', 1);
-            fprintf(fid_out, "pos(%d, %d)\n", pos_x, pos_y);
-            for m = 1:8
-                for n = 1:8
-                    out_mtx(m, n) = abs(coef0(m, n) - coef1(m, n)) / qtable(n, m);
+            dir = fscanf(fid_var, 'pos(%d, %d) dir %d var %d\n', [4, 1]);
+            if dir(3, 1) == 2 && dir(4, 1) > 256
+                fprintf(fid_out_0, "pos(%d, %d) dir %d var %d\n", ...
+                        dir(1, 1), dir(2, 1), dir(3, 1), dir(4, 1));
+                fprintf(fid_out_1, "pos(%d, %d) dir %d var %d\n", ...
+                        dir(1, 1), dir(2, 1), dir(3, 1), dir(4, 1));
+                for m = 1:8
+                    for n = 1:8
+                        fprintf(fid_out_0, "%4d ", coef0(n, m));
+                        fprintf(fid_out_1, "%4d ", coef1(n, m));
+                    end
+                    fprintf(fid_out_0, "\n\n");
+                    fprintf(fid_out_1, "\n\n");
                 end
+                fprintf(fid_out_0, "\n");
+                fprintf(fid_out_1, "\n");
+                blk_num = blk_num + 1;
             end
-            
-            for m = 1:8
-                for n = 1:8
-                    fprintf(fid_out, "%d ", out_mtx(n, m));
-                end
-                fprintf(fid_out, "\n");
-            end
-            fprintf(fid_out, "\n");
-
-%             if blk8_var > 15000 % isequal(coef0, coef1) ~= 1
-%                 fprintf(fid_out, "frame=0, cu_x=%d, cu_y=%d, cu_size=8, mv_x=0, mv_y=-2\n", ...
-%                         pos_x, pos_y);
-%                 blk_num = blk_num + 1;
-%             end
         end
     end
 end
@@ -61,6 +50,9 @@ fclose(fid_dering0);
 fclose(fid_dering1);
 fclose(fid_var);
 fclose(fid_out);
+fclose(fid_out_0);
+fclose(fid_out_1);
+
 
 fprintf("blk_num %d\n", blk_num);
 toc
