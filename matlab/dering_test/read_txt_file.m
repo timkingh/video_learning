@@ -18,15 +18,11 @@ if fid_dering1 == -1
 end
 
 fid_var = fopen('.\log\out_var_street_720p.txt', 'r');
-fid_out = fopen('.\log\dec_cmp_out_rk_1.txt', 'w');
+fid_out = fopen('.\log\jpg_dec_random_720p_hisi_r30_qt10_dering_cmp_1.txt', 'w');
 fid_out_0 = fopen('.\log\dering0.txt', 'w');
 fid_out_1 = fopen('.\log\dering1.txt', 'w');
 
 qtable = ones(8, 8) * 10;
-
-
-blk_num = 0;
-out_mtx = zeros(8, 8);
 min_idx = 16;
 max_multi = 0;
 
@@ -38,31 +34,24 @@ for row = 1:16:height
             coef0 = fscanf(fid_dering0, '%d', [8, 8]);
             coef1 = fscanf(fid_dering1, '%d', [8, 8]);
             dir = fscanf(fid_var, 'pos(%d, %d) dir %d var %d\n', [4, 1]);
-            blk_num = 0; 
+            out_mtx = zeros(8, 8);
+            fprintf(fid_out, "pos(%d, %d)\n", pos_x, pos_y);
 
             for n = 1:8 % row
                 for m = 1:8 % col
                     if coef0(m, n) ~= coef1(m, n)
                         out_mtx(m, n) = abs(coef0(m, n) - coef1(m, n)) / qtable(n, m);
-                        if out_mtx(m, n) > 0
-                            fprintf(fid_out, "pos(%d, %d) (%d, %d) %4d %4d diff=%d\n", ...
-                                    pos_x, pos_y, n, m, ...
-                                    coef0(m, n), coef1(m, n), out_mtx(m, n));
-                        end
-                    end  
-                    
-%                     if (n == 1 && (m >= 1 && m <= 6)) || ...
-%                        (n == 2 && (m >= 1 && m <= 5)) || ...
-%                        (n == 3 && (m >= 1 && m <= 3)) || ...
-%                        (n == 4 && m == 1)
-%                         if coef0(m, n) ~= coef1(m, n)
-%                             fprintf("pos(%d, %d) (%d, %d) %4d %4d diff=%d\n", ...
+%                         if out_mtx(m, n) > 0
+%                             fprintf(fid_out, "pos(%d, %d) (%d, %d) %4d %4d diff=%d\n", ...
 %                                     pos_x, pos_y, n, m, ...
 %                                     coef0(m, n), coef1(m, n), out_mtx(m, n));
 %                         end
-%                     end
+                    end  
+                    fprintf(fid_out, "%4d(%4d) ", out_mtx(m, n), coef0(m, n));
                 end
+                fprintf(fid_out, "\n\n");
             end
+            fprintf(fid_out, "\n\n");
             
 %             if max(max(out_mtx)) > max_multi
 %                 max_multi = max(max(out_mtx));
