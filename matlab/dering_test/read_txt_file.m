@@ -5,20 +5,20 @@ tic
 width = 1280;
 height = 720;
 
-[fid_dering0, msg] = fopen('.\log\jpg_dec_random_720p_hisi_r30_qt10_dering0.txt', 'r');
+[fid_dering0, msg] = fopen('.\log\jpg_dec_coef_test_r1_hisi_r36_qt10_dering0.txt', 'r');
 if fid_dering0 == -1
     disp(msg);
     return;
 end
 
-fid_dering1 = fopen('.\log\jpg_dec_random_720p_hisi_r30_qt10_dering1.txt', 'r');
+fid_dering1 = fopen('.\log\jpg_dec_coef_test_r1_hisi_r36_qt10_dering1.txt', 'r');
 if fid_dering1 == -1
     disp(msg);
     return;
 end
 
 fid_var = fopen('.\log\out_var_street_720p.txt', 'r');
-fid_out = fopen('.\log\jpg_dec_random_720p_hisi_r30_qt10_dering_cmp_1.txt', 'w');
+fid_out = fopen('.\log\jpg_dec_coef_test_r1_hisi_r36_qt10_dering_cmp.txt', 'w');
 fid_out_0 = fopen('.\log\dering0.txt', 'w');
 fid_out_1 = fopen('.\log\dering1.txt', 'w');
 
@@ -37,41 +37,40 @@ for row = 1:16:height
             coef0 = fscanf(fid_dering0, '%d', [8, 8]);
             coef1 = fscanf(fid_dering1, '%d', [8, 8]);
             dir = fscanf(fid_var, 'pos(%d, %d) dir %d var %d\n', [4, 1]);
-            out_mtx = zeros(8, 8);
-            fprintf(fid_out, "pos(%d, %d)\n", pos_x, pos_y);
+            out_mtx = zeros(8, 8); 
+            flag_same_coef = 1;
+            flag_diff_coef = 0;
 
+            
             for n = 1:8 % row
                 for m = 1:8 % col
                     if coef0(m, n) ~= coef1(m, n)
                         out_mtx(m, n) = abs(coef0(m, n) - coef1(m, n)) / qtable(n, m);
+                        flag_diff_coef = flag_diff_coef + 1;
                     end  
            
                     if (n == 1 && (m >= 2 && m <= 4)) || ...
                         (n == 2 && (m >= 1 && m <= 3)) || ...
                         (n == 3 && (m >= 1 && m <= 2)) || ...
                         (n == 4 && m == 1)
-                        if coef0(m, n) > max_coef
-                            max_coef = coef0(m, n);
-                            pos_mtx(1, 1) = pos_x;
-                            pos_mtx(1, 2) = pos_y;
-                        end
-                    
-                        if coef0(m, n) < min_coef
-                            min_coef = coef0(m, n);
-                            pos_mtx(2, 1) = pos_x;
-                            pos_mtx(2, 2) = pos_y;
+                        if coef0(m, n) ~= coef1(m, n)
+                            flag_same_coef = 0;
                         end
                     end
                 end
-            end         
+            end
+            
+            if flag_diff_coef > 0 % dering enabled blk8x8
+                if flag_same_coef == 0
+                    fprintf(fid_out, "pos(%d, %d) error flag_diff_coef %d flag_same_coef %d\n", ...
+                            pos_x, pos_y, flag_diff_coef, flag_same_coef);
+                end
+            else
+                fprintf(fid_out, "pos(%d, %d) dering disable\n", pos_x, pos_y);
+            end
         end
     end
 end
-
-fprintf(fid_out, "max %d pos(%d, %d) min %d pos(%d, %d)\n", ...
-        max_coef, pos_mtx(1, 1), pos_mtx(1, 2), ...
-        min_coef, pos_mtx(2, 1), pos_mtx(2, 2));
-   
    
 fclose(fid_dering0);
 fclose(fid_dering1);
