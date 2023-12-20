@@ -12,7 +12,7 @@ T = dctmtx(8);
 min_v = 0;
 max_v = 255;
 value = [ min_v, max_v ];
-iter_num = 1000;
+iter_num = 1000000;
 target_coef = 0;
 
 coef_min_max = ones(9, 2);
