@@ -2,27 +2,36 @@ clear all
 %clc
 tic
 
-fid_out = fopen("D:\v2_rkvenc\jpeg\20231201\log.txt", "w");
+[fid_out, msg] = fopen("D:\code\video_learning\matlab\dct_spectrum\output\log_r0.txt", "w");
+if fid_out == -1
+    disp(msg);
+    return;
+end
+
 T = dctmtx(8);
 min_v = 0;
 max_v = 255;
 value = [ min_v, max_v ];
-iter_num = 1000000000;
+iter_num = 1000;
 target_coef = 0;
 
-coef_min_max = ones(5, 2);
+coef_min_max = ones(9, 2);
 coef_min_max(:, 1) = coef_min_max(:, 1) * 2048;
 coef_min_max(:, 2) = coef_min_max(:, 2) * (-2048);
 
 
 % order(4): org_min, org_max, coef_min, coef_max
 % pos(5): (1, 1), (3, 4), (4, 1), (6, 3), (8, 8)
-ret_mtx = zeros(8, 8, 20); % 4 * 5
-coord = [ 1, 1;
-          3, 4;
+ret_mtx = zeros(8, 8, 36); % 4 * 9
+coord = [ 1, 2;
+          1, 3;
+          1, 4;
+          2, 1;
+          2, 2;
+          2, 3;
+          3, 1;
+          3, 2;
           4, 1;
-          6, 3;
-          8, 8;
         ];
 
 running_rate = zeros(1, 8);
@@ -44,7 +53,7 @@ for m = 1:iter_num
     coef = T * (blk8 - 128) * T';
     coef = round(coef);
     
-    for n = 1:5
+    for n = 1:9
         target_coef = coef(coord(n, 1), coord(n, 2));
         
         if target_coef < coef_min_max(n, 1)
@@ -68,9 +77,10 @@ for m = 1:iter_num
     end
 end
 
-str_coord = [ "(1, 1)", "(3, 4)", "(4, 1)", "(6, 3)", "(8, 8)" ];
+str_coord = [ "(1, 2)", "(1, 3)", "(1, 4)", "(2, 1)", "(2, 2)", "(2, 3)", ...
+              "(3, 1)", "(3, 2)", "(4, 1)"];
 log_str = [ "org_min", "org_max", "coef_min", "coef_max" ];
-for j = 1:5
+for j = 1:9
     
     fprintf("iter_num %d pos%s coef_min %d coef_max %d\n", ...
             iter_num, str_coord(1, j), coef_min_max(j, 1), coef_min_max(j, 2));
@@ -94,40 +104,3 @@ fclose(fid_out);
 
 fprintf("finished!\n");
 toc
-
-% 01010101
-%     blk8 = [   min_v   max_v   min_v   max_v   min_v   max_v   min_v   max_v
-%                max_v   min_v   max_v   min_v   max_v   min_v   max_v   min_v
-%                min_v   max_v   min_v   max_v   min_v   max_v   min_v   max_v
-%                max_v   min_v   max_v   min_v   max_v   min_v   max_v   min_v
-%                min_v   max_v   min_v   max_v   min_v   max_v   min_v   max_v
-%                max_v   min_v   max_v   min_v   max_v   min_v   max_v   min_v
-%                min_v   max_v   min_v   max_v   min_v   max_v   min_v   max_v
-%                max_v   min_v   max_v   min_v   max_v   min_v   max_v   min_v
-%             ];
-
-% 00110011
-%     blk8 = [   min_v   min_v   max_v   max_v   min_v   min_v   max_v   max_v
-%                min_v   min_v   max_v   max_v   min_v   min_v   max_v   max_v
-%                max_v   max_v   min_v   min_v   max_v   max_v   min_v   min_v
-%                max_v   max_v   min_v   min_v   max_v   max_v   min_v   min_v
-%                min_v   min_v   max_v   max_v   min_v   min_v   max_v   max_v
-%                min_v   min_v   max_v   max_v   min_v   min_v   max_v   max_v
-%                max_v   max_v   min_v   min_v   max_v   max_v   min_v   min_v
-%                max_v   max_v   min_v   min_v   max_v   max_v   min_v   min_v
-%             ];
-
-% 00001111
-%     blk8 = [   min_v   min_v   min_v   min_v   max_v   max_v   max_v   max_v
-%                min_v   min_v   min_v   min_v   max_v   max_v   max_v   max_v
-%                min_v   min_v   min_v   min_v   max_v   max_v   max_v   max_v
-%                min_v   min_v   min_v   min_v   max_v   max_v   max_v   max_v
-%                max_v   max_v   max_v   max_v   min_v   min_v   min_v   min_v
-%                max_v   max_v   max_v   max_v   min_v   min_v   min_v   min_v
-%                max_v   max_v   max_v   max_v   min_v   min_v   min_v   min_v
-%                max_v   max_v   max_v   max_v   min_v   min_v   min_v   min_v
-%             ];
-
-
-
-
