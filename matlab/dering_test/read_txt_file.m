@@ -25,6 +25,9 @@ fid_out_1 = fopen('.\log\dering1.txt', 'w');
 qtable = ones(8, 8) * 10;
 min_idx = 16;
 max_multi = 0;
+max_coef = -2048;
+min_coef = 2048;
+pos_mtx = zeros(2, 2);
 
 for row = 1:16:height
     for col = 1:16:width
@@ -41,25 +44,35 @@ for row = 1:16:height
                 for m = 1:8 % col
                     if coef0(m, n) ~= coef1(m, n)
                         out_mtx(m, n) = abs(coef0(m, n) - coef1(m, n)) / qtable(n, m);
-%                         if out_mtx(m, n) > 0
-%                             fprintf(fid_out, "pos(%d, %d) (%d, %d) %4d %4d diff=%d\n", ...
-%                                     pos_x, pos_y, n, m, ...
-%                                     coef0(m, n), coef1(m, n), out_mtx(m, n));
-%                         end
                     end  
-                    fprintf(fid_out, "%4d(%4d) ", out_mtx(m, n), coef0(m, n));
+           
+                    if (n == 1 && (m >= 2 && m <= 4)) || ...
+                        (n == 2 && (m >= 1 && m <= 3)) || ...
+                        (n == 3 && (m >= 1 && m <= 2)) || ...
+                        (n == 4 && m == 1)
+                        if coef0(m, n) > max_coef
+                            max_coef = coef0(m, n);
+                            pos_mtx(1, 1) = pos_x;
+                            pos_mtx(1, 2) = pos_y;
+                        end
+                    
+                        if coef0(m, n) < min_coef
+                            min_coef = coef0(m, n);
+                            pos_mtx(2, 1) = pos_x;
+                            pos_mtx(2, 2) = pos_y;
+                        end
+                    end
                 end
-                fprintf(fid_out, "\n\n");
-            end
-            fprintf(fid_out, "\n\n");
-            
-%             if max(max(out_mtx)) > max_multi
-%                 max_multi = max(max(out_mtx));
-%             end
+            end         
         end
     end
 end
 
+fprintf(fid_out, "max %d pos(%d, %d) min %d pos(%d, %d)\n", ...
+        max_coef, pos_mtx(1, 1), pos_mtx(1, 2), ...
+        min_coef, pos_mtx(2, 1), pos_mtx(2, 2));
+   
+   
 fclose(fid_dering0);
 fclose(fid_dering1);
 fclose(fid_var);
@@ -68,5 +81,5 @@ fclose(fid_out_0);
 fclose(fid_out_1);
 
 
-fprintf("max_multi %d\n", max_multi);
+fprintf("finished\n");
 toc
