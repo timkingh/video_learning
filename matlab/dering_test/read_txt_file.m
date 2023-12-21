@@ -17,17 +17,13 @@ if fid_dering1 == -1
     return;
 end
 
+x1_path = ".\log\x1_r9.txt";
+y1_path = ".\log\y1_r9.txt";
 fid_var = fopen('.\log\out_var_street_720p.txt', 'r');
-fid_out = fopen('.\log\jpg_dec_coef_test_r1_hisi_r36_qt10_dering_mr2.txt', 'w');
-fid_out_0 = fopen('.\log\x1_r8.txt', 'w');
-fid_out_1 = fopen('.\log\y1_r8.txt', 'w');
+fid_out_0 = fopen(x1_path, 'w');
+fid_out_1 = fopen(y1_path, 'w');
 
 qtable = ones(8, 8) * 10;
-min_idx = 16;
-max_multi = 0;
-max_coef = -2048;
-min_coef = 2048;
-pos_mtx = zeros(2, 2);
 
 for row = 1:16:height
     for col = 1:16:width
@@ -43,7 +39,7 @@ for row = 1:16:height
             
             for n = 1:8 % row
                 for m = 1:8 % col
-                    if (n == 8 && m == 7) || (n == 7 && m == 8)
+                    if (n == 8 && m == 7)
                         calc_flag = 1;
                     else
                         calc_flag = 0;
@@ -61,13 +57,13 @@ for row = 1:16:height
 end
    
 fclose('all');
-[fid_x1, msg] = fopen(".\log\x1_r8.txt", "r");
+[fid_x1, msg] = fopen(x1_path, "r");
 if fid_x1 == -1
     disp(msg);
     return;
 end
 
-[fid_y1, msg] = fopen(".\log\y1_r8.txt", "r");
+[fid_y1, msg] = fopen(y1_path, "r");
 if fid_y1 == -1
     disp(msg);
     return;
