@@ -5,13 +5,13 @@ tic
 width = 1280;
 height = 720;
 
-[fid_dering0, msg] = fopen('.\log\jpg_dec_coef_test_r1_hisi_r36_qt10_dering0.txt', 'r');
+[fid_dering0, msg] = fopen('.\log\jpg_dec_random_720p_hisi_r27_qt10_dering0.txt', 'r');
 if fid_dering0 == -1
     disp(msg);
     return;
 end
 
-fid_dering1 = fopen('.\log\jpg_dec_coef_test_r1_hisi_r36_qt10_dering1.txt', 'r');
+fid_dering1 = fopen('.\log\jpg_dec_random_720p_hisi_r27_qt10_dering1.txt', 'r');
 if fid_dering1 == -1
     disp(msg);
     return;
@@ -19,8 +19,8 @@ end
 
 fid_var = fopen('.\log\out_var_street_720p.txt', 'r');
 fid_out = fopen('.\log\jpg_dec_coef_test_r1_hisi_r36_qt10_dering_mr2.txt', 'w');
-fid_out_0 = fopen('.\log\dering0.txt', 'w');
-fid_out_1 = fopen('.\log\dering1.txt', 'w');
+fid_out_0 = fopen('.\log\x1_r5.txt', 'w');
+fid_out_1 = fopen('.\log\y1_r5.txt', 'w');
 
 qtable = ones(8, 8) * 10;
 min_idx = 16;
@@ -40,45 +40,21 @@ for row = 1:16:height
             out_mtx = zeros(8, 8); 
             flag_same_coef = 1;
             flag_diff_coef = 0;
-
             
             for n = 1:8 % row
                 for m = 1:8 % col
                     if coef0(m, n) ~= coef1(m, n)
                         out_mtx(m, n) = abs(coef0(m, n) - coef1(m, n)) / qtable(n, m);
-                        flag_diff_coef = flag_diff_coef + 1;
+                        fprintf(fid_out_0, "%d\n", coef0(m, n));
+                        fprintf(fid_out_1, "%d\n", out_mtx(m, n));
                     end  
-           
-                    if (n == 1 && (m >= 2 && m <= 4)) || ...
-                        (n == 2 && (m >= 1 && m <= 3)) || ...
-                        (n == 3 && (m >= 1 && m <= 2)) || ...
-                        (n == 4 && m == 1)
-                        if coef0(m, n) ~= coef1(m, n)
-                            flag_same_coef = 0;
-                        end
-                    end
                 end
-            end
-            
-            if flag_diff_coef > 0 % dering enabled blk8x8
-                if flag_same_coef == 0
-                    fprintf(fid_out, "pos(%d, %d) error flag_diff_coef %d flag_same_coef %d\n", ...
-                            pos_x, pos_y, flag_diff_coef, flag_same_coef);
-                end
-            else
-                fprintf(fid_out, "pos(%d, %d) dering disable\n", pos_x, pos_y);
             end
         end
     end
 end
    
-fclose(fid_dering0);
-fclose(fid_dering1);
-fclose(fid_var);
-fclose(fid_out);
-fclose(fid_out_0);
-fclose(fid_out_1);
-
 
 fprintf("finished\n");
+fclose('all');
 toc
