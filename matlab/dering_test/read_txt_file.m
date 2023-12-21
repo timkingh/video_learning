@@ -17,8 +17,8 @@ if fid_dering1 == -1
     return;
 end
 
-x1_path = ".\log\x1_r36.txt";
-y1_path = ".\log\y1_r36.txt";
+x1_path = ".\log\x1_r37.txt";
+y1_path = ".\log\y1_r37.txt";
 fid_var = fopen('.\log\out_var_street_720p.txt', 'r');
 fid_out_0 = fopen(x1_path, 'w');
 fid_out_1 = fopen(y1_path, 'w');
@@ -39,7 +39,7 @@ for row = 1:16:height
             
             for n = 1:8 % row
                 for m = 1:8 % col
-                    if (n == 4 && m == 6) % A35
+                    if (n == 3 && m == 7) % A26
                         calc_flag = 1;
                     else
                         calc_flag = 0;
