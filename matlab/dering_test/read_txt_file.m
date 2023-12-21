@@ -18,7 +18,7 @@ if fid_dering1 == -1
 end
 
 fid_var = fopen('.\log\out_var_street_720p.txt', 'r');
-fid_out = fopen('.\log\jpg_dec_coef_test_r1_hisi_r36_qt10_dering_cmp.txt', 'w');
+fid_out = fopen('.\log\jpg_dec_coef_test_r1_hisi_r36_qt10_dering_mr2.txt', 'w');
 fid_out_0 = fopen('.\log\dering0.txt', 'w');
 fid_out_1 = fopen('.\log\dering1.txt', 'w');
 
