@@ -2,14 +2,22 @@ clear all
 clc
 
 coef = [
-    "75.txt", "76.txt", "77.txt"    
+    "62.txt";
+    "63.txt";
+    "64.txt";
+    "72.txt";
+    "73.txt";
+    "74.txt";
 ];
 
 
 file_list = [
     ".\log_1\x1_r39_A" + coef(1, 1), ".\log_1\y1_r39_A" + coef(1, 1), "sk";
-    ".\log_1\x1_r39_A" + coef(1, 2), ".\log_1\y1_r39_A" + coef(1, 2), "*b"; 
-    ".\log_1\x1_r39_A" + coef(1, 3), ".\log_1\y1_r39_A" + coef(1, 3), "or"; 
+    ".\log_1\x1_r39_A" + coef(2, 1), ".\log_1\y1_r39_A" + coef(2, 1), "*b"; 
+    ".\log_1\x1_r39_A" + coef(3, 1), ".\log_1\y1_r39_A" + coef(3, 1), "or"; 
+    ".\log_1\x1_r39_A" + coef(4, 1), ".\log_1\y1_r39_A" + coef(4, 1), "+c"; 
+    ".\log_1\x1_r39_A" + coef(5, 1), ".\log_1\y1_r39_A" + coef(5, 1), "dm"; 
+    ".\log_1\x1_r39_A" + coef(6, 1), ".\log_1\y1_r39_A" + coef(6, 1), "xg"; 
 ];
 
 [rows, cols] = size(file_list);
