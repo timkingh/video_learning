@@ -10,8 +10,8 @@ coef = [
     "74.txt";
 ];
 
-x1_str = ".\log_2\x1_r44_A";
-y1_str = ".\log_2\y1_r44_A";
+x1_str = ".\log_6\x1_r48_A";
+y1_str = ".\log_6\y1_r48_A";
 
 file_list = [
     x1_str + coef(1, 1), y1_str + coef(1, 1), "sk";
