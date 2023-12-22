@@ -10,14 +10,16 @@ coef = [
     "74.txt";
 ];
 
+x1_str = ".\log_2\x1_r44_A";
+y1_str = ".\log_2\y1_r44_A";
 
 file_list = [
-    ".\log_1\x1_r39_A" + coef(1, 1), ".\log_1\y1_r39_A" + coef(1, 1), "sk";
-    ".\log_1\x1_r39_A" + coef(2, 1), ".\log_1\y1_r39_A" + coef(2, 1), "*b"; 
-    ".\log_1\x1_r39_A" + coef(3, 1), ".\log_1\y1_r39_A" + coef(3, 1), "or"; 
-    ".\log_1\x1_r39_A" + coef(4, 1), ".\log_1\y1_r39_A" + coef(4, 1), "+c"; 
-    ".\log_1\x1_r39_A" + coef(5, 1), ".\log_1\y1_r39_A" + coef(5, 1), "dm"; 
-    ".\log_1\x1_r39_A" + coef(6, 1), ".\log_1\y1_r39_A" + coef(6, 1), "xg"; 
+    x1_str + coef(1, 1), y1_str + coef(1, 1), "sk";
+    x1_str + coef(2, 1), y1_str + coef(2, 1), "*b"; 
+    x1_str + coef(3, 1), y1_str + coef(3, 1), "or"; 
+    x1_str + coef(4, 1), y1_str + coef(4, 1), "+c"; 
+    x1_str + coef(5, 1), y1_str + coef(5, 1), "dm"; 
+    x1_str + coef(6, 1), y1_str + coef(6, 1), "xg"; 
 ];
 
 [rows, cols] = size(file_list);

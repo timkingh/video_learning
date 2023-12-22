@@ -20,7 +20,7 @@ T = dctmtx(8);
 min_v = 0;
 max_v = 255;
 value = [ min_v, max_v ];
-iter_num = 100000000;
+iter_num = 200000000;
 
 running_rate = zeros(1, 8);
 for m = 1:8
