@@ -18,8 +18,8 @@ qtable = [
 for jj = 0:7
     for kk = 0:7
         file_name = num2str(kk) + ".txt";
-        x1_path = ".\log_8\x1_r51_A" + num2str(jj) + file_name;
-        y1_path = ".\log_8\y1_r51_A" + num2str(jj) + file_name;
+        x1_path = ".\log_9\x1_r52_A" + num2str(jj) + file_name;
+        y1_path = ".\log_9\y1_r52_A" + num2str(jj) + file_name;
         fid_out_0 = fopen(x1_path, 'w');
         fid_out_1 = fopen(y1_path, 'w');
         fprintf("jj %d kk %d\n", jj, kk);
@@ -54,7 +54,7 @@ for jj = 0:7
 
                             if coef0(m, n) ~= coef1(m, n) && calc_flag == 1
                                 out_mtx(m, n) = abs(coef0(m, n) - coef1(m, n)) / qtable(n, m);
-                                fprintf(fid_out_0, "%d\n", coef0(m, n));
+                                fprintf(fid_out_0, "%d\n", coef0(m, n) / qtable(n, m));
                                 fprintf(fid_out_1, "%d\n", out_mtx(m, n));
                             end  
                         end
