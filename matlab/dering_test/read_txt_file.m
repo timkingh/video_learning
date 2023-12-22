@@ -9,18 +9,18 @@ qtable = ones(8, 8) * 10;
 for jj = 0:7
     for kk = 0:7
         file_name = num2str(kk) + ".txt";
-        x1_path = ".\log_1\x1_r41_A" + num2str(jj) + file_name;
-        y1_path = ".\log_1\y1_r41_A" + num2str(jj) + file_name;
+        x1_path = ".\log_2\x1_r44_A" + num2str(jj) + file_name;
+        y1_path = ".\log_2\y1_r44_A" + num2str(jj) + file_name;
         fid_out_0 = fopen(x1_path, 'w');
         fid_out_1 = fopen(y1_path, 'w');
         fprintf("jj %d kk %d\n", jj, kk);
-        [fid_dering0, msg] = fopen('.\log\jpg_dec_random_720p_hisi_r27_qt10_dering0.txt', 'r');
+        [fid_dering0, msg] = fopen('.\log_2\jpg_dec_coef_test_r43_hisi_r37_qt10_dering0.txt', 'r');
         if fid_dering0 == -1
             disp(msg);
             return;
         end
 
-        [fid_dering1, msg] = fopen('.\log\jpg_dec_random_720p_hisi_r27_qt10_dering1.txt', 'r');
+        [fid_dering1, msg] = fopen('.\log_2\jpg_dec_coef_test_r43_hisi_r37_qt10_dering1.txt', 'r');
         if fid_dering1 == -1
             disp(msg);
             return;
