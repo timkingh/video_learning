@@ -4,13 +4,22 @@ tic
 
 width = 1280;
 height = 720;
-qtable = ones(8, 8) * 10;
+qtable = [
+  3   2   2   3   5   8  10  12
+  2   2   3   4   5  12  12  11
+  3   3   3   5   8  11  14  11
+  3   3   4   6  10  17  16  12
+  4   4   7  11  14  22  21  15
+  5   7  11  13  16  21  23  18
+ 10  13  16  17  21  24  24  20
+ 14  18  19  20  22  20  21  20
+];
 
 for jj = 0:7
     for kk = 0:7
         file_name = num2str(kk) + ".txt";
-        x1_path = ".\log_8\x1_r50_A" + num2str(jj) + file_name;
-        y1_path = ".\log_8\y1_r50_A" + num2str(jj) + file_name;
+        x1_path = ".\log_8\x1_r51_A" + num2str(jj) + file_name;
+        y1_path = ".\log_8\y1_r51_A" + num2str(jj) + file_name;
         fid_out_0 = fopen(x1_path, 'w');
         fid_out_1 = fopen(y1_path, 'w');
         fprintf("jj %d kk %d\n", jj, kk);

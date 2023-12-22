@@ -2,16 +2,16 @@ clear all
 clc
 
 coef = [
-    "62.txt";
-    "63.txt";
-    "64.txt";
-    "72.txt";
-    "73.txt";
-    "74.txt";
+    "65.txt";
+    "66.txt";
+    "67.txt";
+    "75.txt";
+    "76.txt";
+    "50.txt";
 ];
 
-x1_str = ".\log_6\x1_r48_A";
-y1_str = ".\log_6\y1_r48_A";
+x1_str = ".\log_8\x1_r51_A";
+y1_str = ".\log_8\y1_r51_A";
 
 file_list = [
     x1_str + coef(1, 1), y1_str + coef(1, 1), "sk";
@@ -24,7 +24,7 @@ file_list = [
 
 [rows, cols] = size(file_list);
 
-for m = 1:rows
+for m = 1:5
     x1_path = file_list(m, 1);
     y1_path = file_list(m, 2);
     [fid_x1, msg] = fopen(x1_path, "r");
