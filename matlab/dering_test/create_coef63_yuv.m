@@ -11,8 +11,10 @@ end
 width = 1280;
 height = 720;
 blk8_num = 256;
-blk8_sets = zeros(8, 8, blk8_num);
-blk8_ready_flag = zeros(256, 1);
+coef_num = 64;
+blk8_sets = zeros(8, 8, blk8_num * coef_num);
+blk8_ready_flag = zeros(blk8_num, coef_num);
+blk8_total_cnt = 0;
 
 T = dctmtx(8);
 min_v = 0;
@@ -38,28 +40,42 @@ for m = 1:iter_num
 
     coef = T * (blk8 - 128) * T';
     coef = round(coef);
-    blk8_idx = ceil(coef(8, 8) / 10);
     
-    if blk8_ready_flag(blk8_idx + 128, 1) == 0
-        blk8_sets(:, :, blk8_idx + 128) = blk8;
-        blk8_ready_flag(blk8_idx + 128, 1) = 1;
+    for row = 1:8
+        for col = 1:8
+            blk8_idx = ceil(coef(row, col) / 10);
+            coef_index = (row - 1) * 8 + (col - 1);
+            if blk8_ready_flag(blk8_idx + 128, coef_index + 1) == 0
+                blk8_total_cnt = blk8_total_cnt + 1;
+                blk8_sets(:, :, blk8_total_cnt) = blk8;
+                blk8_ready_flag(blk8_idx + 128, coef_index + 1) = 1;                
+                break;
+            end
+        end
     end
     
     for hh = 1:8
         if m == running_rate(1, hh)
-            fprintf("running %f\n", m / iter_num);
+            fprintf("running %f blk8_total_cnt %d\n", m / iter_num, blk8_total_cnt);
             break;
         end
     end
 end
 
-for m =1:blk8_num
-    if blk8_ready_flag(m, 1) == 0
-        fprintf("blk8 %d not ready\n", m);
+
+for n = 1:coef_num
+    not_ready_num = 0;
+    for m =1:blk8_num
+        if blk8_ready_flag(m, n) == 0
+            not_ready_num = not_ready_num + 1;
+        end
     end
+    
+    fprintf("coef_idx %d not_ready_num %d\n", n, not_ready_num);
 end
 
-[fid_out_yuv, msg] = fopen("D:\code\video_learning\matlab\dering_test\coef_test_r3_v2.yuv", "w");
+
+[fid_out_yuv, msg] = fopen("D:\code\video_learning\matlab\dering_test\coef_test_r43.yuv", "w");
 if fid_out_yuv == -1
     disp(msg);
     return;
@@ -72,7 +88,7 @@ blk8_idx = -1;
 for k = 1:8:height
     for j = 1:8:width
         blk8_idx = blk8_idx + 1;
-        blk8_idx = rem(blk8_idx, 256);
+        blk8_idx = rem(blk8_idx, blk8_total_cnt);
         if blk8_idx == 0
             blk8_idx = 1;
         end
@@ -84,7 +100,7 @@ blk8_idx = -1;
 for k = 1:8:height/2
     for j = 1:8:width/2
         blk8_idx = blk8_idx + 1;
-        blk8_idx = rem(blk8_idx, 256);
+        blk8_idx = rem(blk8_idx, blk8_total_cnt);
         if blk8_idx == 0
             blk8_idx = 1;
         end
