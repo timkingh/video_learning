@@ -15,21 +15,21 @@ qtable = [
  14  18  19  20  22  20  21  20
 ];
 
-for jj = 0:7
-    for kk = 0:7
+for jj = 7:7
+    for kk = 7:7
         file_name = num2str(kk) + ".txt";
-        x1_path = ".\log_9\x1_r52_A" + num2str(jj) + file_name;
-        y1_path = ".\log_9\y1_r52_A" + num2str(jj) + file_name;
+        x1_path = ".\log_10\x1_r53_A" + num2str(jj) + file_name;
+        y1_path = ".\log_10\y1_r53_A" + num2str(jj) + file_name;
         fid_out_0 = fopen(x1_path, 'w');
         fid_out_1 = fopen(y1_path, 'w');
         fprintf("jj %d kk %d\n", jj, kk);
-        [fid_dering0, msg] = fopen('.\log_8\jpg_dec_coef_test_r43_v2_hisi_r42_qfactor90_dering0.txt', 'r');
+        [fid_dering0, msg] = fopen('.\log_10\jpg_dec_coef_test_r43_v2_hisi_r42_qfactor90_dering0.txt', 'r');
         if fid_dering0 == -1
             disp(msg);
             return;
         end
 
-        [fid_dering1, msg] = fopen('.\log_8\jpg_dec_coef_test_r43_v2_hisi_r42_qfactor90_dering1.txt', 'r');
+        [fid_dering1, msg] = fopen('.\log_10\jpg_dec_coef_test_r43_v2_hisi_r42_qfactor90_dering1.txt', 'r');
         if fid_dering1 == -1
             disp(msg);
             return;
