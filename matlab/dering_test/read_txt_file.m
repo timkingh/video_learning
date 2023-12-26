@@ -15,22 +15,22 @@ height = 720;
 %  14  18  19  20  22  20  21  20
 % ];
 
-qtable = ones(8, 8) .* 10;
+qtable = ones(8, 8) .* 20;
 max_bias = zeros(8, 8);
 
 for jj = 0:7
     for kk = 0:7
         file_name = num2str(kk) + ".txt";
-        xy_path = ".\log\log_12\xy_r57_qt10_A" + num2str(jj) + file_name;
+        xy_path = ".\log\log_12\xy_r58_qt20_A" + num2str(jj) + file_name;
         fid_out_xy = fopen(xy_path, 'w');
 
-        [fid_dering0, msg] = fopen('.\log\log_12\jpg_dec_coef_test_r43_v2_hisi_r39_qt10_dering0.txt', 'r');
+        [fid_dering0, msg] = fopen('.\log\log_12\jpg_dec_coef_test_r43_v2_hisi_r43_qt20_dering0.txt', 'r');
         if fid_dering0 == -1
             disp(msg);
             return;
         end
 
-        [fid_dering1, msg] = fopen('.\log\log_12\jpg_dec_coef_test_r43_v2_hisi_r39_qt10_dering1.txt', 'r');
+        [fid_dering1, msg] = fopen('.\log\log_12\jpg_dec_coef_test_r43_v2_hisi_r43_qt20_dering1.txt', 'r');
         if fid_dering1 == -1
             disp(msg);
             return;
