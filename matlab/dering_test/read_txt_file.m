@@ -18,10 +18,8 @@ qtable = [
 for jj = 0:7
     for kk = 0:7
         file_name = num2str(kk) + ".txt";
-        x1_path = ".\log\log_11\x1_r55_A" + num2str(jj) + file_name;
-        y1_path = ".\log\log_11\y1_r55_A" + num2str(jj) + file_name;
-        fid_out_0 = fopen(x1_path, 'w');
-        fid_out_1 = fopen(y1_path, 'w');
+        xy_path = ".\log\log_12\xy_r56_A" + num2str(jj) + file_name;
+        fid_out_xy = fopen(xy_path, 'w');
         fprintf("jj %d kk %d\n", jj, kk);
         [fid_dering0, msg] = fopen('.\log\log_11\jpg_dec_coef_test_r43_v2_hisi_r43_dering0.txt', 'r');
         if fid_dering0 == -1
@@ -54,8 +52,8 @@ for jj = 0:7
 
                             if coef0(m, n) ~= coef1(m, n) && calc_flag == 1
                                 out_mtx(m, n) = abs(coef0(m, n) - coef1(m, n)) / 20;
-                                fprintf(fid_out_0, "%d\n", coef0(m, n) / 20);
-                                fprintf(fid_out_1, "%d\n", out_mtx(m, n));
+                                fprintf(fid_out_xy, "%5d %5d %5d %5d\n", coef0(m, n), ...
+                                        coef0(m, n) / 20, out_mtx(m, n), 20);
                             end  
                         end
                     end
