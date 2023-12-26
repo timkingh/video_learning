@@ -1,35 +1,33 @@
-clear all 
+clear all
 clc
 
 coef = [
-    "31.txt";
-    "32.txt";
-    "33.txt";
-    "07.txt";
-    "47.txt";
-    "50.txt";
-    "07.txt";
-    "47.txt";
-    "50.txt";
+    ".\log\log_12\xy_r57_qt10_A31.txt";
+    ".\log\log_12\xy_r57_qt10_A32.txt";
+    ".\log\log_12\xy_r57_qt10_A33.txt";
+    ".\log\log_12\xy_r57_qt10_A34.txt";
+    ".\log\log_12\xy_r57_qt10_A35.txt";
+    ".\log\log_12\xy_r57_qt10_A36.txt";
+    ".\log\log_12\xy_r57_qt10_A37.txt";
+    ".\log\log_12\xy_r57_qt10_A45.txt";
+    ".\log\log_12\xy_r57_qt10_A46.txt";
 ];
 
-xy_str = ".\log\log_12\xy_r56_A";
-
 file_list = [
-    xy_str + coef(1, 1), "sk";
-    xy_str + coef(2, 1), "*b"; 
-    xy_str + coef(3, 1), "or"; 
-    xy_str + coef(4, 1), "+c"; 
-    xy_str + coef(5, 1), "dm"; 
-    xy_str + coef(6, 1), "xg"; 
-    xy_str + coef(7, 1), "py"; 
-    xy_str + coef(8, 1), "vw"; 
-    xy_str + coef(9, 1), "<r"; 
+    coef(1, 1), "sk";
+    coef(2, 1), "*b";
+    coef(3, 1), "or";
+    coef(4, 1), "+c";
+    coef(5, 1), "dm";
+    coef(6, 1), "xg";
+    coef(7, 1), "py";
+    coef(8, 1), "vw";
+    coef(9, 1), "<r";
 ];
 
 [rows, cols] = size(file_list);
 
-for m = 1:1
+for m = 1:rows
     xy_path = file_list(m, 1);
     [fid_xy, msg] = fopen(xy_path, "r");
     if fid_xy == -1
