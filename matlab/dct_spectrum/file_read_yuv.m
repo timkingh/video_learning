@@ -31,7 +31,7 @@ fclose(fid);
 
 out_blk = ones(8, 8, 2);
 
-for index = 1:2
+for index = 1:1
     blk = out_mtx(1:8, 465:472);
     if index == 1
         blk(1:2:7, :) = 0;
