@@ -8,7 +8,7 @@ blk8_sets = zeros(8, 8, blk8_num);
 min_v = 0;
 max_v = 255;
 y_mtx = zeros(height, width);
-uv_mtx = zeros(height / 2, width / 2);
+uv_mtx = ones(height / 2, width / 2) .* 128;
 
 blk8_1_2_min = [
      0     0     0     0     0     0     0     0
@@ -230,31 +230,24 @@ for k = 19:blk8_num
     blk8_sets(:, :, k) = randi([0, 255], 8, 8);
 end
 
-[fid_out, msg] = fopen("D:\code\video_learning\matlab\dct_spectrum\output\coef_test_r62.yuv", "w");
+[fid_out, msg] = fopen("D:\code\video_learning\matlab\dct_spectrum\output\coef_test_r63.yuv", "w");
 if fid_out == -1
     disp(msg);
     return;
 end
 
-for k = 1:8:height
-    blk8_idx = 0;
-    for j = 1:8:width
-        if rem(j - 1, 16) == 0
-            blk8_idx = blk8_idx + 1;
+for k = 1:16:height
+    for j = 1:16:width
+        for idx = 0:3
+            pos_x = j - 1 + rem(idx, 2) * 8;
+            pos_y = k - 1 + floor(idx / 2) * 8;   
+            for row = 0:7
+                y_mtx(pos_y + 1 + row, (pos_x + 1):(pos_x + 8)) = randi([0, 255], 1);
+            end
         end
-        y_mtx(k:k+7, j:j+7) = blk8_sets(:, :, blk8_idx);
     end
 end
 
-for k = 1:8:height/2
-    blk8_idx = 0;
-    for j = 1:8:width/2
-        if rem(j - 1, 8) == 0
-            blk8_idx = blk8_idx + 1;
-        end
-        uv_mtx(k:k+7, j:j+7) = blk8_sets(:, :, blk8_idx);
-    end
-end
 
 count = fwrite(fid_out, y_mtx', 'uint8');
 count = count + fwrite(fid_out, uv_mtx', 'uint8');
