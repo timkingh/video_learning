@@ -230,7 +230,7 @@ for k = 19:blk8_num
     blk8_sets(:, :, k) = randi([0, 255], 8, 8);
 end
 
-[fid_out, msg] = fopen("D:\code\video_learning\matlab\dct_spectrum\output\coef_test_r64.yuv", "w");
+[fid_out, msg] = fopen("D:\code\video_learning\matlab\dct_spectrum\output\coef_test_r65.yuv", "w");
 if fid_out == -1
     disp(msg);
     return;
@@ -244,7 +244,8 @@ for k = 1:16:height
             rand_v = randi([0, 255], 1, 15);
             for row = 0:7
                 for col = 0:7
-                    y_mtx(pos_y + 1 + row, pos_x + 1 + col) = rand_v(1, row + col + 1);
+                    y_mtx(pos_y + 1 + row, pos_x + 1 + col) = rand_v(1, row - col + 8);
+%                     y_mtx(pos_y + 1 + row, pos_x + 1 + col) = rand_v(1, row + col + 1);
                 end
             end
         end
