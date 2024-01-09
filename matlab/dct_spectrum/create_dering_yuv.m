@@ -1,7 +1,7 @@
 clear all
 clc
 
-load("blk8.mat");
+load("blk8_1.mat");
 
 width = 1280;
 height = 720;
@@ -12,7 +12,7 @@ y_mtx = zeros(height, width);
 uv_mtx = ones(height / 2, width / 2) .* 128;
 
 
-[fid_out, msg] = fopen("D:\code\video_learning\matlab\dct_spectrum\output\coef_test_r68.yuv", "w");
+[fid_out, msg] = fopen("D:\code\video_learning\matlab\dct_spectrum\output\coef_test_r69.yuv", "w");
 if fid_out == -1
     disp(msg);
     return;
@@ -24,7 +24,7 @@ for k = 1:16:height
         for idx = 0:3
             pos_x = j - 1 + rem(idx, 2) * 8;
             pos_y = k - 1 + floor(idx / 2) * 8;       
-            if blk8_cnt < 1000
+            if blk8_cnt < 4
                 y_mtx(pos_y + 1:pos_y + 8, pos_x + 1:pos_x + 8) = min_blk8(:, :, blk8_cnt);
                 blk8_cnt = blk8_cnt + 1;
             end
