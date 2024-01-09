@@ -230,7 +230,7 @@ for k = 19:blk8_num
     blk8_sets(:, :, k) = randi([0, 255], 8, 8);
 end
 
-[fid_out, msg] = fopen("D:\code\video_learning\matlab\dct_spectrum\output\coef_test_r66.yuv", "w");
+[fid_out, msg] = fopen("D:\code\video_learning\matlab\dct_spectrum\output\coef_test_r67.yuv", "w");
 if fid_out == -1
     disp(msg);
     return;
@@ -244,8 +244,27 @@ for k = 1:16:height
             rand_v = randi([0, 255], 1, 15);
             for row = 0:7
                 for col = 0:7
-                    y_mtx(pos_y + 1 + row, pos_x + 1 + col) = rand_v(1, row + floor(col / 2) + 1);
-%                     y_mtx(pos_y + 1 + row, pos_x + 1 + col) = rand_v(1, row + col + 1);
+                    if pos_y < 80 % d = 0
+                        curr_value = rand_v(1, row + col + 1);
+                    elseif pos_y < 160 % d = 1
+                        curr_value = rand_v(1, row + floor(col / 2) + 1);
+                    elseif pos_y < 240 % d = 2
+                        curr_value = rand_v(1, row + 1);
+                    elseif pos_y < 320 % d = 3
+                        curr_value = rand_v(1, 3 + row - floor(col / 2) + 1);
+                    elseif pos_y < 400 % d = 4
+                        curr_value = rand_v(1, 7 + row - col + 1);
+                    elseif pos_y < 480 % d = 5
+                        curr_value = rand_v(1, 3 - floor(row / 2) + col + 1);
+                    elseif pos_y < 560 % d = 6
+                        curr_value = rand_v(1, col + 1);
+                    elseif pos_y < 640
+                        curr_value = rand_v(1, floor(row / 2) + col + 1);
+                    else
+                        curr_value = randi([0, 255], 1);
+                    end
+                            
+                    y_mtx(pos_y + 1 + row, pos_x + 1 + col) = curr_value;
                 end
             end
         end
