@@ -1,5 +1,6 @@
 clear all
-clc
+close all
+% clc
 tic
 
 
@@ -9,14 +10,27 @@ T = dctmtx(8);
 min_blk8 = zeros(8, 8, blk8_num);
 var_sets = ones(1, blk8_num) .* 10000000;
 min_coef_r = zeros(8, 8);
-
-pix_val = [ 233, 234, 235, 236, 237, 238, 239, 240, ...
-            241, 242, 243, 244, 245, 246, 247, 248];
+blk8 = zeros(8, 8);
 
 for idx = 1:1
-    blk8 = randi([0, 255], 8, 8);
+    pix_val = randi([0, 255], 1, 16);
+    sort_val = sort(pix_val);
+    
+    for row = 0:7
+        for col = 0:7
+            blk8(row + 1, col + 1) = sort_val(1, row + floor(col / 2) + 1);
+        end
+    end    
+    
+    blk8
     coef = T * (blk8 - 128) * T';
     coef_r = round(coef);
+    coef_r(1, 1) = 0;
+    figure;
+    imagesc(abs(coef_r));
+    colorbar;
+%     fprintf("figure %d\n", idx);
+%     fprintf("\n");
     
 %     sum_coef = 0;
 %     for r = 7:8
