@@ -19,7 +19,7 @@ fid_dering0 = fopen('./input_file/concat_b_1080p_jpege_r52.txt', 'r');
 fid_dering1 = fopen('./input_file/jpg_dec_coef_test_r67_hisi_r59_q4_dering1.txt', 'r');
 fid_var = fopen('./input_file/var_coef_test_r67.txt', 'r');
 fid_madi = fopen('./input_file/madi_coef_test_r67.txt', 'r');
-fid_out = fopen('dct_coef_out_matlab_r74.txt', 'w');
+fid_out = fopen('dct_coef_out_matlab_r75.txt', 'w');
 
 blk8_num = width * height / 64 * 1;
 out_flag = 0;
@@ -44,8 +44,10 @@ for idx = 1:blk8_num
         end
     end
 
-    fprintf(fid_out, "frame %d pos(%d, %d) non_zero_cnt %d\n\n", ...
-            frm_num, pos_x, pos_y, non_zero_cnt);
+    if var < 128 && non_zero_cnt > 4
+        fprintf(fid_out, "frame %d pos(%d, %d) non_zero_cnt %d\n\n", ...
+                frm_num, pos_x, pos_y, non_zero_cnt);
+    end
 end
 
 fclose('all');
