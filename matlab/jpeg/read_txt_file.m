@@ -1,51 +1,52 @@
 clear all
 clc
 
-width = 1280;
-height = 720;
+width = 1920;
+height = 1088;
 
-fid_dering0 = fopen('./input_file/jpg_dec_coef_test_r67_hisi_r59_q4_dering0.txt', 'r');
+zsantoraster = [
+        0,  1,  8, 16,  9,  2,   3, 10, ...
+        17, 24, 32, 25, 18, 11,  4,  5, ...
+        12, 19, 26, 33, 40, 48, 41, 34, ...
+        27, 20, 13,  6,  7, 14, 21, 28, ...
+        35, 42, 49, 56, 57, 50, 43, 36, ...
+        29, 22, 15, 23, 30, 37, 44, 51, ...
+        58, 59, 52, 45, 38, 31, 39, 46, ...
+        53, 60, 61, 54, 47, 55, 62, 63
+];
+
+fid_dering0 = fopen('./input_file/concat_b_1080p_jpege_r52.txt', 'r');
 fid_dering1 = fopen('./input_file/jpg_dec_coef_test_r67_hisi_r59_q4_dering1.txt', 'r');
 fid_var = fopen('./input_file/var_coef_test_r67.txt', 'r');
 fid_madi = fopen('./input_file/madi_coef_test_r67.txt', 'r');
-fid_out = fopen('dct_cmp_out.txt', 'w');
+fid_out = fopen('dct_coef_out_matlab_r74.txt', 'w');
 
-read_mtx = fscanf(fid_var, '%d', [width / 8, height / 8]);
-pic_var = read_mtx';
-
-read_mtx = fscanf(fid_madi, '%d', [width / 8, height / 8]);
-pic_madi = read_mtx';
-
-blk_num = 0;
+blk8_num = width * height / 64 * 1;
 out_flag = 0;
 
-for row = 1:16:height
-    for col = 1:16:width
-        for idx = 0:3
-            pos_x = col - 1 + rem(idx, 2) * 8;
-            pos_y = row - 1 + floor(idx / 2) * 8;
-            coef0 = fscanf(fid_dering0, '%d', [8, 8]);
-            coef1 = fscanf(fid_dering1, '%d', [8, 8]);
-            
-            if coef0(8, 8) == 4 && coef1(8, 8) == 0
-                out_flag = 1;
-            else
-                out_flag = 0;
-            end
-            
-            if out_flag == 1
-                blk8_x = pos_x / 8 + 1;
-                blk8_y = pos_y / 8 + 1;
-                fprintf(fid_out, "pos(%d, %d) DC %4d c0=%d c1=%d diff=%d var=%d madi=%d\n\n", ...
-                        pos_x, pos_y, coef0(1, 1), coef0(8, 8), coef1(8, 8), ...
-                        abs(coef0(8, 8) - coef1(8, 8)), ...
-                        pic_var(blk8_y, blk8_x), pic_madi(blk8_y, blk8_x));
-%                 fprintf(fid_out, "%4d %4d %4d %4d %4d %4d %4d %4d\n\n", coef0);
-            end
+for idx = 1:blk8_num
+    info = fscanf(fid_dering0, 'frame %d pos(%d, %d) dir %d var %d\n');
+    frm_num = info(1, 1);
+    pos_x = info(2, 1);
+    pos_y = info(3, 1);
+    dir = info(4, 1);
+    var = info(5, 1);
+    
+    coef0 = fscanf(fid_dering0, '%d', [8, 8]);
+    fscanf(fid_dering0, '\n');
+    coef_res = reshape(coef0, 64, 1);
+    
+    non_zero_cnt = 0;
+    for m = 37:64
+        raster_idx = zsantoraster(1, m) + 1;
+        if coef_res(raster_idx, 1) ~= 0
+            non_zero_cnt = non_zero_cnt + 1;
         end
     end
+
+    fprintf(fid_out, "frame %d pos(%d, %d) non_zero_cnt %d\n\n", ...
+            frm_num, pos_x, pos_y, non_zero_cnt);
 end
 
-
 fclose('all');
-fprintf("blk_num %d\n", blk_num);
+fprintf("blk8_num %d\n", blk8_num);
