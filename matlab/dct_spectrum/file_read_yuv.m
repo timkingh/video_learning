@@ -3,10 +3,10 @@ clc
 
 T = dctmtx(8);
 
-width = 1280;
-height = 720;
+width = 1920;
+height = 1080;
 
-[fid, msg] = fopen("F:\nfs\street_1080p_part.yuv", "r");
+[fid, msg] = fopen("F:\nfs\part\street_1080p_part.yuv", "r");
 if fid == -1
     disp(msg);
     return;
@@ -30,6 +30,8 @@ out_mtx = y_mtx';
 fclose(fid);
 
 out_blk = ones(8, 8, 2);
+
+out_mtx(145:160, 385:400)
 
 for index = 1:1
     blk = out_mtx(1:8, 465:472);
