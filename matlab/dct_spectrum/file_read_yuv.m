@@ -6,7 +6,7 @@ T = dctmtx(8);
 width = 1280;
 height = 720;
 
-[fid, msg] = fopen("F:\nfs\street_720p_out_42.yuv", "r");
+[fid, msg] = fopen("F:\nfs\street_1080p_part.yuv", "r");
 if fid == -1
     disp(msg);
     return;

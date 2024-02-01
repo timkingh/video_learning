@@ -19,11 +19,11 @@ max_bias = zeros(8, 8, 20);
 coef_cnt = zeros(8, 8);
 
 file_name = ".txt";
-path_name = ".\input_file\jpg_dec_street_1080p_part_hisi_r73_pos_392_144";
+path_name = ".\input_file\jpg_dec_street_1080p_part_hisi_r73_pos_384_152";
 xy_path = path_name + file_name;
 fid_out_xy = fopen(xy_path, 'w');
 
-for quant_value = 9:1:99
+for quant_value = 1:1:99
     qt_val = quant_value;
     qtable = ones(8, 8) .* qt_val;
     fprintf("qf %d\n", qt_val);
@@ -54,7 +54,7 @@ for quant_value = 9:1:99
                 fscanf(fid_dering0, '\n');
                 fscanf(fid_dering1, '\n');                 
 
-                if pos_x == 392 && pos_y == 144
+                if pos_x == 384 && pos_y == 152
                    for n = 1:8 % row
                         for m = 1:8 % col
                             if coef0(m, n) ~= coef1(m, n)
