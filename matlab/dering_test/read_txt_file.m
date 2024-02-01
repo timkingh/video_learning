@@ -18,14 +18,15 @@ height = 1080;
 max_bias = zeros(8, 8, 20);
 coef_cnt = zeros(8, 8);
 
-for quant_value = 10:1:10
+file_name = ".txt";
+path_name = ".\input_file\jpg_dec_street_1080p_part_hisi_r73_pos_392_144";
+xy_path = path_name + file_name;
+fid_out_xy = fopen(xy_path, 'w');
+
+for quant_value = 9:1:99
     qt_val = quant_value;
     qtable = ones(8, 8) .* qt_val;
-
-    file_name = ".txt";
-    path_name = ".\input_file\jpg_dec_street_1080p_part_hisi_r73_qf" + num2str(qt_val) + "_A";
-    xy_path = path_name + file_name;
-%     fid_out_xy = fopen(xy_path, 'w');
+    fprintf("qf %d\n", qt_val);
 
     file_path = ".\input_file\jpg_dec_street_1080p_part_hisi_r73_qf" + num2str(qt_val) + "_dering0.txt";
     [fid_dering0, msg] = fopen(file_path, 'r');
@@ -58,20 +59,22 @@ for quant_value = 10:1:10
                         for m = 1:8 % col
                             if coef0(m, n) ~= coef1(m, n)
                                 coef_cnt(m, n) = coef_cnt(m, n) + 1;
+                                fprintf(fid_out_xy, "qf %d coef(%d, %d) %d %d\n", ...
+                                        quant_value, n, m, coef0(m, n), coef1(m, n));
                             end  
                         end
                     end
-                end
-                
-
+                end               
             end
         end
     end
 
-    fclose('all');
+    fclose(fid_dering0);
+    fclose(fid_dering1);
 end
 
 coef_cnt'
 
 fprintf("finished\n");
+fclose(fid_out_xy);
 toc
