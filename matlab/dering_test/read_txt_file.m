@@ -22,21 +22,21 @@ file_name = ".txt";
 path_name = ".\input_file\jpg_dec_street_1080p_part_hisi_r73_pos_384_152";
 xy_path = path_name + file_name;
 fid_out_xy = fopen(xy_path, 'w');
-ret_mtx = zeros(256, 1);
+ret_mtx = zeros(2048, 1);
 
 for quant_value = 1:1:1
     qt_val = quant_value;
     qtable = ones(8, 8) .* qt_val;
     fprintf("qf %d\n", qt_val);
 
-    file_path = ".\dr0\ave.txt";
+    file_path = ".\dr0\madi.txt";
     [fid_dering0, msg] = fopen(file_path, 'r');
     if fid_dering0 == -1
         disp(msg);
         return;
     end
 
-    file_path = ".\dr1\ave.txt";
+    file_path = ".\dr1\madi.txt";
     [fid_dering1, msg] = fopen(file_path, 'r');
     if fid_dering1 == -1
         disp(msg);
@@ -50,8 +50,11 @@ for quant_value = 1:1:1
                 pos_y = row - 1 + floor(idx / 2) * 8;
                 ret0 = fscanf(fid_dering0, 'pos(%d, %d) %d\n', 3);
                 ret1 = fscanf(fid_dering1, 'pos(%d, %d) %d\n', 3);         
-                ret_diff = abs(ret0(3, 1) - ret1(3, 1));
+                ret_diff = (ret0(3, 1) - ret1(3, 1)) + 1024;
                 ret_mtx(ret_diff + 1, 1) = ret_mtx(ret_diff + 1, 1) + 1;
+                if (ret0(3, 1)) < ret1(3, 1)
+                    fprintf("pos(%d, %d)\n", ret0(1, 1), ret0(2, 1));
+                end
             end
         end
     end
@@ -60,7 +63,9 @@ for quant_value = 1:1:1
     fclose(fid_dering1);
 end
 
-stem(1:256, ret_mtx');
+ret_mtx(1025, 1) = 0;
+
+% stem(1:2048, ret_mtx');
 
 fprintf("finished\n");
 fclose(fid_out_xy);
