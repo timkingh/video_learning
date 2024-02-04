@@ -70,10 +70,25 @@ for r = 1:8
     fprintf("\n");
 end
 
-recon_pix = round(T' * coef_inv * T + 128)
-recon_dering = round(T' * coef_dering * T + 128)
-recon_delta = round(T' * coef_delta * T)
+recon_pix = round(T' * coef_inv * T + 128);
+recon_dering = round(T' * coef_dering * T + 128);
+recon_delta = round(T' * coef_delta * T);
+
+[pix_ave, pix_var] = calc_var(recon_pix, 8, 8)
+
+
+
+
 
 fprintf("\n");    
 
 toc
+
+
+
+
+
+
+
+
+
