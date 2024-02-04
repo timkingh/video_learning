@@ -1,6 +1,6 @@
 clear all
 close all
-% clc
+clc
 tic
 
 T = dctmtx(8);
@@ -13,6 +13,17 @@ qtable = [
      22  32  50  58  73  94 102  83 
      44  58  70  78  93 109 108  91 
      65  83  86  88 101  90  93  89 
+];
+
+qtable_delta = [
+     0 0 0 0 0 0 0 0
+     0 0 0 0 0 0 0 0
+     0 0 0 0 0 0 0 0
+     0 1 0 1 0 0 0 0
+     0 0 1 0 0 0 0 0
+     1 0 1 0 0 0 0 0
+     0 0 0 0 0 0 0 0
+     0 0 0 0 0 0 0 0
 ];
 
 blk16 = [
@@ -36,16 +47,32 @@ blk16 = [
 
 blk8 = blk16(1:8, 9:16);
 coef_r = zeros(8, 8);
+coef_inv = zeros(8, 8);
+coef_delta = zeros(8, 8);
+coef_dering = zeros(8, 8);
 
 coef = T * (blk8 - 128) * T';
 
 for r = 1:8
     for c = 1:8
         coef_r(r, c) = round(coef(r, c) / qtable(r, c));
-        fprintf("%8d ", coef_r(r, c));
+        coef_inv(r, c) = coef_r(r, c) * qtable(r, c);
+        fprintf("%8d ", coef_inv(r, c));
+        
+        if coef_r(r, c) > 0
+            coef_dering(r, c) = (coef_r(r, c) - qtable_delta(r, c)) * qtable(r, c);
+            coef_delta(r, c) = qtable_delta(r, c) * qtable(r, c) * (-1);
+        elseif coef_r(r, c) < 0
+            coef_dering(r, c) = (coef_r(r, c) + qtable_delta(r, c)) * qtable(r, c);
+            coef_delta(r, c) = qtable_delta(r, c) * qtable(r, c) * 1;
+        end
     end
     fprintf("\n");
 end
+
+recon_pix = round(T' * coef_inv * T + 128)
+recon_dering = round(T' * coef_dering * T + 128)
+recon_delta = round(T' * coef_delta * T)
 
 fprintf("\n");    
 
