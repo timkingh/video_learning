@@ -99,29 +99,31 @@ static void print_calc_result(CalcCtx *ctx, FILE *fp_out)
 {
     int stride = ctx->width / 8;
     int lines = ctx->height / 8;
-    int i, j;
+    int i, j, pos_x, pos_y;
     uint32_t value;
 
     for (i = 0; i < lines; i++) {
         for (j = 0; j < stride; j++) {
+            pos_x = j * 8;
+            pos_y = i * 8;
             value = *(ctx->frm_buf0 + j + i * stride);
-            FPRINT(ctx->fp_out[0], "%d ", value);
+            FPRINT(ctx->fp_out[0], "pos(%d, %d) %d\n", pos_x, pos_y, value);
 
             value = *(ctx->frm_buf1 + j + i * stride);
-            FPRINT(ctx->fp_out[1], "%d ", value);
+            FPRINT(ctx->fp_out[1], "pos(%d, %d) %d\n", pos_x, pos_y, value);
 
             value = *(ctx->frm_buf2 + j + i * stride);
-            FPRINT(ctx->fp_out[2], "%d ", value);
+            FPRINT(ctx->fp_out[2], "pos(%d, %d) %d\n", pos_x, pos_y, value);
 
             for (int k = 3; k < 6; k++) {
                 value = *(ctx->frm_buf[k] + j + i * stride);
-                FPRINT(ctx->fp_out[k], "%d ", value);
+                FPRINT(ctx->fp_out[k], "pos(%d, %d) %d\n", pos_x, pos_y, value);
             }
         }
 
-        for (int k = 0; k < 6; k++) {
-            FPRINT(ctx->fp_out[k], "\n");
-        }
+        // for (int k = 0; k < 6; k++) {
+        //     FPRINT(ctx->fp_out[k], "\n");
+        // }
     }
 }
 

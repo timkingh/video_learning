@@ -262,7 +262,7 @@ int main(int argc, char **argv)
     bool help = getarg(false, "-H", "--help", "-?");
     string in_file = getarg("/home/timkingh/yuv/street_720p_250frames.yuv", "-i", "--input");
     string out_file = getarg("/mnt/shared/street_1280x720_out.yuv", "-o", "--output");
-    ctx->coord_file = getarg("/mnt/shared/dir_out.txt", "-c", "--coordinate");
+    ctx->coord_file = getarg("/mnt/shared/dec_cmp_out.txt", "-c", "--coordinate");
     ctx->sad_file = getarg("F:\\rkvenc_verify\\cfg\\3903_720x576_150_1.sad", "-s", "--sad");
     ctx->width = getarg(1920, "-w", "--width");
     ctx->height = getarg(1080, "-h", "--height");

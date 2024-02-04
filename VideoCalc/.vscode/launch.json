@@ -10,9 +10,9 @@
             "request": "launch",
             "program": "${workspaceFolder}/VideoCalc",
             "args": [
-                "-i=/mnt/winshare/street_720p.yuv",
-                "-m=5", "--var_ratio_flg=1", "-w=1280", "-h=720",
-                "--frames=1", "-p=/mnt/shared/out_var_street_720p_2.txt"
+                "-i=/mnt/shared/concat_b_1080p_rk_r96_qf55_dr1_0000.yuv",
+                "-m=1", "--var_ratio_flg=1", "-w=1920", "-h=1080",
+                "--frames=1", "-p=/mnt/shared/var_coef_test_r64.txt"
             ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
