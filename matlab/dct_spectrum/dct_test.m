@@ -55,11 +55,34 @@ madi_dr_mtx = zeros(8, 8);
 
 coef = T * (blk8 - 128) * T';
 
-for row = 1:8
-    for col = 1:8
+for row = 1:1
+    for col = 1:4
         qtable_delta = zeros(8, 8);
-        qtable_delta(row, col) = 1;
-        
+        if col == 1
+            qtable_delta(6, 3) = 1;
+            qtable_delta(4, 4) = 1;
+            qtable_delta(4, 3) = 1;
+            qtable_delta(5, 4) = 1;
+        elseif col == 2
+            qtable_delta(6, 3) = 1;
+            qtable_delta(4, 4) = 1;
+            qtable_delta(5, 3) = 1;
+            qtable_delta(4, 3) = 1;
+        elseif col == 3
+            qtable_delta(4, 2) = 1;
+            qtable_delta(4, 4) = 1;
+            qtable_delta(5, 3) = 1;
+            qtable_delta(6, 1) = 1;
+            qtable_delta(6, 3) = 1;
+        else
+            qtable_delta(4, 2) = 1;
+            qtable_delta(4, 4) = 1;
+            qtable_delta(5, 3) = 1;
+            qtable_delta(6, 1) = 1;
+            qtable_delta(6, 3) = 1;
+            qtable_delta(4, 3) = 1;
+        end
+                
         for r = 1:8
             for c = 1:8
                 coef_r(r, c) = round(coef(r, c) / qtable(r, c));
@@ -80,6 +103,9 @@ for row = 1:8
         recon_pix = round(T' * coef_inv * T + 128);
         recon_dering = round(T' * coef_dering * T + 128);
         recon_delta = round(T' * coef_delta * T);
+        
+        blk_sse = calc_sse(blk8, recon_dering, 8, 8);
+        fprintf("blk_sse %d\n", blk_sse);
 
         [pix_ave, pix_var, pix_madi] = calc_var(recon_pix, 8, 8);
 
