@@ -50,35 +50,57 @@ coef_r = zeros(8, 8);
 coef_inv = zeros(8, 8);
 coef_delta = zeros(8, 8);
 coef_dering = zeros(8, 8);
+var_dr_mtx = zeros(8, 8);
+madi_dr_mtx = zeros(8, 8);
 
 coef = T * (blk8 - 128) * T';
 
-for r = 1:8
-    for c = 1:8
-        coef_r(r, c) = round(coef(r, c) / qtable(r, c));
-        coef_inv(r, c) = coef_r(r, c) * qtable(r, c);
-        fprintf("%8d ", coef_inv(r, c));
+for row = 1:8
+    for col = 1:8
+        qtable_delta = zeros(8, 8);
+        qtable_delta(row, col) = 1;
         
-        if coef_r(r, c) > 0
-            coef_dering(r, c) = (coef_r(r, c) - qtable_delta(r, c)) * qtable(r, c);
-            coef_delta(r, c) = qtable_delta(r, c) * qtable(r, c) * (-1);
-        elseif coef_r(r, c) < 0
-            coef_dering(r, c) = (coef_r(r, c) + qtable_delta(r, c)) * qtable(r, c);
-            coef_delta(r, c) = qtable_delta(r, c) * qtable(r, c) * 1;
+        for r = 1:8
+            for c = 1:8
+                coef_r(r, c) = round(coef(r, c) / qtable(r, c));
+                coef_inv(r, c) = coef_r(r, c) * qtable(r, c);
+%                 fprintf("%8d ", coef_inv(r, c));
+
+                if coef_r(r, c) > 0
+                    coef_dering(r, c) = (coef_r(r, c) - qtable_delta(r, c)) * qtable(r, c);
+                    coef_delta(r, c) = qtable_delta(r, c) * qtable(r, c) * (-1);
+                elseif coef_r(r, c) < 0
+                    coef_dering(r, c) = (coef_r(r, c) + qtable_delta(r, c)) * qtable(r, c);
+                    coef_delta(r, c) = qtable_delta(r, c) * qtable(r, c) * 1;
+                end
+            end
+%             fprintf("\n");
         end
+
+        recon_pix = round(T' * coef_inv * T + 128);
+        recon_dering = round(T' * coef_dering * T + 128);
+        recon_delta = round(T' * coef_delta * T);
+
+        [pix_ave, pix_var, pix_madi] = calc_var(recon_pix, 8, 8);
+
+        [pix_ave_dr, pix_var_dr, pix_madi_dr] = calc_var(recon_dering, 8, 8);
+        fprintf("delta(%d, %d) dering ave %d var %d madi %d\n", ...
+                row, col, pix_ave_dr, pix_var_dr, pix_madi_dr);
+            
+        var_dr_mtx(row, col) = pix_var_dr;
+        madi_dr_mtx(row, col) = pix_madi_dr;
     end
-    fprintf("\n");
 end
 
-recon_pix = round(T' * coef_inv * T + 128);
-recon_dering = round(T' * coef_dering * T + 128);
-recon_delta = round(T' * coef_delta * T);
+[min_v_col, row_arr] = min(var_dr_mtx);
+[min_v_row, col_arr] = min(min_v_col);
 
-[pix_ave, pix_var] = calc_var(recon_pix, 8, 8)
+fprintf("min_var_pos(%d, %d) %d\n", row_arr(col_arr), col_arr, min_v_row);
 
+[min_v_col, row_arr] = min(madi_dr_mtx);
+[min_v_row, col_arr] = min(min_v_col);
 
-
-
+fprintf("min_madi_pos(%d, %d) %d\n", row_arr(col_arr), col_arr, min_v_row);
 
 fprintf("\n");    
 
