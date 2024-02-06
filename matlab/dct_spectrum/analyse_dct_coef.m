@@ -17,7 +17,7 @@ qtable_delta = [
      0 0 0 0 0 0 0 0
 ];
 
-for qf = 50:59
+for qf = 1:99
     file_path = "D:\\code\\video_learning\\matlab\\dering_test\\input_file\\";
     file_path0 = file_path + "jpg_dec_street_1080p_part_hisi_r73_qf%d_dering0.txt";
     file_name = sprintf(file_path0, qf);
@@ -35,17 +35,16 @@ for qf = 50:59
         pos_y = pos0(iter, 2);
 
         coef_delta = zeros(8, 8);
-        count = 0;
         for r = 1:8
             for c = 1:8
-                if blk8_dr0(r, c) ~= blk8_dr1(r, c) && (qtable_delta(r, c) == 1)
-                    count = count + 1;
+                if blk8_dr0(r, c) ~= blk8_dr1(r, c)
+                    coef_delta(r, c) = 1;
                 end
             end
         end
 
-        if count >= 5
-            fprintf("qf %d pos(%d, %d) count %d\n", qf, pos_x, pos_y, count);
+        if isequal(qtable_delta, coef_delta)
+            fprintf("qf %d pos(%d, %d)\n", qf, pos_x, pos_y);
         end
     end
 end
