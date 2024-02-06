@@ -5,6 +5,7 @@ function out_mtx = open_yuv_file(file_path, width, height, fmt, seek);
 % height:
 % fmt: 'yuv420p', 'yuv422p'
 % seek: start from zero
+% out_mtx: height * width
 
 out_mtx = zeros(height, width);
 tmp_mtx = zeros(width, height);
