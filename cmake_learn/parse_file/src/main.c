@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<string.h>
+#include "hello.h"
 
 int main(int argc, char **argv)
 {
@@ -65,10 +66,10 @@ int main(int argc, char **argv)
 	    break;
 	}
     }
-    
+
     //fwrite(data + 1844967 + 614989, 1, 614989/*fileSize - idx*/, fp_output);
 
-    printf("%s line %d, idx:%d, jpeg_pos:%d\n", __func__, __LINE__, idx, jpeg_pos);    
+    printf("%s line %d, idx:%d, jpeg_pos:%d\n", __func__, __LINE__, idx, jpeg_pos);
     for(idx = 1; idx < jpeg_pos; idx++){
 	//printf("frame_%3d_length = %8d\n", idx, jpeg_length[idx]);
 	printf("%8d,", jpeg_length[idx]);
