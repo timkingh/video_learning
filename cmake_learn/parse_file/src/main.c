@@ -15,6 +15,7 @@ int main(int argc, char **argv)
     FILE *fp_output = NULL;
 
     printf("argc:%d, len:%u\n", argc, strlen(argv[1]));
+    print_hello();
 
     strncpy(input, argv[1], strlen(argv[1]));
     input[strlen(argv[1])] = '\0';
