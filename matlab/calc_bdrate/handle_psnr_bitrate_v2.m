@@ -15,7 +15,7 @@ yuv_list = textscan(fid_yuv, "%s\n");
 fclose(fid_yuv);
 
 bd_all = 0;
-nFileName = 35;
+nFileName = 39;
 file_step = 4;
 
 for i = 1:1:nFileName
@@ -31,25 +31,25 @@ for i = 1:1:nFileName
     PSNR_SRC2 = [psnr2((i-1)*file_step + 1), psnr2((i-1)*file_step + 2), ...
                  psnr2((i-1)*file_step + 3), psnr2((i-1)*file_step + 4)];
 
-    figure;
-    hold on
-    values = spcrv([[SRC1(1) SRC1 SRC1(end)];[PSNR_SRC1(1) PSNR_SRC1 PSNR_SRC1(end)]],3);
-    plot(values(1,:),values(2,:), 'r');
-    values = spcrv([[SRC2(1) SRC2 SRC2(end)];[PSNR_SRC2(1) PSNR_SRC2 PSNR_SRC2(end)]],3);
-    plot(values(1,:),values(2,:), 'b');
-    xlabel('Kbit rate')
-    ylabel('PSNR(dB)')
-    legend('org', 'new', 'Location','NorthWest')
-    grid on
-    x_min = floor(min([ min(SRC1); min(SRC2);]));
-    x_max = ceil(max([ max(SRC1); max(SRC2);]));
-    y_min = floor(min([ min(PSNR_SRC1); min(PSNR_SRC2);]));
-    y_max = ceil(max([ max(PSNR_SRC1); max(PSNR_SRC2);]));
-    x_stride = floor((x_max - x_min)/5);
-    y_stride = floor((y_max - y_min)/5);
-    set(gca, 'xtick', x_min:x_stride:x_max);
-    set(gca, 'ytick', y_min:y_stride:y_max);
-    title(strrep(yuv_list{1}{i},'_','\_'));
+%     figure;
+%     hold on
+%     values = spcrv([[SRC1(1) SRC1 SRC1(end)];[PSNR_SRC1(1) PSNR_SRC1 PSNR_SRC1(end)]],3);
+%     plot(values(1,:),values(2,:), 'r');
+%     values = spcrv([[SRC2(1) SRC2 SRC2(end)];[PSNR_SRC2(1) PSNR_SRC2 PSNR_SRC2(end)]],3);
+%     plot(values(1,:),values(2,:), 'b');
+%     xlabel('Kbit rate')
+%     ylabel('PSNR(dB)')
+%     legend('org', 'new', 'Location','NorthWest')
+%     grid on
+%     x_min = floor(min([ min(SRC1); min(SRC2);]));
+%     x_max = ceil(max([ max(SRC1); max(SRC2);]));
+%     y_min = floor(min([ min(PSNR_SRC1); min(PSNR_SRC2);]));
+%     y_max = ceil(max([ max(PSNR_SRC1); max(PSNR_SRC2);]));
+%     x_stride = floor((x_max - x_min)/5);
+%     y_stride = floor((y_max - y_min)/5);
+%     set(gca, 'xtick', x_min:x_stride:x_max);
+%     set(gca, 'ytick', y_min:y_stride:y_max);
+%     title(strrep(yuv_list{1}{i},'_','\_'));
 
     mode = 'rate';
     bd = bjontegaard2(SRC1,PSNR_SRC1,SRC2,PSNR_SRC2, mode, result_path);

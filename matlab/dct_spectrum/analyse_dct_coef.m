@@ -18,12 +18,12 @@ qtable_delta = [
 ];
 
 for qf = 1:99
-    file_path = "D:\\code\\video_learning\\matlab\\dering_test\\input_file\\";
-    file_path0 = file_path + "jpg_dec_street_1080p_part_hisi_r73_qf%d_dering0.txt";
+    file_path = "D:\\code\\video_learning\\matlab\\dering_test\\input_file\\log\\";
+    file_path0 = file_path + "jpg_dec_cannon_1080p_test0_part_hisi_r73_qf%d_dering0.txt";
     file_name = sprintf(file_path0, qf);
     [coef0, pos0] = open_jpeg_coef_file(file_name, width, height);
 
-    file_path1 = file_path + "jpg_dec_street_1080p_part_hisi_r73_qf%d_dering1.txt";
+    file_path1 = file_path + "jpg_dec_cannon_1080p_test0_part_hisi_r73_qf%d_dering0.txt";
     file_name = sprintf(file_path1, qf);
     [coef1, pos1] = open_jpeg_coef_file(file_name, width, height);
     fprintf("qf %d\n", qf);
