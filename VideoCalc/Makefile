@@ -1,6 +1,6 @@
 CC = g++
 OBJ = calc_hist.o calc_psnr.o calc_var.o quant_mtx.o common.o weight_yuv.o \
-      video_calc.o cdef_dir.o
+      video_calc.o cdef_dir.o parse_stream.o
 
 VideoCalc : $(OBJ)
 	${CC} -std=c++11 -o VideoCalc $(OBJ)
@@ -28,6 +28,9 @@ common.o : video_common.cpp video_common.h
 
 weight_yuv.o : weight_yuv.cpp weight_yuv.h
 	${CC} -std=c++11 -c weight_yuv.cpp -g -o weight_yuv.o
+
+parse_stream.o : parse_hview_av1_stream.cpp parse_hview_av1_stream.h
+	${CC} -std=c++11 -c parse_hview_av1_stream.cpp -g -o parse_stream.o
 
 clean :
 	rm -rf VideoCalc *.o

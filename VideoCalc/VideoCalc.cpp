@@ -6,6 +6,7 @@
 #include "calc_histogram.h"
 #include "weight_yuv.h"
 #include "quant_matrix.h"
+#include "parse_hview_av1_stream.h"
 
 using namespace std;
 
@@ -154,7 +155,8 @@ int main(int argc, char **argv)
         calc_histogram,
         weight_yuv,
         calc_quant_matrix,
-        cdef_find_dir
+        cdef_find_dir,
+        parse_hview_av1_stream
     };
 
     open_file(ctx);
