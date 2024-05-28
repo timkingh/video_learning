@@ -124,7 +124,7 @@ static RET parse_hview_stream_flag(ParseCtx *ps_ctx)
     for(uint32_t i = 0; i < ps_ctx->flag_cnt - 1; i++) {
         flag_len = ps_ctx->flag_pos[i+1] - ps_ctx->flag_pos[i];
         ps_ctx->flag_len[i] = flag_len;
-        printf("i %d flag_pos = 0x%x, flag_len = 0x%x\n", i, ps_ctx->flag_pos[i], flag_len);
+        // printf("i %d flag_pos = 0x%x, flag_len = 0x%x\n", i, ps_ctx->flag_pos[i], flag_len);
     }
 
     return RET_OK;
@@ -139,8 +139,11 @@ static RET parse_hview_stream_frame(ParseCtx *ps_ctx)
         for (uint32_t pos = 0; pos < ps_ctx->flag_len[i]; pos++) {
             td_buf = (uint16_t *)(ps_ctx->src_buf + ps_ctx->flag_pos[i] + pos);
 
-            /* 0x818 may be changed(20240528) */
-            if ((*td_buf == td_flag) && (ps_ctx->flag_len[i] != 0x818)) {
+            /* 0x818 may be changed(20240528)
+             * pos >= 24: skip the first 24 bytes(AVI info from h.view)
+             */
+            if ((*td_buf == td_flag) && (ps_ctx->flag_len[i] != 0x818) &&
+                (pos >= 24)) {
                 ps_ctx->strm_pos[ps_ctx->frame_cnt] = ps_ctx->flag_pos[i] + pos;
                 ps_ctx->strm_len[ps_ctx->frame_cnt] = ps_ctx->flag_pos[i+1] - ps_ctx->flag_pos[i] - pos;
                 ps_ctx->frame_cnt++;

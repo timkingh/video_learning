@@ -10,9 +10,9 @@
             "request": "launch",
             "program": "${workspaceFolder}/VideoCalc",
             "args": [
-                "-i=/home/timkingh/code/open_source/video_learning/VideoCalc/exec/2_av1.avi",
-                "-o=/home/timkingh/code/open_source/video_learning/VideoCalc/exec/test_out.ivf",
-                "-m=6", "-w=1920", "-h=1080", "-f=500"
+                "-i=/mnt/winshare/av1_stream/REC000T-20240527-141454-141754.avi",
+                "-o=/mnt/winshare/av1_stream/test_out.ivf",
+                "-m=6", "-w=1920", "-h=1080", "-f=50000"
             ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
