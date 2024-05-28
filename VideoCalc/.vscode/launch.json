@@ -10,9 +10,9 @@
             "request": "launch",
             "program": "${workspaceFolder}/VideoCalc",
             "args": [
-                "-i=/mnt/shared/concat_b_1080p_rk_r96_qf55_dr1_0000.yuv",
-                "-m=1", "--var_ratio_flg=1", "-w=1920", "-h=1080",
-                "--frames=1", "-p=/mnt/shared/var_coef_test_r64.txt"
+                "-i=/home/timkingh/code/open_source/video_learning/VideoCalc/exec/2_av1.avi",
+                "-o=/home/timkingh/code/open_source/video_learning/VideoCalc/exec/test_out.ivf",
+                "-m=6", "-w=1920", "-h=1080", "-f=500"
             ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
