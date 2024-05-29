@@ -11,6 +11,7 @@ typedef struct {
     uint32_t strm_pos[kMaxFrameNum];
     uint32_t strm_len[kMaxFrameNum];
     uint32_t frame_pos[kMaxFrameNum];
+    uint32_t frame_type[kMaxFrameNum]; /* 1 - key frame, 2 - inter frame */
     uint32_t flag_cnt;
     uint32_t frame_cnt;
     uint32_t write_frm_num;
@@ -160,6 +161,46 @@ static RET parse_hview_stream_frame(ParseCtx *ps_ctx)
     return RET_OK;
 }
 
+static RET parse_hview_stream_frame_v2(ParseCtx *ps_ctx)
+{
+    uint8_t *buf = ps_ctx->src_buf;
+    uint32_t *flag_buf = NULL;
+    uint32_t *flag_end = NULL;
+    uint32_t *frame_size = NULL;
+    uint32_t parse_len = 0;
+    uint32_t strm_pos = 0;
+    uint32_t flag_len = 0;
+
+    while(parse_len < ps_ctx->read_len) {
+        /* hview avi info: 24 bytes
+         * 10 11 15 01 c9 a2 00 00 ab ce da ba 8f 01 00 00 00 00 00 00 00 00 00 00
+         * 10 11 15 02 f9 20 01 00 ba ce da ba 8f 01 00 00 00 00 00 00 00 00 00 00
+         */
+        flag_buf = (uint32_t *)(buf + parse_len);
+        frame_size = (uint32_t *)(buf + parse_len + 4);
+        flag_end = (uint32_t *)(buf + parse_len + 20);
+
+        /* flag1: I frame ?? flag2: P frame ?? (20240528) */
+        if ((*flag_buf == flag1 || *flag_buf == flag2) &&
+            (*flag_end == 0) && (ps_ctx->flag_cnt < kMaxFrameNum)){
+            ps_ctx->strm_pos[ps_ctx->frame_cnt] = parse_len + 24;
+            ps_ctx->strm_len[ps_ctx->frame_cnt] = *frame_size;
+            ps_ctx->frame_type[ps_ctx->frame_cnt] = (*flag_buf == flag1) ? 1 : 2;
+            parse_len += 24;
+            ps_ctx->frame_cnt++;
+        }
+        parse_len++;
+    }
+
+    printf("frame_cnt = %d\n", ps_ctx->frame_cnt);
+    for(uint32_t i = 0; i < ps_ctx->frame_cnt; i++) {
+        // printf("frame %d type %d strm_pos = 0x%x, strm_len = 0x%x\n",
+        //        i, ps_ctx->frame_type[i], ps_ctx->strm_pos[i], ps_ctx->strm_len[i]);
+    }
+
+    return RET_OK;
+}
+
 static RET parse_hview_av1_stream_write(ParseCtx *ps_ctx)
 {
     uint8_t *buf = ps_ctx->src_buf;
@@ -208,6 +249,7 @@ RET parse_hview_av1_stream(CalcCtx *ctx)
         goto fail;
     }
 
+#if 0
     ret = parse_hview_stream_flag(&ps_ctx);
     if (ret != RET_OK) {
         printf("parse_hview_stream_flag failed\n");
@@ -219,6 +261,13 @@ RET parse_hview_av1_stream(CalcCtx *ctx)
         printf("parse_hview_stream_frame failed\n");
         goto fail;
     }
+#else
+    ret = parse_hview_stream_frame_v2(&ps_ctx);
+    if (ret != RET_OK) {
+        printf("parse_hview_stream_frame_v2 failed\n");
+        goto fail;
+    }
+#endif
 
     ret = parse_hview_av1_stream_write(&ps_ctx);
     if (ret != RET_OK) {
