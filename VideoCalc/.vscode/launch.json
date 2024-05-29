@@ -10,9 +10,9 @@
             "request": "launch",
             "program": "${workspaceFolder}/VideoCalc",
             "args": [
-                "-i=/mnt/winshare/av1_stream/REC000T-20240527-141454-141754.avi",
+                "-i=/mnt/winshare/av1_stream/1440p/REC000T-20240522-165621-165921.avi",
                 "-o=/mnt/winshare/av1_stream/test_out.ivf",
-                "-m=6", "-w=1920", "-h=1080", "-f=50000"
+                "-m=6", "-w=2560", "-h=1440", "-f=50000"
             ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

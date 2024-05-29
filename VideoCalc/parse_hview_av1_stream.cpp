@@ -21,6 +21,7 @@ typedef struct {
     uint32_t dst_len;
     uint32_t read_len;
     uint32_t write_len;
+	CalcCtx *calc_ctx;
     FILE *fp_in;
     FILE *fp_out;
 } ParseCtx;
@@ -70,6 +71,7 @@ static RET parse_hview_av1_stream_init(ParseCtx *ps_ctx, CalcCtx *calc_ctx)
     }
 
     ps_ctx->write_frm_num = calc_ctx->frames;
+	ps_ctx->calc_ctx = calc_ctx;
 
     return RET_OK;
 }
@@ -204,9 +206,18 @@ static RET parse_hview_stream_frame_v2(ParseCtx *ps_ctx)
 static RET parse_hview_av1_stream_write(ParseCtx *ps_ctx)
 {
     uint8_t *buf = ps_ctx->src_buf;
+	uint16_t *buf_wh = NULL;
+	uint32_t *frm_num = NULL;
     uint32_t write_len = 0;
 
+	buf_wh = (uint16_t *)(ivf_header + 12);
+	*buf_wh = (uint16_t)(ps_ctx->calc_ctx->width & 0xffff);
+	*(buf_wh + 1) = (uint16_t)(ps_ctx->calc_ctx->height & 0xffff);
+
+	frm_num = (uint32_t *)(ivf_header + 24);
+	*frm_num = ps_ctx->frame_cnt;
     write_len = fwrite(ivf_header, 1, 32, ps_ctx->fp_out);
+
     for(uint32_t i = 0; i < ps_ctx->frame_cnt; i++) {
         uint32_t *frm_size = (uint32_t *)(frm_header);
         uint64_t *timestamp = (uint64_t *)(frm_header + 4);
