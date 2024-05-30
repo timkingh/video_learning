@@ -120,6 +120,7 @@ int main(int argc, char **argv)
     ctx->width = getarg(1920, "-w", "--width");
     ctx->height = getarg(1080, "-h", "--height");
     ctx->frames = getarg(300, "-f", "--frames");
+    ctx->framerate = getarg(30, "--fps");
     ctx->mode = getarg(0, "-m", "--mode");
     ctx->var_ratio_flg = getarg(0, "--var_ratio_flg");
     ctx->log_frames = getarg(1, "--log_frames");

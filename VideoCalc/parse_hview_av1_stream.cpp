@@ -208,11 +208,15 @@ static RET parse_hview_av1_stream_write(ParseCtx *ps_ctx)
     uint8_t *buf = ps_ctx->src_buf;
 	uint16_t *buf_wh = NULL;
 	uint32_t *frm_num = NULL;
+	uint32_t *fps = NULL;
     uint32_t write_len = 0;
 
 	buf_wh = (uint16_t *)(ivf_header + 12);
 	*buf_wh = (uint16_t)(ps_ctx->calc_ctx->width & 0xffff);
 	*(buf_wh + 1) = (uint16_t)(ps_ctx->calc_ctx->height & 0xffff);
+
+	fps = (uint32_t *)(ivf_header + 16);
+	*fps = (uint32_t)(ps_ctx->calc_ctx->framerate & 0xffffffff);
 
 	frm_num = (uint32_t *)(ivf_header + 24);
 	*frm_num = ps_ctx->frame_cnt;

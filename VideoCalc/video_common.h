@@ -45,6 +45,7 @@ typedef struct {
 	uint32_t width;
 	uint32_t height;
 	uint32_t frames;
+    uint32_t framerate; /* fps */
 	uint32_t mode;
 	uint32_t var_ratio_flg;
 	uint32_t log_frames;
