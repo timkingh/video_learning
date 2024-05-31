@@ -56,7 +56,7 @@ static RET parse_hview_av1_stream_init(ParseCtx *ps_ctx, CalcCtx *calc_ctx)
     }
 
     ps_ctx->src_len = 256 * 1024 * 1024;
-    ps_ctx->dst_len = 256 * 1024 * 1024;
+    ps_ctx->dst_len = 2 * 1024 * 1024;
 
     ps_ctx->src_buf = (uint8_t *)calloc(ps_ctx->src_len, sizeof(uint8_t));
     if (ps_ctx->src_buf == NULL) {
