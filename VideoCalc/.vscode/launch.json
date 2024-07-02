@@ -10,9 +10,9 @@
             "request": "launch",
             "program": "${workspaceFolder}/VideoCalc",
             "args": [
-                "-i=/mnt/winshare/av1_stream/record/REC000T-20000105-080830-081006_1280x720.avi",
-                "-o=/mnt/winshare/av1_stream/record/REC000T-20000105-080830-081006_1280x720.ivf",
-                "-m=6", "-w=1280", "-h=720", "-f=50000"
+                "-i=/mnt/winshare/oqe/311_1080p_10000kbps_h265_300frames.yuv",
+                "-o=/mnt/winshare/311_1080p_10000kbps_h265_300frames_out.yuv",
+                "-m=7", "-w=1920", "-h=1080", "-f=300"
             ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
