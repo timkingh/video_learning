@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/ff_tools",
             "args": [
-                "--input=/home/timkingh/yuv/314_sw.h264"
+                "--input=/home/timkingh/yuv/311_1080p_10000kbps_h265_300frames.yuv"
             ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

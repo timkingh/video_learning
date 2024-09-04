@@ -142,9 +142,18 @@ static int open_input_yuv(DrawTextCtx *dtc)
     AVCodec *codec = NULL;
     AVFrame *frame = NULL;
     AVPacket packet;
+    const AVInputFormat *fmt = av_find_input_format("rawvideo");
+    // format_ctx = avformat_alloc_context();
+    AVDictionary *options = NULL;
+    av_dict_set(&options, "video_size", "1920x1080", 0);
+    av_dict_set(&options, "pixel_format", "yuv420p", 0);
 
-    format_ctx = avformat_alloc_context();
-    format_ctx->iformat = av_guess_format("rawvideo", NULL, NULL);
+    if ((ret = avformat_open_input(&format_ctx, dtc->in_filename, fmt, &options)) < 0) {
+        av_log(NULL, AV_LOG_ERROR, "Cannot open input file\n");
+        return ret;
+    }
+    video_stream_index = 0;
+    // format_ctx->iformat = av_guess_format("rawvideo", NULL, NULL);
 
     codec = avcodec_find_decoder_by_name("rawvideo");
     if (!codec) {
@@ -182,11 +191,11 @@ static int open_input_yuv(DrawTextCtx *dtc)
     //     return RET_NOK;;
     // }
 
-    // // 打开输入文件
-    // if (avio_open(&format_ctx->pb, dtc->in_filename, AVIO_FLAG_READ) < 0) {
-    //     fprintf(stderr, "Could not open input file\n");
-    //     return RET_NOK;
-    // }
+    // 打开输入文件
+    if (avio_open(&format_ctx->pb, dtc->in_filename, AVIO_FLAG_READ) < 0) {
+        fprintf(stderr, "Could not open input file\n");
+        return RET_NOK;
+    }
 
     // // 读取YUV数据并解码
     // while (av_read_frame(format_ctx, &packet) >= 0) {
@@ -207,6 +216,8 @@ static int open_input_yuv(DrawTextCtx *dtc)
 
     // // 清理
     // avcodec_free_context(&codec_ctx);
+
+    av_dict_free(&options);
     return ret;
 }
 
@@ -218,6 +229,8 @@ static int init_filters(DrawTextCtx *dtc, const char *filters_descr)
     const AVFilter *buffersink = avfilter_get_by_name("buffersink");
     AVFilterInOut *outputs = avfilter_inout_alloc();
     AVFilterInOut *inputs  = avfilter_inout_alloc();
+    AVRational time_base = dtc->is_yuv_input ? (AVRational){ 1, 25 } :
+                           dtc->fmt_ctx->streams[video_stream_index]->time_base;
     enum AVPixelFormat pix_fmts[] = { AV_PIX_FMT_GRAY8, AV_PIX_FMT_NONE };
 
     filter_graph = avfilter_graph_alloc();
@@ -228,8 +241,9 @@ static int init_filters(DrawTextCtx *dtc, const char *filters_descr)
 
     /* buffer video source: the decoded frames from the decoder will be inserted here. */
     snprintf(args, sizeof(args),
-            "video_size=%dx%d:pix_fmt=%d:pixel_aspect=%d/%d",
+            "video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d",
             dtc->dec_ctx->width, dtc->dec_ctx->height, dtc->dec_ctx->pix_fmt,
+            time_base.num, time_base.den,
             dtc->dec_ctx->sample_aspect_ratio.num, dtc->dec_ctx->sample_aspect_ratio.den);
 
     ret = avfilter_graph_create_filter(&buffersrc_ctx, buffersrc, "in",
