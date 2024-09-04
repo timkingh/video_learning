@@ -30,6 +30,7 @@ static RET tools_init(CliCtx *ctx, ToolsCtx *t)
 
     t->in_filename = ctx->in_filename.c_str();
     t->out_filename = ctx->out_filename.c_str();
+    t->frames = ctx->frames;
 
     return ret;
 }
@@ -61,7 +62,7 @@ int main(int argc, char **argv)
     ctx->height_in = getarg(1080, "-hi", "--height");
     ctx->width_out = getarg(ctx->width_in, "-wo");
     ctx->height_out = getarg(ctx->height_in, "-ho");
-    ctx->frames = getarg(10, "-f", "--frames");
+    ctx->frames = getarg(3, "-f", "--frames");
 
     cout << "input: " << ctx->in_filename << endl
          << "output: " << ctx->out_filename << endl

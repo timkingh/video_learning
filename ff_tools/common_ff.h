@@ -14,6 +14,7 @@ typedef struct {
     int width;
     int height;
     int fps;
+    int frames;
     FILE *fp_in;
     FILE *fp_out;
 } ToolsCtx;

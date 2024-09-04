@@ -59,12 +59,14 @@ typedef struct {
     int is_yuv_input;
     int width;
     int height;
+    int frames_to_filter;
+    int frm_cnt;
 
     FILE *fp_in;
     FILE *fp_out;
 } DrawTextCtx;
 
-const char *filter_descr = "scale=78:24,transpose=cclock";
+const char *filter_descr = "scale=1280:720,transpose=cclock";
 /* other way:
    scale=78:24 [scl]; [scl] transpose=cclock // assumes "[in]" and "[out]" to be input output pads respectively
  */
@@ -79,11 +81,18 @@ static RET draw_txt_filter_init(ToolsCtx *ctx, DrawTextCtx *dtc)
 {
     memset(dtc, 0, sizeof(DrawTextCtx));
     dtc->tools_ctx = ctx;
+    dtc->frames_to_filter = ctx->frames;
     dtc->in_filename = ctx->in_filename;
     dtc->out_filename = ctx->out_filename;
     dtc->width = ctx->width;
     dtc->height = ctx->height;
     dtc->is_yuv_input = 1;
+
+    dtc->fp_out = fopen(dtc->out_filename, "wb");
+    if (!dtc->fp_out) {
+        av_log(NULL, AV_LOG_ERROR, "Cannot open output file %s\n", dtc->out_filename);
+        return RET_NOK;
+    }
 
     return RET_OK;
 }
@@ -92,6 +101,11 @@ static RET draw_txt_filter_deinit(DrawTextCtx *dtc)
 {
     avcodec_free_context(&dtc->dec_ctx);
     avformat_close_input(&dtc->fmt_ctx);
+
+    if (dtc->fp_out) {
+        fclose(dtc->fp_out);
+        dtc->fp_out = NULL;
+    }
 
     return RET_OK;
 }
@@ -309,7 +323,7 @@ end:
     return ret;
 }
 
-static void display_frame(const AVFrame *frame, AVRational time_base)
+static void dump_frame(DrawTextCtx *dtc, const AVFrame *frame, AVRational time_base)
 {
     int x, y;
     uint8_t *p0, *p;
@@ -327,17 +341,9 @@ static void display_frame(const AVFrame *frame, AVRational time_base)
         last_pts = frame->pts;
     }
 
-    /* Trivial ASCII grayscale display. */
-    p0 = frame->data[0];
-    puts("\033c");
-    for (y = 0; y < frame->height; y++) {
-        p = p0;
-        for (x = 0; x < frame->width; x++)
-            putchar(" .-+#"[*(p++) / 52]);
-        putchar('\n');
-        p0 += frame->linesize[0];
+    if (dtc->fp_out) {
+        fwrite(frame->data[0], 1, frame->linesize[0] * frame->height, dtc->fp_out);
     }
-    fflush(stdout);
 }
 
 int draw_text_filter_ff(ToolsCtx *ctx)
@@ -351,7 +357,7 @@ int draw_text_filter_ff(ToolsCtx *ctx)
 
     ret = draw_txt_filter_init(ctx, dtc);
     if (ret != RET_OK) {
-        printf("%s line %d init failed\n", __FUNCTION__, __LINE__);
+        av_log(NULL, AV_LOG_ERROR, "drawtxt filter init failed\n");
         goto end;
     }
 
@@ -366,7 +372,7 @@ int draw_text_filter_ff(ToolsCtx *ctx)
     if (dtc->is_yuv_input) {
         ret = open_input_yuv(dtc);
         if (ret != RET_OK) {
-            printf("%s line %d open input yuv failed\n", __FUNCTION__, __LINE__);
+            av_log(NULL, AV_LOG_ERROR, "open input yuv %s failed\n", dtc->in_filename);
             goto end;
         }
     } else {
@@ -378,7 +384,7 @@ int draw_text_filter_ff(ToolsCtx *ctx)
         goto end;
 
     /* read all packets */
-    while (1) {
+    do {
         if ((ret = av_read_frame(dtc->fmt_ctx, packet)) < 0)
             break;
 
@@ -413,14 +419,15 @@ int draw_text_filter_ff(ToolsCtx *ctx)
                         break;
                     if (ret < 0)
                         goto end;
-                    display_frame(filt_frame, buffersink_ctx->inputs[0]->time_base);
+                    dump_frame(dtc, filt_frame, buffersink_ctx->inputs[0]->time_base);
                     av_frame_unref(filt_frame);
                 }
                 av_frame_unref(frame);
             }
         }
         av_packet_unref(packet);
-    }
+    } while (dtc->frm_cnt++ < dtc->frames_to_filter);
+
 end:
     avfilter_graph_free(&filter_graph);
     av_frame_free(&frame);
