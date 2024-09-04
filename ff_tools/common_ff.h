@@ -3,10 +3,10 @@
 
 #include <stdio.h>
 
-enum RET {
+typedef enum {
 	RET_NOK = -1,
 	RET_OK = 0,
-};
+} RET;
 
 typedef struct {
     const char *in_filename;

@@ -1,12 +1,14 @@
 # compiler and linker flags
 CC = gcc
 CXX = g++
-CFLAGS = -Wall -g -I /usr/local/ffmpeg/include \
-         -L /usr/local/ffmpeg/lib -lavformat -lavcodec \
-         -lavfilter -lavutil -lswscale -lswresample
-CXXFLAGS = -Wall -g -std=c++11 -I /usr/local/ffmpeg/include \
-         -L /usr/local/ffmpeg/lib -lavformat -lavcodec \
-         -lavfilter -lavutil -lswscale -lswresample
+CFLAGS = -Wall -g -I ./ffmpeg/include \
+         -L ./ffmpeg/lib -lavformat -lavcodec \
+         -lavfilter -lavutil -lswscale -lswresample \
+		 -Wl,-rpath,./ffmpeg/lib
+CXXFLAGS = -Wall -g -std=c++11 -I ./ffmpeg/include \
+         -L ./ffmpeg/lib -lavformat -lavcodec \
+         -lavfilter -lavutil -lswscale -lswresample \
+		 -Wl,-rpath,./ffmpeg/lib
 
 # source files
 C_SOURCES = $(wildcard *.c)

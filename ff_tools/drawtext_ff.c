@@ -46,37 +46,73 @@ extern "C" {
 
 #include "common_ff.h"
 
+typedef struct {
+    AVFormatContext *fmt_ctx;
+    AVCodecContext *dec_ctx;
+    AVFilterContext *buffersink_ctx;
+    AVFilterContext *buffersrc_ctx;
+    AVFilterGraph *filter_graph;
+
+    ToolsCtx *tools_ctx;
+    const char *in_filename;
+    const char *out_filename;
+    int is_yuv_input;
+    int width;
+    int height;
+
+    FILE *fp_in;
+    FILE *fp_out;
+} DrawTextCtx;
 
 const char *filter_descr = "scale=78:24,transpose=cclock";
 /* other way:
    scale=78:24 [scl]; [scl] transpose=cclock // assumes "[in]" and "[out]" to be input output pads respectively
  */
 
-static AVFormatContext *fmt_ctx;
-static AVCodecContext *dec_ctx;
 AVFilterContext *buffersink_ctx;
 AVFilterContext *buffersrc_ctx;
 AVFilterGraph *filter_graph;
 static int video_stream_index = -1;
 static int64_t last_pts = AV_NOPTS_VALUE;
 
-static int open_input_file(const char *filename)
+static RET draw_txt_filter_init(ToolsCtx *ctx, DrawTextCtx *dtc)
+{
+    memset(dtc, 0, sizeof(DrawTextCtx));
+    dtc->tools_ctx = ctx;
+    dtc->in_filename = ctx->in_filename;
+    dtc->out_filename = ctx->out_filename;
+    dtc->width = ctx->width;
+    dtc->height = ctx->height;
+    dtc->is_yuv_input = 1;
+
+    return RET_OK;
+}
+
+static RET draw_txt_filter_deinit(DrawTextCtx *dtc)
+{
+    avcodec_free_context(&dtc->dec_ctx);
+    avformat_close_input(&dtc->fmt_ctx);
+
+    return RET_OK;
+}
+
+static int open_input_file(DrawTextCtx *dtc)
 {
     const AVCodec *dec;
     int ret;
 
-    if ((ret = avformat_open_input(&fmt_ctx, filename, NULL, NULL)) < 0) {
+    if ((ret = avformat_open_input(&dtc->fmt_ctx, dtc->in_filename, NULL, NULL)) < 0) {
         av_log(NULL, AV_LOG_ERROR, "Cannot open input file\n");
         return ret;
     }
 
-    if ((ret = avformat_find_stream_info(fmt_ctx, NULL)) < 0) {
+    if ((ret = avformat_find_stream_info(dtc->fmt_ctx, NULL)) < 0) {
         av_log(NULL, AV_LOG_ERROR, "Cannot find stream information\n");
         return ret;
     }
 
     /* select the video stream */
-    ret = av_find_best_stream(fmt_ctx, AVMEDIA_TYPE_VIDEO, -1, -1, &dec, 0);
+    ret = av_find_best_stream(dtc->fmt_ctx, AVMEDIA_TYPE_VIDEO, -1, -1, &dec, 0);
     if (ret < 0) {
         av_log(NULL, AV_LOG_ERROR, "Cannot find a video stream in the input file\n");
         return ret;
@@ -84,13 +120,13 @@ static int open_input_file(const char *filename)
     video_stream_index = ret;
 
     /* create decoding context */
-    dec_ctx = avcodec_alloc_context3(dec);
-    if (!dec_ctx)
+    dtc->dec_ctx = avcodec_alloc_context3(dec);
+    if (!dtc->dec_ctx)
         return AVERROR(ENOMEM);
-    avcodec_parameters_to_context(dec_ctx, fmt_ctx->streams[video_stream_index]->codecpar);
+    avcodec_parameters_to_context(dtc->dec_ctx, dtc->fmt_ctx->streams[video_stream_index]->codecpar);
 
     /* init the video decoder */
-    if ((ret = avcodec_open2(dec_ctx, dec, NULL)) < 0) {
+    if ((ret = avcodec_open2(dtc->dec_ctx, dec, NULL)) < 0) {
         av_log(NULL, AV_LOG_ERROR, "Cannot open video decoder\n");
         return ret;
     }
@@ -98,7 +134,83 @@ static int open_input_file(const char *filename)
     return 0;
 }
 
-static int init_filters(const char *filters_descr)
+static int open_input_yuv(DrawTextCtx *dtc)
+{
+    RET ret = RET_OK;
+    AVFormatContext *format_ctx = NULL;
+    AVCodecContext *dec_ctx = NULL;
+    AVCodec *codec = NULL;
+    AVFrame *frame = NULL;
+    AVPacket packet;
+
+    format_ctx = avformat_alloc_context();
+    format_ctx->iformat = av_guess_format("rawvideo", NULL, NULL);
+
+    codec = avcodec_find_decoder_by_name("rawvideo");
+    if (!codec) {
+        fprintf(stderr, "Codec 'rawvideo' not found\n");
+        return RET_NOK;
+    }
+
+    // 分配解码器上下文
+    dec_ctx = avcodec_alloc_context3(codec);
+    if (!dec_ctx) {
+        fprintf(stderr, "Could not allocate video codec context\n");
+        return RET_NOK;
+    }
+
+    // 设置解码器上下文参数
+    dec_ctx->codec_id = codec->id; //AV_CODEC_ID_RAWVIDEO
+    dec_ctx->codec_type = AVMEDIA_TYPE_VIDEO;
+    dec_ctx->bit_rate = 400000; // 设置码率，对于rawvideo编解码器，这通常没有实际作用
+    dec_ctx->width = 1920;
+    dec_ctx->height = 1080;
+    dec_ctx->pix_fmt = AV_PIX_FMT_YUV420P; // 设置像素格式为YUV420P
+    dec_ctx->time_base = (AVRational){1, 25}; // 设置时间基，对于rawvideo编解码器，这通常没有实际作用
+    dec_ctx->framerate = (AVRational){25, 1}; // 设置帧率，对于rawvideo编解码器，这通常没有实际作用
+    dec_ctx->sample_aspect_ratio = (AVRational){1, 1}; // 设置采样率，对于rawvideo编解码器，这通常没有实际作用
+
+    if (avcodec_open2(dec_ctx, codec, NULL) < 0) {
+        fprintf(stderr, "Could not open codec\n");
+        return RET_NOK;
+    }
+
+    // // 分配并初始化一个AVFrame
+    // frame = av_frame_alloc();
+    // if (!frame) {
+    //     fprintf(stderr, "Could not allocate video frame\n");
+    //     return RET_NOK;;
+    // }
+
+    // // 打开输入文件
+    // if (avio_open(&format_ctx->pb, dtc->in_filename, AVIO_FLAG_READ) < 0) {
+    //     fprintf(stderr, "Could not open input file\n");
+    //     return RET_NOK;
+    // }
+
+    // // 读取YUV数据并解码
+    // while (av_read_frame(format_ctx, &packet) >= 0) {
+    //     // 解码过程...
+    //     // 注意：这里你需要手动处理YUV数据的读取和填充到AVPacket结构中
+
+    //     // 释放AVPacket
+    //     av_packet_unref(&packet);
+    // }
+
+    // // 清理和关闭
+    // av_frame_free(&frame);
+    // avcodec_close(codec_ctx);
+    // avformat_close_input(&format_ctx);
+
+    dtc->fmt_ctx = format_ctx;
+    dtc->dec_ctx = dec_ctx;
+
+    // // 清理
+    // avcodec_free_context(&codec_ctx);
+    return ret;
+}
+
+static int init_filters(DrawTextCtx *dtc, const char *filters_descr)
 {
     char args[512];
     int ret = 0;
@@ -106,7 +218,6 @@ static int init_filters(const char *filters_descr)
     const AVFilter *buffersink = avfilter_get_by_name("buffersink");
     AVFilterInOut *outputs = avfilter_inout_alloc();
     AVFilterInOut *inputs  = avfilter_inout_alloc();
-    AVRational time_base = fmt_ctx->streams[video_stream_index]->time_base;
     enum AVPixelFormat pix_fmts[] = { AV_PIX_FMT_GRAY8, AV_PIX_FMT_NONE };
 
     filter_graph = avfilter_graph_alloc();
@@ -117,10 +228,9 @@ static int init_filters(const char *filters_descr)
 
     /* buffer video source: the decoded frames from the decoder will be inserted here. */
     snprintf(args, sizeof(args),
-            "video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d",
-            dec_ctx->width, dec_ctx->height, dec_ctx->pix_fmt,
-            time_base.num, time_base.den,
-            dec_ctx->sample_aspect_ratio.num, dec_ctx->sample_aspect_ratio.den);
+            "video_size=%dx%d:pix_fmt=%d:pixel_aspect=%d/%d",
+            dtc->dec_ctx->width, dtc->dec_ctx->height, dtc->dec_ctx->pix_fmt,
+            dtc->dec_ctx->sample_aspect_ratio.num, dtc->dec_ctx->sample_aspect_ratio.den);
 
     ret = avfilter_graph_create_filter(&buffersrc_ctx, buffersrc, "in",
                                        args, NULL, filter_graph);
@@ -218,10 +328,18 @@ static void display_frame(const AVFrame *frame, AVRational time_base)
 
 int draw_text_filter_ff(ToolsCtx *ctx)
 {
-    int ret;
+    DrawTextCtx draw_text_ctx;
+    DrawTextCtx *dtc = &draw_text_ctx;
     AVPacket *packet;
     AVFrame *frame;
     AVFrame *filt_frame;
+    int ret;
+
+    ret = draw_txt_filter_init(ctx, dtc);
+    if (ret != RET_OK) {
+        printf("%s line %d init failed\n", __FUNCTION__, __LINE__);
+        goto end;
+    }
 
     frame = av_frame_alloc();
     filt_frame = av_frame_alloc();
@@ -231,25 +349,34 @@ int draw_text_filter_ff(ToolsCtx *ctx)
         exit(1);
     }
 
-    if ((ret = open_input_file(ctx->in_filename)) < 0)
-        goto end;
-    if ((ret = init_filters(filter_descr)) < 0)
+    if (dtc->is_yuv_input) {
+        ret = open_input_yuv(dtc);
+        if (ret != RET_OK) {
+            printf("%s line %d open input yuv failed\n", __FUNCTION__, __LINE__);
+            goto end;
+        }
+    } else {
+        if ((ret = open_input_file(dtc)) < 0)
+            goto end;
+    }
+
+    if ((ret = init_filters(dtc, filter_descr)) < 0)
         goto end;
 
     /* read all packets */
     while (1) {
-        if ((ret = av_read_frame(fmt_ctx, packet)) < 0)
+        if ((ret = av_read_frame(dtc->fmt_ctx, packet)) < 0)
             break;
 
         if (packet->stream_index == video_stream_index) {
-            ret = avcodec_send_packet(dec_ctx, packet);
+            ret = avcodec_send_packet(dtc->dec_ctx, packet);
             if (ret < 0) {
                 av_log(NULL, AV_LOG_ERROR, "Error while sending a packet to the decoder\n");
                 break;
             }
 
             while (ret >= 0) {
-                ret = avcodec_receive_frame(dec_ctx, frame);
+                ret = avcodec_receive_frame(dtc->dec_ctx, frame);
                 if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
                     break;
                 } else if (ret < 0) {
@@ -282,8 +409,6 @@ int draw_text_filter_ff(ToolsCtx *ctx)
     }
 end:
     avfilter_graph_free(&filter_graph);
-    avcodec_free_context(&dec_ctx);
-    avformat_close_input(&fmt_ctx);
     av_frame_free(&frame);
     av_frame_free(&filt_frame);
     av_packet_free(&packet);
@@ -293,5 +418,7 @@ end:
         exit(1);
     }
 
-    exit(0);
+    draw_txt_filter_deinit(dtc);
+
+    return ret;
 }
