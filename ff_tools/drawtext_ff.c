@@ -46,6 +46,9 @@ extern "C" {
 
 #include "common_ff.h"
 
+#define MAX_FILTER_DESC_LEN  (4 * 1024 * 1024)
+#define MAX_STR_LEN          (1024)
+
 typedef struct {
     AVFormatContext *fmt_ctx;
     AVCodecContext *dec_ctx;
@@ -56,6 +59,7 @@ typedef struct {
     ToolsCtx *tools_ctx;
     const char *in_filename;
     const char *out_filename;
+    char *filter_descr;
     int is_yuv_input;
     int width;
     int height;
@@ -66,7 +70,7 @@ typedef struct {
     FILE *fp_out;
 } DrawTextCtx;
 
-const char *filter_descr = "scale=3840:2160,drawtext=fontfile=/usr/share/fonts/truetype/freefont/FreeSans.ttf:fontsize=10:text='1234567890':fontcolor=red:x=10:y=10:enable='between(t,0,10)';";
+const char *filter_descr = "scale=3840:2160,drawtext=fontfile=/usr/share/fonts/truetype/freefont/FreeSans.ttf:fontsize=10:text='1234567890':fontcolor=red:x=10:y=10,drawtext=fontfile=/usr/share/fonts/truetype/freefont/FreeSans.ttf:fontsize=10:text='test':x=20:y=20:fontcolor=red";
 /* other way:
    scale=78:24 [scl]; [scl] transpose=cclock // assumes "[in]" and "[out]" to be input output pads respectively
  */
@@ -94,6 +98,12 @@ static RET draw_txt_filter_init(ToolsCtx *ctx, DrawTextCtx *dtc)
         return RET_NOK;
     }
 
+    dtc->filter_descr = (char *)malloc(MAX_FILTER_DESC_LEN);
+    if (!dtc->filter_descr) {
+        av_log(NULL, AV_LOG_ERROR, "Cannot allocate filter description\n");
+        return RET_NOK;
+    }
+
     return RET_OK;
 }
 
@@ -105,6 +115,11 @@ static RET draw_txt_filter_deinit(DrawTextCtx *dtc)
     if (dtc->fp_out) {
         fclose(dtc->fp_out);
         dtc->fp_out = NULL;
+    }
+
+    if (dtc->filter_descr) {
+        free(dtc->filter_descr);
+        dtc->filter_descr = NULL;
     }
 
     return RET_OK;
@@ -348,6 +363,25 @@ static void dump_frame(DrawTextCtx *dtc, const AVFrame *frame, AVRational time_b
     }
 }
 
+static int build_filter_descr(DrawTextCtx *dtc)
+{
+    static const char *fontfile = "fontfile=/usr/share/fonts/truetype/freefont/FreeSans.ttf:"
+                "fontsize=10:fontcolor=red:";
+    char *dst = dtc->filter_descr;
+    int len = 0, idx;
+
+    len += snprintf(dst + len, MAX_STR_LEN, "scale=%d:%d,", dtc->width, dtc->height);
+    for (idx = 0; idx < 5; idx++) {
+        if (len < MAX_FILTER_DESC_LEN - MAX_STR_LEN) {
+            len += snprintf(dst + len, MAX_STR_LEN, "drawtext=%s", fontfile);
+            len += snprintf(dst + len, MAX_STR_LEN, "text='text'%d:x=%d:y=%d,",
+                            idx, idx * 16, idx * 16);
+        }
+    }
+
+    return RET_OK;
+}
+
 int draw_text_filter_ff(ToolsCtx *ctx)
 {
     DrawTextCtx draw_text_ctx;
@@ -382,7 +416,9 @@ int draw_text_filter_ff(ToolsCtx *ctx)
             goto end;
     }
 
-    if ((ret = init_filters(dtc, filter_descr)) < 0)
+    build_filter_descr(dtc);
+
+    if ((ret = init_filters(dtc, dtc->filter_descr)) < 0)
         goto end;
 
     /* read all packets */
@@ -407,16 +443,6 @@ int draw_text_filter_ff(ToolsCtx *ctx)
                 }
 
                 frame->pts = frame->best_effort_timestamp;
-
-                // 在将帧发送到滤镜图之前，更新滤镜参数
-                char args[512];
-                if (dtc->frm_cnt < 1)
-                    snprintf(args, sizeof(args), "10");
-                else
-                    snprintf(args, sizeof(args), "20");
-
-
-                avfilter_graph_send_command(filter_graph, "drawtext", "x", args, NULL, 0, 0);
 
                 /* push the decoded frame into the filtergraph */
                 if (av_buffersrc_add_frame_flags(buffersrc_ctx, frame, AV_BUFFERSRC_FLAG_KEEP_REF) < 0) {
