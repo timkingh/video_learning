@@ -4,7 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/local/ffmpeg/include"
+                "${workspaceFolder}/ffmpeg/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

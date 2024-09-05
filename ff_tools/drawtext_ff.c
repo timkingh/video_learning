@@ -66,7 +66,7 @@ typedef struct {
     FILE *fp_out;
 } DrawTextCtx;
 
-const char *filter_descr = "scale=1280:720,transpose=cclock";
+const char *filter_descr = "scale=3840:2160,drawtext=fontfile=/usr/share/fonts/truetype/freefont/FreeSans.ttf:fontsize=10:text='1234567890':fontcolor=red:x=10:y=10:enable='between(t,0,10)';";
 /* other way:
    scale=78:24 [scl]; [scl] transpose=cclock // assumes "[in]" and "[out]" to be input output pads respectively
  */
@@ -245,7 +245,7 @@ static int init_filters(DrawTextCtx *dtc, const char *filters_descr)
     AVFilterInOut *inputs  = avfilter_inout_alloc();
     AVRational time_base = dtc->is_yuv_input ? (AVRational){ 1, 25 } :
                            dtc->fmt_ctx->streams[video_stream_index]->time_base;
-    enum AVPixelFormat pix_fmts[] = { AV_PIX_FMT_GRAY8, AV_PIX_FMT_NONE };
+    enum AVPixelFormat pix_fmts[] = { AV_PIX_FMT_YUV420P, AV_PIX_FMT_NONE };
 
     filter_graph = avfilter_graph_alloc();
     if (!outputs || !inputs || !filter_graph) {
@@ -343,6 +343,8 @@ static void dump_frame(DrawTextCtx *dtc, const AVFrame *frame, AVRational time_b
 
     if (dtc->fp_out) {
         fwrite(frame->data[0], 1, frame->linesize[0] * frame->height, dtc->fp_out);
+        fwrite(frame->data[1], 1, frame->linesize[1] * frame->height / 2, dtc->fp_out);
+        fwrite(frame->data[2], 1, frame->linesize[2] * frame->height / 2, dtc->fp_out);
     }
 }
 
@@ -406,6 +408,16 @@ int draw_text_filter_ff(ToolsCtx *ctx)
 
                 frame->pts = frame->best_effort_timestamp;
 
+                // 在将帧发送到滤镜图之前，更新滤镜参数
+                char args[512];
+                if (dtc->frm_cnt < 1)
+                    snprintf(args, sizeof(args), "10");
+                else
+                    snprintf(args, sizeof(args), "20");
+
+
+                avfilter_graph_send_command(filter_graph, "drawtext", "x", args, NULL, 0, 0);
+
                 /* push the decoded frame into the filtergraph */
                 if (av_buffersrc_add_frame_flags(buffersrc_ctx, frame, AV_BUFFERSRC_FLAG_KEEP_REF) < 0) {
                     av_log(NULL, AV_LOG_ERROR, "Error while feeding the filtergraph\n");
@@ -427,6 +439,8 @@ int draw_text_filter_ff(ToolsCtx *ctx)
         }
         av_packet_unref(packet);
     } while (dtc->frm_cnt++ < dtc->frames_to_filter);
+
+    av_log(NULL, AV_LOG_INFO, "Filtered %d frames\n", dtc->frm_cnt);
 
 end:
     avfilter_graph_free(&filter_graph);
