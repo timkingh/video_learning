@@ -31,6 +31,8 @@ static RET tools_init(CliCtx *ctx, ToolsCtx *t)
     t->in_filename = ctx->in_filename.c_str();
     t->out_filename = ctx->out_filename.c_str();
     t->frames = ctx->frames;
+    t->width = ctx->width_in;
+    t->height = ctx->height_in;
 
     return ret;
 }
