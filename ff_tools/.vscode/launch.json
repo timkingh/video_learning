@@ -10,8 +10,10 @@
             "request": "launch",
             "program": "${workspaceFolder}/ff_tools",
             "args": [
-                "--input=/home/timkingh/yuv/311_1080p_10000kbps_h265_300frames.yuv"
+                "--input=/home/timkingh/yuv/311_1080p_10000kbps_h265_300frames.yuv",
+                "--frames=2"
             ],
+            "preLaunchTask": "build",
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],

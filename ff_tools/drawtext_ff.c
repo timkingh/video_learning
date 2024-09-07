@@ -50,6 +50,15 @@ extern "C" {
 #define MAX_STR_LEN          (1024)
 
 typedef struct {
+    int x, y;
+    int blk_size_madi;
+    int blk_size_madp;
+    int node_id;
+    int madi;
+    int madp;
+} Node;
+
+typedef struct {
     AVFormatContext *fmt_ctx;
     AVCodecContext *dec_ctx;
     AVFilterContext *buffersink_ctx;
@@ -60,7 +69,17 @@ typedef struct {
     ToolsCtx *tools_ctx;
     const char *in_filename;
     const char *out_filename;
+    Node *node_list;
+    int node_num;
+    int node_max_num;
     char *filter_descr;
+    unsigned char *cur_frm_data;
+    unsigned char *ref_frm_data;
+    unsigned char *cur_frm;
+    unsigned char *ref_frm;
+    int linesize;
+    int blk_size_madi;
+    int blk_size_madp;
     int is_yuv_input;
     int width;
     int height;
@@ -73,6 +92,8 @@ typedef struct {
 
 static RET draw_txt_filter_init(ToolsCtx *ctx, DrawTextCtx *dtc)
 {
+    int width_align, height_align;
+
     memset(dtc, 0, sizeof(DrawTextCtx));
     dtc->tools_ctx = ctx;
     dtc->frames_to_filter = ctx->frames;
@@ -82,6 +103,11 @@ static RET draw_txt_filter_init(ToolsCtx *ctx, DrawTextCtx *dtc)
     dtc->height = ctx->height;
     dtc->is_yuv_input = 1;
     dtc->video_stream_index = -1;
+    dtc->linesize = FFALIGN(dtc->width, 32);
+    dtc->blk_size_madi = 16;
+    dtc->blk_size_madp = 32;
+    width_align = FFALIGN(dtc->width, 32);
+    height_align = FFALIGN(dtc->height, 32);
 
     dtc->fp_out = fopen(dtc->out_filename, "wb");
     if (!dtc->fp_out) {
@@ -89,9 +115,31 @@ static RET draw_txt_filter_init(ToolsCtx *ctx, DrawTextCtx *dtc)
         return RET_NOK;
     }
 
-    dtc->filter_descr = (char *)malloc(MAX_FILTER_DESC_LEN);
+    dtc->filter_descr = (char *)calloc(1, MAX_FILTER_DESC_LEN);
     if (!dtc->filter_descr) {
         av_log(NULL, AV_LOG_ERROR, "Cannot allocate filter description\n");
+        return RET_NOK;
+    }
+
+    dtc->cur_frm_data = (unsigned char *)calloc(1, width_align * height_align * 3 / 2);
+    if (!dtc->cur_frm_data) {
+        av_log(NULL, AV_LOG_ERROR, "Cannot allocate current frame data\n");
+        return RET_NOK;
+    }
+
+    dtc->ref_frm_data = (unsigned char *)calloc(1, width_align * height_align * 3 / 2);
+    if (!dtc->ref_frm_data) {
+        av_log(NULL, AV_LOG_ERROR, "Cannot allocate reference frame data\n");
+        return RET_NOK;
+    }
+
+    dtc->cur_frm = dtc->cur_frm_data;
+    dtc->ref_frm = dtc->ref_frm_data;
+
+    dtc->node_max_num = width_align * height_align / (8 * 8);
+    dtc->node_list = (Node *)calloc(dtc->node_max_num, sizeof(Node));
+    if (!dtc->node_list) {
+        av_log(NULL, AV_LOG_ERROR, "Cannot allocate node list\n");
         return RET_NOK;
     }
 
@@ -111,6 +159,21 @@ static RET draw_txt_filter_deinit(DrawTextCtx *dtc)
     if (dtc->filter_descr) {
         free(dtc->filter_descr);
         dtc->filter_descr = NULL;
+    }
+
+    if (dtc->cur_frm_data) {
+        free(dtc->cur_frm_data);
+        dtc->cur_frm_data = NULL;
+    }
+
+    if (dtc->ref_frm_data) {
+        free(dtc->ref_frm_data);
+        dtc->ref_frm_data = NULL;
+    }
+
+    if (dtc->node_list) {
+        free(dtc->node_list);
+        dtc->node_list = NULL;
     }
 
     return RET_OK;
@@ -308,16 +371,28 @@ static int build_filter_descr(DrawTextCtx *dtc)
     static const char *fontfile = "fontfile=/usr/share/fonts/truetype/freefont/FreeSans.ttf:"
                 "fontsize=18:fontcolor=red:";
     char *dst = dtc->filter_descr;
-    int len = 0, idx;
+    Node *node = dtc->node_list;
+    int len = 0, idx, text_num = 0;
+    int scale = 2;
+    int madi_thd = 1;
 
-    len += snprintf(dst + len, MAX_STR_LEN, "scale=%d:%d,", dtc->width, dtc->height);
-    for (idx = 0; idx < (dtc->frm_cnt < 2 ? 5 : 8) ; idx++) {
-        if (len < MAX_FILTER_DESC_LEN - MAX_STR_LEN) {
+    av_log(NULL, AV_LOG_INFO, "frame %d total text num %d\n", dtc->frm_cnt, dtc->node_num);
+
+    len += snprintf(dst + len, MAX_STR_LEN, "scale=%d:%d,",
+                    dtc->width * scale, dtc->height * scale);
+    for (idx = 0; idx < dtc->node_num; idx++) {
+        if ((len < MAX_FILTER_DESC_LEN - MAX_STR_LEN) && (node->madi > madi_thd)) {
             len += snprintf(dst + len, MAX_STR_LEN, "drawtext=%s", fontfile);
-            len += snprintf(dst + len, MAX_STR_LEN, "text=%03d:x=%d:y=%d,",
-                            idx, 480 + idx * 32 + 1, 480 +idx * 32 + 1);
+            len += snprintf(dst + len, MAX_STR_LEN, "text=%3d:x=%d:y=%d,",
+                            node->madi, node->x * scale, node->y * scale);
+            text_num++;
+
         }
+        node++;
     }
+
+    av_log(NULL, AV_LOG_INFO, "frame %d draw text num %d (madi > %d)\n",
+           dtc->frm_cnt, text_num, madi_thd);
 
     return RET_OK;
 }
@@ -334,6 +409,93 @@ static int build_filter(DrawTextCtx *dtc)
     }
 
     return ret;
+}
+
+static RET store_yuv_frame(DrawTextCtx *dtc, AVFrame *frame)
+{
+    int w = dtc->width;
+    int h = dtc->height;
+    int w32 = FFALIGN(dtc->width, 32);
+    int h32 = FFALIGN(dtc->height, 32);
+    int linesize = dtc->linesize;
+    int i, k;
+
+    dtc->ref_frm = dtc->cur_frm;
+
+    for (i = 0; i < h32; i++) {
+        memcpy(dtc->cur_frm + i * linesize,
+               frame->data[0] + i * frame->linesize[0], w);
+
+        if (w32 > w) {
+            for (k = 0; k < w32 - w; k++)
+                dtc->cur_frm[i * linesize + w + k] = dtc->cur_frm[i * linesize + w - 1];
+        }
+    }
+
+    if (h32 > h) {
+        for (k = 0; k < h32 - h; k++)
+            memcpy(dtc->cur_frm + (h + k) * linesize,
+                   dtc->cur_frm + (h - 1) * linesize, w32);
+    }
+
+    return RET_OK;
+}
+
+static int calc_block_madi(uint8_t *src, int stride, int blk_size)
+{
+    int ave, sum = 0, madi = 0;
+    int i, j;
+
+
+    for (i = 0; i < blk_size; i++) {
+        for (j = 0; j < blk_size; j++) {
+            sum += src[i * stride + j];
+        }
+    }
+
+    ave = sum / (blk_size * blk_size);
+
+    for (i = 0; i < blk_size; i++) {
+        for (j = 0; j < blk_size; j++) {
+            madi += abs(src[i * stride + j] - ave);
+        }
+    }
+
+    return madi / (blk_size * blk_size);
+}
+
+static RET calc_frame_madi(DrawTextCtx *dtc)
+{
+    Node *node = dtc->node_list;
+    int madi_size = dtc->blk_size_madi;
+    uint8_t *src = NULL;
+    int i, j;
+
+    dtc->node_num = 0;
+    for (i = 0; i < dtc->height; i += madi_size) {
+        for (j = 0; j < dtc->width; j += madi_size) {
+            src = dtc->cur_frm + i * dtc->linesize + j;
+            node->x = j;
+            node->y = i;
+            node->blk_size_madi = madi_size;
+            node->node_id = dtc->node_num++;
+            node->madi = calc_block_madi(src, dtc->linesize, madi_size);
+            av_log(NULL, AV_LOG_DEBUG, "(%d, %d) node_id %d madi %d\n",
+                   node->x, node->y, node->node_id, node->madi);
+            node++;
+        }
+    }
+
+    return RET_OK;
+}
+
+static RET calc_madi_madp(DrawTextCtx *dtc, AVFrame *frame)
+{
+    store_yuv_frame(dtc, frame);
+
+    calc_frame_madi(dtc);
+
+    return RET_OK;
 }
 
 static void dump_frame(DrawTextCtx *dtc, const AVFrame *frame)
@@ -384,18 +546,6 @@ int draw_text_filter_ff(ToolsCtx *ctx)
         if ((ret = av_read_frame(dtc->fmt_ctx, packet)) < 0)
             break;
 
-        // // 读取YUV数据并解码
-        // while (av_read_frame(format_ctx, &packet) >= 0) {
-        //     // 解码过程...
-        //     // 注意：这里你需要手动处理YUV数据的读取和填充到AVPacket结构中
-
-        //     // 释放AVPacket
-        //     av_packet_unref(&packet);
-        // }
-
-        if (build_filter(dtc) != RET_OK)
-            break;
-
         if (packet->stream_index == dtc->video_stream_index) {
             ret = avcodec_send_packet(dtc->dec_ctx, packet);
             if (ret < 0) {
@@ -412,6 +562,9 @@ int draw_text_filter_ff(ToolsCtx *ctx)
                     goto end;
                 }
 
+                calc_madi_madp(dtc, frame);
+                if (build_filter(dtc) != RET_OK)
+                    break;
                 frame->pts = frame->best_effort_timestamp;
 
                 /* push the decoded frame into the filtergraph */
@@ -438,7 +591,7 @@ int draw_text_filter_ff(ToolsCtx *ctx)
 
         av_packet_unref(packet);
         avfilter_graph_free(&dtc->filter_graph);
-    } while (dtc->frm_cnt++ < dtc->frames_to_filter);
+    } while (++dtc->frm_cnt < dtc->frames_to_filter);
 
     av_log(NULL, AV_LOG_INFO, "Filtered %d frames\n", dtc->frm_cnt);
 
