@@ -48,14 +48,19 @@ extern "C" {
 
 #define MAX_FILTER_DESC_LEN  (4 * 1024 * 1024)
 #define MAX_STR_LEN          (1024)
+#define NODE_LIST_NUM        (2)
+
+typedef enum {
+    MADI = 0,
+    MADP = 1,
+} NodeType;
 
 typedef struct {
     int x, y;
     int blk_size_madi;
     int blk_size_madp;
     int node_id;
-    int madi;
-    int madp;
+    int mad[NODE_LIST_NUM];
 } Node;
 
 typedef struct {
@@ -69,9 +74,9 @@ typedef struct {
     ToolsCtx *tools_ctx;
     const char *in_filename;
     const char *out_filename;
-    Node *node_list;
-    int node_num;
-    int node_max_num;
+    Node *node_list[NODE_LIST_NUM]; /* 0 - MADI; 1 - MADP */
+    int node_num[NODE_LIST_NUM];
+    int node_max_num[NODE_LIST_NUM];
     char *filter_descr;
     unsigned char *cur_frm_data;
     unsigned char *ref_frm_data;
@@ -85,6 +90,7 @@ typedef struct {
     int height;
     int frames_to_filter;
     int frm_cnt;
+    int display_flg; /* 0 - no display; 1 - display madi; 2 - display madp */
 
     FILE *fp_in;
     FILE *fp_out;
@@ -93,6 +99,7 @@ typedef struct {
 static RET draw_txt_filter_init(ToolsCtx *ctx, DrawTextCtx *dtc)
 {
     int width_align, height_align;
+    int k;
 
     memset(dtc, 0, sizeof(DrawTextCtx));
     dtc->tools_ctx = ctx;
@@ -105,7 +112,8 @@ static RET draw_txt_filter_init(ToolsCtx *ctx, DrawTextCtx *dtc)
     dtc->video_stream_index = -1;
     dtc->linesize = FFALIGN(dtc->width, 32);
     dtc->blk_size_madi = 16;
-    dtc->blk_size_madp = 32;
+    dtc->blk_size_madp = 16;
+    dtc->display_flg = ctx->disp_flg;
     width_align = FFALIGN(dtc->width, 32);
     height_align = FFALIGN(dtc->height, 32);
 
@@ -136,11 +144,13 @@ static RET draw_txt_filter_init(ToolsCtx *ctx, DrawTextCtx *dtc)
     dtc->cur_frm = dtc->cur_frm_data;
     dtc->ref_frm = dtc->ref_frm_data;
 
-    dtc->node_max_num = width_align * height_align / (8 * 8);
-    dtc->node_list = (Node *)calloc(dtc->node_max_num, sizeof(Node));
-    if (!dtc->node_list) {
-        av_log(NULL, AV_LOG_ERROR, "Cannot allocate node list\n");
-        return RET_NOK;
+    for (k = 0; k < NODE_LIST_NUM; k++) {
+        dtc->node_max_num[k] = width_align * height_align / (8 * 8);
+        dtc->node_list[k] = (Node *)calloc(dtc->node_max_num[k], sizeof(Node));
+        if (!dtc->node_list[k]) {
+            av_log(NULL, AV_LOG_ERROR, "Cannot allocate node list %d\n", k);
+            return RET_NOK;
+        }
     }
 
     return RET_OK;
@@ -148,6 +158,8 @@ static RET draw_txt_filter_init(ToolsCtx *ctx, DrawTextCtx *dtc)
 
 static RET draw_txt_filter_deinit(DrawTextCtx *dtc)
 {
+    int k;
+
     avcodec_free_context(&dtc->dec_ctx);
     avformat_close_input(&dtc->fmt_ctx);
 
@@ -171,9 +183,11 @@ static RET draw_txt_filter_deinit(DrawTextCtx *dtc)
         dtc->ref_frm_data = NULL;
     }
 
-    if (dtc->node_list) {
-        free(dtc->node_list);
-        dtc->node_list = NULL;
+    for (k = 0; k < NODE_LIST_NUM; k++) {
+        if (dtc->node_list[k]) {
+            free(dtc->node_list[k]);
+            dtc->node_list[k] = NULL;
+        }
     }
 
     return RET_OK;
@@ -369,30 +383,42 @@ end:
 static int build_filter_descr(DrawTextCtx *dtc)
 {
     static const char *fontfile = "fontfile=/usr/share/fonts/truetype/freefont/FreeSans.ttf:"
-                "fontsize=18:fontcolor=red:";
+                "fontsize=18:";
     char *dst = dtc->filter_descr;
-    Node *node = dtc->node_list;
+    NodeType nt = (dtc->display_flg == 1) ? MADI : MADP;
+    Node *node = dtc->node_list[nt];
     int len = 0, idx, text_num = 0;
     int scale = 2;
-    int madi_thd = 1;
-
-    av_log(NULL, AV_LOG_INFO, "frame %d total text num %d\n", dtc->frm_cnt, dtc->node_num);
+    int mad_thd[2] = { 1, 0 };
 
     len += snprintf(dst + len, MAX_STR_LEN, "scale=%d:%d,",
                     dtc->width * scale, dtc->height * scale);
-    for (idx = 0; idx < dtc->node_num; idx++) {
-        if ((len < MAX_FILTER_DESC_LEN - MAX_STR_LEN) && (node->madi > madi_thd)) {
-            len += snprintf(dst + len, MAX_STR_LEN, "drawtext=%s", fontfile);
-            len += snprintf(dst + len, MAX_STR_LEN, "text=%3d:x=%d:y=%d,",
-                            node->madi, node->x * scale, node->y * scale);
-            text_num++;
+    if ((dtc->display_flg == 2) && (dtc->frm_cnt == 0)) {
+        av_log(NULL, AV_LOG_INFO, "frame %d display madp\n", dtc->frm_cnt);
+        len += snprintf(dst + len, MAX_STR_LEN, "drawtext="
+                        "fontfile=/usr/share/fonts/truetype/freefont/FreeSans.ttf:"
+                        "fontsize=80:fontcolor=red:text='MADP CALCULATING...':x=%d:y=%d",
+                        dtc->width * scale / 2, dtc->height * scale / 2);
+    } else {
+        int node_num = dtc->node_num[nt];
+        av_log(NULL, AV_LOG_INFO, "frame %d total %s num %d\n", dtc->frm_cnt,
+               (dtc->display_flg == 1) ? "MADI" : "MADP", node_num);
 
+        for (idx = 0; idx < node_num; idx++) {
+            if ((len < MAX_FILTER_DESC_LEN - MAX_STR_LEN) && (node->mad[nt] > mad_thd[nt])) {
+                len += snprintf(dst + len, MAX_STR_LEN, "drawtext=%s", fontfile);
+                len += snprintf(dst + len, MAX_STR_LEN, "fontcolor=%s:",
+                                (dtc->display_flg == 1) ? "red" : "blue");
+                len += snprintf(dst + len, MAX_STR_LEN, "text=%3d:x=%d:y=%d,",
+                                node->mad[nt], node->x * scale, node->y * scale);
+                text_num++;
+            }
+            node++;
         }
-        node++;
-    }
 
-    av_log(NULL, AV_LOG_INFO, "frame %d draw text num %d (madi > %d)\n",
-           dtc->frm_cnt, text_num, madi_thd);
+        av_log(NULL, AV_LOG_INFO, "frame %d draw text num %d (mad > %d)\n",
+            dtc->frm_cnt, text_num, mad_thd[nt]);
+    }
 
     return RET_OK;
 }
@@ -420,7 +446,11 @@ static RET store_yuv_frame(DrawTextCtx *dtc, AVFrame *frame)
     int linesize = dtc->linesize;
     int i, k;
 
-    dtc->ref_frm = dtc->cur_frm;
+    if (dtc->frm_cnt > 0) {
+        unsigned char *tmp = dtc->cur_frm;
+        dtc->cur_frm = dtc->ref_frm;
+        dtc->ref_frm = tmp;
+    }
 
     for (i = 0; i < h32; i++) {
         memcpy(dtc->cur_frm + i * linesize,
@@ -466,22 +496,70 @@ static int calc_block_madi(uint8_t *src, int stride, int blk_size)
 
 static RET calc_frame_madi(DrawTextCtx *dtc)
 {
-    Node *node = dtc->node_list;
+    Node *node = dtc->node_list[MADI];
     int madi_size = dtc->blk_size_madi;
     uint8_t *src = NULL;
     int i, j;
 
-    dtc->node_num = 0;
+    dtc->node_num[MADI] = 0;
     for (i = 0; i < dtc->height; i += madi_size) {
         for (j = 0; j < dtc->width; j += madi_size) {
             src = dtc->cur_frm + i * dtc->linesize + j;
             node->x = j;
             node->y = i;
             node->blk_size_madi = madi_size;
-            node->node_id = dtc->node_num++;
-            node->madi = calc_block_madi(src, dtc->linesize, madi_size);
+            node->node_id = dtc->node_num[MADI]++;
+            node->mad[MADI] = calc_block_madi(src, dtc->linesize, madi_size);
             av_log(NULL, AV_LOG_DEBUG, "(%d, %d) node_id %d madi %d\n",
-                   node->x, node->y, node->node_id, node->madi);
+                   node->x, node->y, node->node_id, node->mad[MADI]);
+            node++;
+        }
+    }
+
+    return RET_OK;
+}
+
+static int calc_block_madp(uint8_t *cur, uint8_t *ref, int stride, int blk_size)
+{
+    int sad = 0, ave_cur, ave_ref;
+    int i, j;
+
+    for (i = 0; i < blk_size; i += 2) {
+        for (j = 0; j < blk_size; j += 2) {
+            ave_cur = (cur[(i + 0) * stride + (j + 0)] +
+                       cur[(i + 0) * stride + (j + 1)] +
+                       cur[(i + 1) * stride + (j + 0)] +
+                       cur[(i + 1) * stride + (j + 1)]) / 4;
+            ave_ref = (ref[(i + 0) * stride + (j + 0)] +
+                       ref[(i + 0) * stride + (j + 1)] +
+                       ref[(i + 1) * stride + (j + 0)] +
+                       ref[(i + 1) * stride + (j + 1)]) / 4;
+            sad += abs(ave_cur - ave_ref);
+        }
+    }
+
+    return av_clip(sad, 0, 255);
+}
+
+static RET calc_frame_madp(DrawTextCtx *dtc)
+{
+    Node *node = dtc->node_list[MADP];
+    int madp_size = dtc->blk_size_madp;
+    uint8_t *cur = NULL, *ref = NULL;
+    int i, j;
+
+    dtc->node_num[MADP] = 0;
+    for (i = 0; i < dtc->height; i += madp_size) {
+        for (j = 0; j < dtc->width; j += madp_size) {
+            cur = dtc->cur_frm + i * dtc->linesize + j;
+            ref = dtc->ref_frm + i * dtc->linesize + j;
+            node->x = j;
+            node->y = i;
+            node->blk_size_madp = madp_size;
+            node->node_id = dtc->node_num[MADP]++;
+            node->mad[MADP] = calc_block_madp(cur, ref, dtc->linesize, madp_size);
+            av_log(NULL, AV_LOG_DEBUG, "(%d, %d) node_id %d madp %d\n",
+                   node->x, node->y, node->node_id, node->mad[MADP]);
             node++;
         }
     }
@@ -494,6 +572,9 @@ static RET calc_madi_madp(DrawTextCtx *dtc, AVFrame *frame)
     store_yuv_frame(dtc, frame);
 
     calc_frame_madi(dtc);
+
+    if (dtc->frm_cnt > 0)
+        calc_frame_madp(dtc);
 
     return RET_OK;
 }

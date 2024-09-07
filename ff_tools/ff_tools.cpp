@@ -18,6 +18,8 @@ typedef struct CliCtx {
     uint32_t height_out;
     uint8_t *in_data[3];
 
+    int disp_flg; /* 0 - no display, 1 - display madi, 2 - display madp */
+
     string in_filename;
     string out_filename;
 
@@ -33,6 +35,7 @@ static RET tools_init(CliCtx *ctx, ToolsCtx *t)
     t->frames = ctx->frames;
     t->width = ctx->width_in;
     t->height = ctx->height_in;
+    t->disp_flg = ctx->disp_flg;
 
     return ret;
 }
@@ -55,7 +58,7 @@ int main(int argc, char **argv)
     memset((void *)ctx, 0, sizeof(CliCtx));
     memset((void *)tools, 0, sizeof(ToolsCtx));
 
-    cout << "Start!" << endl;
+    cout << "----> FF TOOLS Start ----> " << endl;
 
     bool help = getarg(false, "-H", "--help", "-?");
     ctx->in_filename = getarg("/home/timkingh/yuv/311_1080p_10000kbps_h265_300frames.yuv", "-i", "--input");
@@ -65,6 +68,22 @@ int main(int argc, char **argv)
     ctx->width_out = getarg(ctx->width_in, "-wo");
     ctx->height_out = getarg(ctx->height_in, "-ho");
     ctx->frames = getarg(3, "-f", "--frames");
+    ctx->disp_flg = getarg(1, "--disp_flg");
+
+    if (help) {
+        cout << "Usage: " << argv[0] << " [options]" << endl
+             << "Options:" << endl
+             << "  -i, --input <file>    input file name" << endl
+             << "  -o, --output <file>   output file name" << endl
+             << "  -wi, --width <num>    input width" << endl
+             << "  -hi, --height <num>   input height" << endl
+             << "  -wo, --width_out <num>   output width" << endl
+             << "  -ho, --height_out <num>  output height" << endl
+             << "  -f, --frames <num>    number of frames to process" << endl
+             << "  --disp_flg <num>      display flag" << endl
+             << "  -H, --help            display this help message" << endl;
+        return 0;
+    }
 
     cout << "input: " << ctx->in_filename << endl
          << "output: " << ctx->out_filename << endl
@@ -76,6 +95,8 @@ int main(int argc, char **argv)
     }
 
     tools_deinit(ctx, tools);
+
+    cout << "----> FF TOOLS End ----> " << endl;
 
     return 0;
 }
