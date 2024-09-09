@@ -9,13 +9,23 @@ typedef enum {
 } RET;
 
 typedef struct {
+    int disp_flg;
+    int out_scale;
+    int madi_thd;
+    int madp_thd;
+} DrawTextParam;
+
+typedef struct {
     const char *in_filename;
     const char *out_filename;
     int width;
     int height;
+    int pix_fmt;
     int fps;
     int frames;
-    int disp_flg;
+
+    DrawTextParam draw_text_param;
+
     FILE *fp_in;
     FILE *fp_out;
 } ToolsCtx;

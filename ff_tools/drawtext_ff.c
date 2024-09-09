@@ -88,9 +88,12 @@ typedef struct {
     int is_yuv_input;
     int width;
     int height;
+    int out_width, out_height;
+    enum AVPixelFormat pix_fmt;
     int frames_to_filter;
     int frm_cnt;
-    int display_flg; /* 0 - no display; 1 - display madi; 2 - display madp */
+
+    DrawTextParam *dtp;
 
     FILE *fp_in;
     FILE *fp_out;
@@ -108,12 +111,15 @@ static RET draw_txt_filter_init(ToolsCtx *ctx, DrawTextCtx *dtc)
     dtc->out_filename = ctx->out_filename;
     dtc->width = ctx->width;
     dtc->height = ctx->height;
+    dtc->pix_fmt = (ctx->pix_fmt == 0) ? AV_PIX_FMT_YUV420P : AV_PIX_FMT_NV12;
     dtc->is_yuv_input = 1;
     dtc->video_stream_index = -1;
     dtc->linesize = FFALIGN(dtc->width, 32);
     dtc->blk_size_madi = 16;
     dtc->blk_size_madp = 16;
-    dtc->display_flg = ctx->disp_flg;
+    dtc->dtp = &ctx->draw_text_param;
+    dtc->out_width = dtc->width * dtc->dtp->out_scale;
+    dtc->out_height = dtc->height * dtc->dtp->out_scale;
     width_align = FFALIGN(dtc->width, 32);
     height_align = FFALIGN(dtc->height, 32);
 
@@ -240,9 +246,15 @@ static int open_input_yuv(DrawTextCtx *dtc)
     const AVCodec *codec = NULL;
     const AVInputFormat *fmt = av_find_input_format("rawvideo");
     AVDictionary *options = NULL;
+    char res_str[MAX_STR_LEN];
 
-    av_dict_set(&options, "video_size", "1920x1080", 0);
-    av_dict_set(&options, "pixel_format", "yuv420p", 0);
+    snprintf(res_str, sizeof(res_str), "%dx%d", dtc->width, dtc->height);
+    av_dict_set(&options, "video_size", res_str, 0);
+
+    if (dtc->pix_fmt == AV_PIX_FMT_YUV420P)
+        av_dict_set(&options, "pixel_format", "yuv420p", 0);
+    else
+        av_dict_set(&options, "pixel_format", "nv12", 0);
 
     if ((ret = avformat_open_input(&format_ctx, dtc->in_filename, fmt, &options)) < 0) {
         av_log(NULL, AV_LOG_ERROR, "Cannot open input file\n");
@@ -268,7 +280,7 @@ static int open_input_yuv(DrawTextCtx *dtc)
     dec_ctx->bit_rate = 400000; // 设置码率，对于rawvideo编解码器，这通常没有实际作用
     dec_ctx->width = dtc->width;
     dec_ctx->height = dtc->height;
-    dec_ctx->pix_fmt = AV_PIX_FMT_YUV420P; // 设置像素格式为YUV420P
+    dec_ctx->pix_fmt = dtc->pix_fmt;
     dec_ctx->time_base = (AVRational){1, 25}; // 设置时间基，对于rawvideo编解码器，这通常没有实际作用
     dec_ctx->framerate = (AVRational){25, 1}; // 设置帧率，对于rawvideo编解码器，这通常没有实际作用
     dec_ctx->sample_aspect_ratio = (AVRational){1, 1}; // 设置采样率，对于rawvideo编解码器，这通常没有实际作用
@@ -385,15 +397,18 @@ static int build_filter_descr(DrawTextCtx *dtc)
     static const char *fontfile = "fontfile=/usr/share/fonts/truetype/freefont/FreeSans.ttf:"
                 "fontsize=18:";
     char *dst = dtc->filter_descr;
-    NodeType nt = (dtc->display_flg == 1) ? MADI : MADP;
+    NodeType nt = (dtc->dtp->disp_flg == 1) ? MADI : MADP;
     Node *node = dtc->node_list[nt];
     int len = 0, idx, text_num = 0;
-    int scale = 2;
-    int mad_thd[2] = { 1, 0 };
+    int scale = dtc->dtp->out_scale;
+    int mad_thd[2];
+
+    mad_thd[MADI] = dtc->dtp->madi_thd;
+    mad_thd[MADP] = dtc->dtp->madp_thd;
 
     len += snprintf(dst + len, MAX_STR_LEN, "scale=%d:%d,",
                     dtc->width * scale, dtc->height * scale);
-    if ((dtc->display_flg == 2) && (dtc->frm_cnt == 0)) {
+    if ((dtc->dtp->disp_flg == 2) && (dtc->frm_cnt == 0)) {
         av_log(NULL, AV_LOG_INFO, "frame %d display madp\n", dtc->frm_cnt);
         len += snprintf(dst + len, MAX_STR_LEN, "drawtext="
                         "fontfile=/usr/share/fonts/truetype/freefont/FreeSans.ttf:"
@@ -402,13 +417,13 @@ static int build_filter_descr(DrawTextCtx *dtc)
     } else {
         int node_num = dtc->node_num[nt];
         av_log(NULL, AV_LOG_INFO, "frame %d total %s num %d\n", dtc->frm_cnt,
-               (dtc->display_flg == 1) ? "MADI" : "MADP", node_num);
+               (dtc->dtp->disp_flg == 1) ? "MADI" : "MADP", node_num);
 
         for (idx = 0; idx < node_num; idx++) {
             if ((len < MAX_FILTER_DESC_LEN - MAX_STR_LEN) && (node->mad[nt] > mad_thd[nt])) {
                 len += snprintf(dst + len, MAX_STR_LEN, "drawtext=%s", fontfile);
                 len += snprintf(dst + len, MAX_STR_LEN, "fontcolor=%s:",
-                                (dtc->display_flg == 1) ? "red" : "blue");
+                                (dtc->dtp->disp_flg == 1) ? "red" : "blue");
                 len += snprintf(dst + len, MAX_STR_LEN, "text=%3d:x=%d:y=%d,",
                                 node->mad[nt], node->x * scale, node->y * scale);
                 text_num++;
@@ -674,7 +689,8 @@ int draw_text_filter_ff(ToolsCtx *ctx)
         avfilter_graph_free(&dtc->filter_graph);
     } while (++dtc->frm_cnt < dtc->frames_to_filter);
 
-    av_log(NULL, AV_LOG_INFO, "Filtered %d frames\n", dtc->frm_cnt);
+    av_log(NULL, AV_LOG_INFO, "Filtered %d frames, output res %dx%d\n",
+           dtc->frm_cnt, dtc->out_width, dtc->out_height);
 
 end:
     avfilter_graph_free(&dtc->filter_graph);
