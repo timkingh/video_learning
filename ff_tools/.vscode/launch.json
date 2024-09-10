@@ -11,7 +11,8 @@
             "program": "${workspaceFolder}/ff_tools",
             "args": [
                 "--input=/home/timkingh/yuv/vi_frame_960x540_1.yuv",
-                "--width=960", "--height=540", "--frames=32"
+                "--width=960", "--height=540", "--frames=32",
+                "--disp_flg=2"
             ],
             "preLaunchTask": "build",
             "stopAtEntry": false,

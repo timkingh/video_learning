@@ -539,16 +539,40 @@ static int calc_block_madp(uint8_t *cur, uint8_t *ref, int stride, int blk_size)
     int sad = 0, ave_cur, ave_ref;
     int i, j;
 
-    for (i = 0; i < blk_size; i += 2) {
-        for (j = 0; j < blk_size; j += 2) {
+    for (i = 0; i < blk_size; i += 4) {
+        for (j = 0; j < blk_size; j += 4) {
             ave_cur = (cur[(i + 0) * stride + (j + 0)] +
                        cur[(i + 0) * stride + (j + 1)] +
+                       cur[(i + 0) * stride + (j + 2)] +
+                       cur[(i + 0) * stride + (j + 3)] +
                        cur[(i + 1) * stride + (j + 0)] +
-                       cur[(i + 1) * stride + (j + 1)]) / 4;
+                       cur[(i + 1) * stride + (j + 1)] +
+                       cur[(i + 1) * stride + (j + 2)] +
+                       cur[(i + 1) * stride + (j + 3)] +
+                       cur[(i + 2) * stride + (j + 0)] +
+                       cur[(i + 2) * stride + (j + 1)] +
+                       cur[(i + 2) * stride + (j + 2)] +
+                       cur[(i + 2) * stride + (j + 3)] +
+                       cur[(i + 3) * stride + (j + 0)] +
+                       cur[(i + 3) * stride + (j + 1)] +
+                       cur[(i + 3) * stride + (j + 2)] +
+                       cur[(i + 3) * stride + (j + 3)]) / 16;
             ave_ref = (ref[(i + 0) * stride + (j + 0)] +
                        ref[(i + 0) * stride + (j + 1)] +
+                       ref[(i + 0) * stride + (j + 2)] +
+                       ref[(i + 0) * stride + (j + 3)] +
                        ref[(i + 1) * stride + (j + 0)] +
-                       ref[(i + 1) * stride + (j + 1)]) / 4;
+                       ref[(i + 1) * stride + (j + 1)] +
+                       ref[(i + 1) * stride + (j + 2)] +
+                       ref[(i + 1) * stride + (j + 3)] +
+                       ref[(i + 2) * stride + (j + 0)] +
+                       ref[(i + 2) * stride + (j + 1)] +
+                       ref[(i + 2) * stride + (j + 2)] +
+                       ref[(i + 2) * stride + (j + 3)] +
+                       ref[(i + 3) * stride + (j + 0)] +
+                       ref[(i + 3) * stride + (j + 1)] +
+                       ref[(i + 3) * stride + (j + 2)] +
+                       ref[(i + 3) * stride + (j + 3)]) / 16;
             sad += abs(ave_cur - ave_ref);
         }
     }
