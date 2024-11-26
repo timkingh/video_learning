@@ -15,7 +15,7 @@ yuv_list = textscan(fid_yuv, "%s\n");
 fclose(fid_yuv);
 
 bd_all = 0;
-nFileName = 39;
+nFileName = 46;
 file_step = 4;
 
 for i = 1:1:nFileName
