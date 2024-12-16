@@ -2,6 +2,7 @@
 #define _COMMON_FF_H_
 
 #include <stdio.h>
+#include <stdint.h>
 
 typedef enum {
 	RET_NOK = -1,
@@ -29,5 +30,14 @@ typedef struct {
     FILE *fp_in;
     FILE *fp_out;
 } ToolsCtx;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+int64_t time_mdate(void);
+
+#ifdef __cplusplus
+}    // extern "C"
+#endif
 
 #endif

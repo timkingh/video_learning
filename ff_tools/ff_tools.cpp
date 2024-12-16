@@ -6,6 +6,7 @@
 #include "stdint.h"
 #include "getopt.hpp"
 #include "ff_tools.h"
+#include "common_ff.h"
 
 using namespace std;
 
@@ -65,6 +66,8 @@ int main(int argc, char **argv)
     ToolsCtx tools_ctx;
     CliCtx *ctx = &cli_ctx;
     ToolsCtx *tools = &tools_ctx;
+    int64_t start_time = time_mdate();
+    int64_t end_time = 0;
 
     memset((void *)ctx, 0, sizeof(CliCtx));
     memset((void *)tools, 0, sizeof(ToolsCtx));
@@ -116,6 +119,8 @@ int main(int argc, char **argv)
     tools_deinit(ctx, tools);
 
     cout << "----> FF TOOLS End ----> " << endl;
+    end_time = time_mdate();
+    printf("calc %d frame(s) elapsed %.2fs\n", ctx->frames, (float)(end_time - start_time) / 1000000);
 
     return 0;
 }
