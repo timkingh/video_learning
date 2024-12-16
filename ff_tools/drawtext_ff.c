@@ -48,11 +48,13 @@ extern "C" {
 
 #define MAX_FILTER_DESC_LEN  (4 * 1024 * 1024)
 #define MAX_STR_LEN          (1024)
-#define NODE_LIST_NUM        (2)
+#define NODE_LIST_NUM        (3) /* MADI, MADP, DSP_Y */
 
 typedef enum {
     MADI = 0,
     MADP = 1,
+    DSP_Y = 2,
+    NODE_TYPE_MAX
 } NodeType;
 
 typedef struct {
@@ -397,18 +399,27 @@ static int build_filter_descr(DrawTextCtx *dtc)
     static const char *fontfile = "fontfile=/usr/share/fonts/truetype/freefont/FreeSans.ttf:"
                 "fontsize=18:";
     char *dst = dtc->filter_descr;
-    NodeType nt = (dtc->dtp->disp_flg == 1) ? MADI : MADP;
+    NodeType nt = dtc->dtp->disp_flg - 1;
     Node *node = dtc->node_list[nt];
     int len = 0, idx, text_num = 0;
     int scale = dtc->dtp->out_scale;
-    int mad_thd[2];
+    int mad_thd[NODE_TYPE_MAX];
 
     mad_thd[MADI] = dtc->dtp->madi_thd;
     mad_thd[MADP] = dtc->dtp->madp_thd;
+    mad_thd[DSP_Y] = -1;
 
     len += snprintf(dst + len, MAX_STR_LEN, "scale=%d:%d,",
                     dtc->width * scale, dtc->height * scale);
-    if ((dtc->dtp->disp_flg == 2) && (dtc->frm_cnt == 0)) {
+
+    if(dtc->dtp->disp_flg == 3) {
+        av_log(NULL, AV_LOG_INFO, "frame %d display dsp_y\n", dtc->frm_cnt);
+        len += snprintf(dst + len, MAX_STR_LEN, "drawtext="
+                        "fontfile=/usr/share/fonts/truetype/freefont/FreeSans.ttf:"
+                        "fontsize=80:fontcolor=red:text='%d':x=%d:y=%d",
+                        node->mad[DSP_Y],
+                        dtc->width * scale / 2, dtc->height * scale / 2);
+    } else if ((dtc->dtp->disp_flg == 2) && (dtc->frm_cnt == 0)) {
         av_log(NULL, AV_LOG_INFO, "frame %d display madp\n", dtc->frm_cnt);
         len += snprintf(dst + len, MAX_STR_LEN, "drawtext="
                         "fontfile=/usr/share/fonts/truetype/freefont/FreeSans.ttf:"
@@ -417,7 +428,8 @@ static int build_filter_descr(DrawTextCtx *dtc)
     } else {
         int node_num = dtc->node_num[nt];
         av_log(NULL, AV_LOG_INFO, "frame %d total %s num %d\n", dtc->frm_cnt,
-               (dtc->dtp->disp_flg == 1) ? "MADI" : "MADP", node_num);
+               (dtc->dtp->disp_flg == 1) ? "MADI" :
+               (dtc->dtp->disp_flg == 2) ? "MADP" : "DSP_Y", node_num);
 
         for (idx = 0; idx < node_num; idx++) {
             if ((len < MAX_FILTER_DESC_LEN - MAX_STR_LEN) && (node->mad[nt] > mad_thd[nt])) {
@@ -606,14 +618,71 @@ static RET calc_frame_madp(DrawTextCtx *dtc)
     return RET_OK;
 }
 
+static int calc_block_dspy(uint8_t *cur, int stride, int blk_size)
+{
+    int ave_cur;
+    int i, j;
+
+    for (i = 0; i < blk_size; i += 4) {
+        for (j = 0; j < blk_size; j += 4) {
+            ave_cur = (cur[(i + 0) * stride + (j + 0)] +
+                       cur[(i + 0) * stride + (j + 1)] +
+                       cur[(i + 0) * stride + (j + 2)] +
+                       cur[(i + 0) * stride + (j + 3)] +
+                       cur[(i + 1) * stride + (j + 0)] +
+                       cur[(i + 1) * stride + (j + 1)] +
+                       cur[(i + 1) * stride + (j + 2)] +
+                       cur[(i + 1) * stride + (j + 3)] +
+                       cur[(i + 2) * stride + (j + 0)] +
+                       cur[(i + 2) * stride + (j + 1)] +
+                       cur[(i + 2) * stride + (j + 2)] +
+                       cur[(i + 2) * stride + (j + 3)] +
+                       cur[(i + 3) * stride + (j + 0)] +
+                       cur[(i + 3) * stride + (j + 1)] +
+                       cur[(i + 3) * stride + (j + 2)] +
+                       cur[(i + 3) * stride + (j + 3)]) / 16;
+        }
+    }
+
+    return ave_cur;
+}
+
+/* downscale of luma */
+static RET calc_frame_dspy(DrawTextCtx *dtc)
+{
+    Node *node = dtc->node_list[DSP_Y];
+    int madp_size = 4;
+    uint8_t *cur = NULL;
+    int i, j, dspy, dspy_sum = 0;
+
+    for (i = 0; i < dtc->height; i += madp_size) {
+        for (j = 0; j < dtc->width; j += madp_size) {
+            cur = dtc->cur_frm + i * dtc->linesize + j;
+            dspy = calc_block_dspy(cur, dtc->linesize, madp_size);
+            dspy_sum += dspy;
+            av_log(NULL, AV_LOG_DEBUG, "(%d, %d) dspy %d\n", j, i, dspy);
+        }
+    }
+
+    dtc->node_num[DSP_Y] = 1;
+    node->x = dtc->width / 2;
+    node->y = dtc->height / 2;
+    node->mad[DSP_Y] = dspy_sum / (dtc->width / 4 * dtc->height / 4);
+
+    return RET_OK;
+}
+
 static RET calc_madi_madp(DrawTextCtx *dtc, AVFrame *frame)
 {
     store_yuv_frame(dtc, frame);
 
-    calc_frame_madi(dtc);
-
-    if (dtc->frm_cnt > 0)
-        calc_frame_madp(dtc);
+    if (dtc->dtp->disp_flg == 1)
+        calc_frame_madi(dtc);
+    else if (dtc->dtp->disp_flg == 2) {
+        if (dtc->frm_cnt > 0)
+            calc_frame_madp(dtc);
+    } else
+        calc_frame_dspy(dtc);
 
     return RET_OK;
 }

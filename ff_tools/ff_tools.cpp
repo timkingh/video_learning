@@ -19,7 +19,9 @@ typedef struct CliCtx {
     int input_fmt; /* 0 - yuv420p, 1 - yuv420sp */
     uint8_t *in_data[3];
 
-    int disp_flg; /* 0 - no display, 1 - display madi, 2 - display madp */
+    /* 0 - no display, 1 - display madi,
+     * 2 - display madp, 3 - display dsp of Y */
+    int disp_flg;
     int out_scale; /* scale factor for output */
     int madi_thd;
     int madp_thd;
@@ -94,7 +96,7 @@ int main(int argc, char **argv)
              << "  -wo, --width_out <num>   output width" << endl
              << "  -ho, --height_out <num>  output height" << endl
              << "  -f, --frames <num>    number of frames to process" << endl
-             << "  --disp_flg <num>      display flag" << endl
+             << "  --disp_flg <num>      display flag(1 - madi, 2 - madp)" << endl
              << "  --out_scale <num>     output scale factor" << endl
              << "  --madi_thd <num>      madi threshold" << endl
              << "  --madp_thd <num>      madp threshold" << endl
