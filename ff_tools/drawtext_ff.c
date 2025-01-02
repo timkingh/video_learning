@@ -413,7 +413,7 @@ static int build_filter_descr(DrawTextCtx *dtc)
                     dtc->width * scale, dtc->height * scale);
 
     if(dtc->dtp->disp_flg == 3) {
-        av_log(NULL, AV_LOG_INFO, "frame %d display dsp_y\n", dtc->frm_cnt);
+        av_log(NULL, AV_LOG_DEBUG, "frame %d display dsp_y\n", dtc->frm_cnt);
         len += snprintf(dst + len, MAX_STR_LEN, "drawtext="
                         "fontfile=/usr/share/fonts/truetype/freefont/FreeSans.ttf:"
                         "fontsize=80:fontcolor=red:text='%d':x=%d:y=%d",
@@ -655,8 +655,8 @@ static RET calc_frame_dspy(DrawTextCtx *dtc)
     uint8_t *cur = NULL;
     int i, j, dspy, dspy_sum = 0;
 
-    for (i = 0; i < dtc->height; i += madp_size) {
-        for (j = 0; j < dtc->width; j += madp_size) {
+    for (i = 0; i < FFALIGN(dtc->height, 32); i += madp_size) {
+        for (j = 0; j < FFALIGN(dtc->width, 32); j += madp_size) {
             cur = dtc->cur_frm + i * dtc->linesize + j;
             dspy = calc_block_dspy(cur, dtc->linesize, madp_size);
             dspy_sum += dspy;
@@ -667,7 +667,7 @@ static RET calc_frame_dspy(DrawTextCtx *dtc)
     dtc->node_num[DSP_Y] = 1;
     node->x = dtc->width / 2;
     node->y = dtc->height / 2;
-    node->mad[DSP_Y] = dspy_sum / (dtc->width / 4 * dtc->height / 4);
+    node->mad[DSP_Y] = dspy_sum / (FFALIGN(dtc->width, 32) / 4 * FFALIGN(dtc->height, 32) / 4);
 
     return RET_OK;
 }

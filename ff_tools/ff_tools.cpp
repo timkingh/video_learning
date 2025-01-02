@@ -99,7 +99,7 @@ int main(int argc, char **argv)
              << "  -wo, --width_out <num>   output width" << endl
              << "  -ho, --height_out <num>  output height" << endl
              << "  -f, --frames <num>    number of frames to process" << endl
-             << "  --disp_flg <num>      display flag(1 - madi, 2 - madp)" << endl
+             << "  --disp_flg <num>      display flag(1 - madi, 2 - madp, 3 - dsp of Y)" << endl
              << "  --out_scale <num>     output scale factor" << endl
              << "  --madi_thd <num>      madi threshold" << endl
              << "  --madp_thd <num>      madp threshold" << endl
@@ -118,9 +118,10 @@ int main(int argc, char **argv)
 
     tools_deinit(ctx, tools);
 
-    cout << "----> FF TOOLS End ----> " << endl;
     end_time = time_mdate();
     printf("calc %d frame(s) elapsed %.2fs\n", ctx->frames, (float)(end_time - start_time) / 1000000);
+
+    cout << "----> FF TOOLS End ----> " << endl;
 
     return 0;
 }
