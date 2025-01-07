@@ -99,6 +99,7 @@ typedef struct {
 
     FILE *fp_in;
     FILE *fp_out;
+    FILE *fp_out_dspy;
 } DrawTextCtx;
 
 static RET draw_txt_filter_init(ToolsCtx *ctx, DrawTextCtx *dtc)
@@ -128,6 +129,12 @@ static RET draw_txt_filter_init(ToolsCtx *ctx, DrawTextCtx *dtc)
     dtc->fp_out = fopen(dtc->out_filename, "wb");
     if (!dtc->fp_out) {
         av_log(NULL, AV_LOG_ERROR, "Cannot open output file %s\n", dtc->out_filename);
+        return RET_NOK;
+    }
+
+    dtc->fp_out_dspy = fopen(dtc->tools_ctx->out_file_dspy, "wb");
+    if (!dtc->fp_out_dspy) {
+        av_log(NULL, AV_LOG_ERROR, "Cannot open output file %s\n", dtc->tools_ctx->out_file_dspy);
         return RET_NOK;
     }
 
@@ -174,6 +181,11 @@ static RET draw_txt_filter_deinit(DrawTextCtx *dtc)
     if (dtc->fp_out) {
         fclose(dtc->fp_out);
         dtc->fp_out = NULL;
+    }
+
+    if (dtc->fp_out_dspy) {
+        fclose(dtc->fp_out_dspy);
+        dtc->fp_out_dspy = NULL;
     }
 
     if (dtc->filter_descr) {
@@ -668,6 +680,11 @@ static RET calc_frame_dspy(DrawTextCtx *dtc)
     node->x = dtc->width / 2;
     node->y = dtc->height / 2;
     node->mad[DSP_Y] = dspy_sum / (FFALIGN(dtc->width, 32) / 4 * FFALIGN(dtc->height, 32) / 4);
+
+    if (dtc->fp_out_dspy)
+        fprintf(dtc->fp_out_dspy, "frame %4d dsp_y %3d\n", dtc->frm_cnt, node->mad[DSP_Y]);
+    else
+        av_log(NULL, AV_LOG_INFO, "frame %4d dsp_y %3d\n", dtc->frm_cnt, node->mad[DSP_Y]);
 
     return RET_OK;
 }

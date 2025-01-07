@@ -10,8 +10,9 @@
             "request": "launch",
             "program": "${workspaceFolder}/ff_tools",
             "args": [
-                "--input=/home/timkingh/yuv/31705_1080p_10000kbps_h265_300frames.yuv",
-                "--width=1920", "--height=1080", "--frames=300",
+                "--input=/mnt/winshare/panther_test/yuv/T8W11C_05_2304x1296.yuv",
+                "--output=/mnt/winshare/panther_test/yuv/T8W11C_05_2304x1296_out.yuv",
+                "--width=2304", "--height=1296", "--frames=30",
                 "--disp_flg=3", "--input_fmt=0", "--out_scale=1"
             ],
             "preLaunchTask": "build",

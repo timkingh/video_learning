@@ -19,6 +19,7 @@ typedef struct {
 typedef struct {
     const char *in_filename;
     const char *out_filename;
+    const char *out_file_dspy;
     int width;
     int height;
     int pix_fmt;

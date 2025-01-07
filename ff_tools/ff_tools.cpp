@@ -29,6 +29,7 @@ typedef struct CliCtx {
 
     string in_filename;
     string out_filename;
+    string out_filename_dspy;
 
     ofstream *ofs;
 } CliCtx;
@@ -39,6 +40,7 @@ static RET tools_init(CliCtx *ctx, ToolsCtx *t)
 
     t->in_filename = ctx->in_filename.c_str();
     t->out_filename = ctx->out_filename.c_str();
+    t->out_file_dspy = ctx->out_filename_dspy.c_str();
     t->frames = ctx->frames;
     t->width = ctx->width_in;
     t->height = ctx->height_in;
@@ -87,6 +89,7 @@ int main(int argc, char **argv)
     ctx->out_scale = getarg(2, "--out_scale");
     ctx->madi_thd = getarg(1, "--madi_thd");
     ctx->madp_thd = getarg(1, "--madp_thd");
+    ctx->out_filename_dspy = getarg(ctx->in_filename + "_dspy.txt", "--out_filename_dspy");
 
     if (help || argc == 1) {
         cout << "Usage: " << argv[0] << " [options]" << endl
@@ -109,7 +112,9 @@ int main(int argc, char **argv)
 
     cout << "input: " << ctx->in_filename << endl
          << "output: " << ctx->out_filename << endl
-         << "frames: " << ctx->frames << endl;
+         << "frames: " << ctx->frames << endl
+         << (ctx->disp_flg == 1 ? "MADI" :
+            (ctx->disp_flg == 2 ? "MADP" : "DSP of Y")) << endl;
 
     ret = tools_init(ctx, tools);
     if (ret == RET_OK) {
