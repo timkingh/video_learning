@@ -1,47 +1,23 @@
 #! /usr/bin/bash
 
-IN_PATH=/mnt/udisk/tongli
-OUT_PATH=/mnt/udisk/tongli/out
+IN_PATH=/mnt/udisk/light_change_yuv
+OUT_PATH=/mnt/udisk/light_change_yuv/out
 
 YUV_LIST="
-T8418N_05_2304x1296
-T8418N_10_2304x1296
-T8418N_15_2304x1296
-T8418N_20_2304x1296
-T8418N_25_2304x1296
-T8418N_30_2304x1296
-T8418N_35_2304x1296
-T8418N_40_2304x1296
-T8418N_44_2304x1296
-T8418N_50_2304x1296
-T8418N_55_2304x1296
-T8418N_60_2304x1296
-T8418N_65_2304x1296
-T8418N_70_2304x1296
-T8418N_74_2304x1296
-T8418N_79_2304x1296
-T8418N_83_2304x1296
-T8418N_88_2304x1296
-T8418N_89_2304x1296
-T8W11C_05_2304x1296
-T8W11C_10_2304x1296
-T8W11C_15_2304x1296
-T8W11C_20_2304x1296
-T8W11C_25_2304x1296
-T8W11C_30_2304x1296
-T8W11C_35_2304x1296
-T8W11C_40_2304x1296
-T8W11C_44_2304x1296
-T8W11C_50_2304x1296
-T8W11C_55_2304x1296
-T8W11C_60_2304x1296
-T8W11C_65_2304x1296
-T8W11C_70_2304x1296
-T8W11C_71_2304x1296
-T8W11C_76_2304x1296
-T8W11C_80_2304x1296
-T8W11C_85_2304x1296
-T8W11C_86_2304x1296
+test_0_indoor_alg_2304x1296_nv12
+test_0_indoor_alg_night_2304x1296_nv12
+test_1_outdoor_2304x1296_nv12
+test_1_outdoor_night_2304x1296_nv12
+test_2_outdoor_2304x1296_nv12
+test_2_outdoor_night_2304x1296_nv12
+test_3_front_desk_2304x1296_nv12
+test_3_front_desk_night_2304x1296_nv12
+test_4_front_desk_2304x1296_nv12
+test_4_front_desk_night_2304x1296_nv12
+test_5_darkroom_2304x1296_nv12
+test_5_darkroom_night_2304x1296_nv12
+test_6_darkroom_2304x1296_nv12
+test_7_darkroom_2304x1296_nv12
 "
 
 draw_960x540()
@@ -69,7 +45,7 @@ draw_1920x1080_dspy()
                 --output=$OUT_PATH/${yuv}_dspy.yuv \
                 --width=2304 --height=1296 --disp_flg=3 \
                 --out_scale=1 --madi_thd=0 --madp_thd=1 \
-                --input_fmt=0 --frames=3000
+                --input_fmt=1 --frames=3000
     done
 }
 

@@ -27,6 +27,8 @@ typedef struct CliCtx {
     int madi_thd;
     int madp_thd;
 
+    int aligned_size;
+
     string in_filename;
     string out_filename;
     string out_filename_dspy;
@@ -45,6 +47,7 @@ static RET tools_init(CliCtx *ctx, ToolsCtx *t)
     t->width = ctx->width_in;
     t->height = ctx->height_in;
     t->pix_fmt = ctx->input_fmt;
+    t->aligned_size = ctx->aligned_size;
 
     t->draw_text_param.disp_flg = ctx->disp_flg;
     t->draw_text_param.out_scale = ctx->out_scale;
@@ -78,7 +81,7 @@ int main(int argc, char **argv)
 
     bool help = getarg(false, "-H", "--help", "-?");
     ctx->in_filename = getarg("/home/timkingh/yuv/311_1080p_10000kbps_h265_300frames.yuv", "-i", "--input");
-    ctx->out_filename = getarg("/home/timkingh/yuv/out_1080p.yuv", "-o", "--output");
+    ctx->out_filename = getarg("/home/timkingh/yuv/out_1080p.yuv", "-o", "--output"); /* support yuv420p only */
     ctx->width_in = getarg(1920, "-wi", "--width");
     ctx->height_in = getarg(1080, "-hi", "--height");
     ctx->input_fmt = getarg(0, "--input_fmt");
@@ -90,6 +93,7 @@ int main(int argc, char **argv)
     ctx->madi_thd = getarg(1, "--madi_thd");
     ctx->madp_thd = getarg(1, "--madp_thd");
     ctx->out_filename_dspy = getarg(ctx->in_filename + "_dspy.txt", "--out_filename_dspy");
+    ctx->aligned_size = getarg(32, "--aligned_size"); /* 32 for HEVC, 16 for AVC */
 
     if (help || argc == 1) {
         cout << "Usage: " << argv[0] << " [options]" << endl

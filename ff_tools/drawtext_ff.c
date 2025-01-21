@@ -480,8 +480,9 @@ static RET store_yuv_frame(DrawTextCtx *dtc, AVFrame *frame)
 {
     int w = dtc->width;
     int h = dtc->height;
-    int w32 = FFALIGN(dtc->width, 32);
-    int h32 = FFALIGN(dtc->height, 32);
+    int align = dtc->tools_ctx->aligned_size;
+    int w32 = FFALIGN(dtc->width, align);
+    int h32 = FFALIGN(dtc->height, align);
     int linesize = dtc->linesize;
     int i, k;
 
@@ -663,12 +664,13 @@ static int calc_block_dspy(uint8_t *cur, int stride, int blk_size)
 static RET calc_frame_dspy(DrawTextCtx *dtc)
 {
     Node *node = dtc->node_list[DSP_Y];
+    int align = dtc->tools_ctx->aligned_size;
     int madp_size = 4;
     uint8_t *cur = NULL;
     int i, j, dspy, dspy_sum = 0;
 
-    for (i = 0; i < FFALIGN(dtc->height, 32); i += madp_size) {
-        for (j = 0; j < FFALIGN(dtc->width, 32); j += madp_size) {
+    for (i = 0; i < FFALIGN(dtc->height, align); i += madp_size) {
+        for (j = 0; j < FFALIGN(dtc->width, align); j += madp_size) {
             cur = dtc->cur_frm + i * dtc->linesize + j;
             dspy = calc_block_dspy(cur, dtc->linesize, madp_size);
             dspy_sum += dspy;
@@ -679,7 +681,7 @@ static RET calc_frame_dspy(DrawTextCtx *dtc)
     dtc->node_num[DSP_Y] = 1;
     node->x = dtc->width / 2;
     node->y = dtc->height / 2;
-    node->mad[DSP_Y] = dspy_sum / (FFALIGN(dtc->width, 32) / 4 * FFALIGN(dtc->height, 32) / 4);
+    node->mad[DSP_Y] = dspy_sum / (FFALIGN(dtc->width, align) / 4 * FFALIGN(dtc->height, align) / 4);
 
     if (dtc->fp_out_dspy)
         fprintf(dtc->fp_out_dspy, "frame %4d dsp_y %3d\n", dtc->frm_cnt, node->mad[DSP_Y]);

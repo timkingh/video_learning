@@ -25,6 +25,7 @@ typedef struct {
     int pix_fmt;
     int fps;
     int frames;
+    int aligned_size; /* aligned size of input file */
 
     DrawTextParam draw_text_param;
 
