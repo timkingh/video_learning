@@ -4,13 +4,22 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#define FCLOSE(fp) { if (fp) { fclose(fp); fp = NULL; } }
+
 typedef enum {
 	RET_NOK = -1,
 	RET_OK = 0,
 } RET;
 
+typedef enum {
+    DISP_MADI = 0,
+    DISP_MADP = 1,
+    DISP_DSPY = 2,
+    DISP_NN_RET = 3
+} DispType;
+
 typedef struct {
-    int disp_flg;
+    DispType disp_flg;
     int out_scale;
     int madi_thd;
     int madp_thd;
@@ -18,6 +27,7 @@ typedef struct {
 
 typedef struct {
     const char *in_filename;
+    const char *in_nn_results;
     const char *out_filename;
     const char *out_file_dspy;
     int width;

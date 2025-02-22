@@ -10,11 +10,11 @@
             "request": "launch",
             "program": "${workspaceFolder}/ff_tools",
             "args": [
-                "--input=/mnt/udisk/light_change_yuv/test_2_outdoor_2304x1296_nv12.yuv",
-                "--output=/mnt/winshare/out/test_2_outdoor_2304x1296_out.yuv", /* yuv420p only */
-                "--width=2304", "--height=1296", "--frames=3",
-                "--disp_flg=3", /* 1 - madi, 2 - madp, 3 - dspy */
-                "--input_fmt=1", /* 0 - YUV420, 1 - YUV420sp */
+                "--input=/home/timkingh/yuv/bus_640x640.yuv",
+                "--output=/home/timkingh/yuv/bus_640x640_out.yuv", /* yuv420p only */
+                "--width=640", "--height=640", "--frames=1",
+                "--disp_flg=3", /* 0 - madi, 1 - madp, 2 - dspy, 3 - nn results */
+                "--input_fmt=0", /* 0 - YUV420, 1 - YUV420sp */
                 "--out_scale=1", /* output scaling factor for output yuv */
                 "--aligned_size=16", /* aligned size for input yuv, 16 for H.264 */
             ],

@@ -50,6 +50,15 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "cinttypes": "cpp",
-        "avcodec.h": "c"
+        "avcodec.h": "c",
+        "cstring": "cpp",
+        "avformat.h": "c",
+        "buffersrc.h": "c",
+        "stdlib.h": "c",
+        "buffersink.h": "c",
+        "stdio.h": "c",
+        "common_ff.h": "c",
+        "opt.h": "c",
+        "stdint.h": "c"
     }
 }
