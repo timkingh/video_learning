@@ -1,23 +1,14 @@
 #! /usr/bin/bash
 
-IN_PATH=/mnt/udisk/light_change_yuv
-OUT_PATH=/mnt/udisk/light_change_yuv/out
+IN_PATH=/mnt/udisk/hikvision/yuv_smart_v3/
+OUT_PATH=/mnt/udisk/hikvision/yuv_smart_v3/output
 
 YUV_LIST="
-test_0_indoor_alg_2304x1296_nv12
-test_0_indoor_alg_night_2304x1296_nv12
-test_1_outdoor_2304x1296_nv12
-test_1_outdoor_night_2304x1296_nv12
-test_2_outdoor_2304x1296_nv12
-test_2_outdoor_night_2304x1296_nv12
-test_3_front_desk_2304x1296_nv12
-test_3_front_desk_night_2304x1296_nv12
-test_4_front_desk_2304x1296_nv12
-test_4_front_desk_night_2304x1296_nv12
-test_5_darkroom_2304x1296_nv12
-test_5_darkroom_night_2304x1296_nv12
-test_6_darkroom_2304x1296_nv12
-test_7_darkroom_2304x1296_nv12
+A_1080p_3000frames
+B_1080p_3000frames
+C_1080p_3000frames
+D_1080p_3000frames
+E_1080p_3000frames
 "
 
 draw_960x540()
@@ -49,4 +40,17 @@ draw_1920x1080_dspy()
     done
 }
 
-draw_1920x1080_dspy
+draw_1920x1080_nn_results()
+{
+    for yuv in $YUV_LIST; do
+        ./ff_tools --input=$IN_PATH/$yuv.yuv \
+                --output=$OUT_PATH/${yuv}_nn_results.yuv \
+                --nn_results=$OUT_PATH/nn_out_${yuv}.txt \
+                --width=1920 --height=1080 --disp_flg=3 \
+                --out_scale=1 --aligned_size=16 \
+                --input_fmt=0 --frames=300
+    done
+}
+
+#draw_1920x1080_dspy
+draw_1920x1080_nn_results

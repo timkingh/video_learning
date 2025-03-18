@@ -145,10 +145,12 @@ static RET draw_txt_filter_init(ToolsCtx *ctx, DrawTextCtx *dtc)
         return RET_NOK;
     }
 
-    dtc->fp_out_dspy = fopen(dtc->tools_ctx->out_file_dspy, "wb");
-    if (!dtc->fp_out_dspy) {
-        av_log(NULL, AV_LOG_ERROR, "Cannot open output file %s\n", dtc->tools_ctx->out_file_dspy);
-        return RET_NOK;
+    if (dtc->dtp->disp_flg == DISP_DSPY) {
+        dtc->fp_out_dspy = fopen(dtc->tools_ctx->out_file_dspy, "wb");
+        if (!dtc->fp_out_dspy) {
+            av_log(NULL, AV_LOG_ERROR, "Cannot open output file %s\n", dtc->tools_ctx->out_file_dspy);
+            return RET_NOK;
+        }
     }
 
     dtc->filter_descr = (char *)calloc(1, MAX_FILTER_DESC_LEN);
