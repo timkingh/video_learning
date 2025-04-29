@@ -3,8 +3,8 @@ clear
 
 
 file = 'D:\code\video_learning\matlab\filter_md\test_854x480_yuv400.yuv';
-file_filt = 'D:\code\video_learning\matlab\filter_md\test_854x480_yuv400_filt.yuv';
-file_md = 'D:\code\video_learning\matlab\filter_md\test_854x480_yuv400_md.yuv';
+file_filt = 'D:\code\video_learning\matlab\filter_md\test_854x480_yuv400_filt_2_3.yuv';
+file_md = 'D:\code\video_learning\matlab\filter_md\test_854x480_yuv400_md_2_3.yuv';
 
 fid = fopen(file, 'rb');
 if fid == -1
@@ -28,7 +28,7 @@ frame_num = 495;
 
 filter_radius = 25;
 filter_sigma = filter_radius;
-filter_kernel = fspecial('gaussian', filter_radius, filter_sigma);
+filter_kernel = fspecial('gaussian', filter_radius * 2 + 1, filter_sigma);
 
 for i = 1:frame_num
     y = fread(fid, [width, height], 'ubit8')';
