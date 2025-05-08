@@ -756,10 +756,26 @@ static RET calc_madi_madp(DrawTextCtx *dtc, AVFrame *frame)
 
 static void dump_frame(DrawTextCtx *dtc, const AVFrame *frame)
 {
+    int width_in = dtc->width;
+    int height_in = dtc->height;
+    int width_out = frame->width;
+    int height_out = frame->height;
+    int y_stride = frame->linesize[0];
+    int u_stride = frame->linesize[1];
+    int v_stride = frame->linesize[2];
+
+    av_log(NULL, AV_LOG_INFO, "input %dx%d output %dx%d\n", width_in, height_in, width_out, height_out);
+    av_log(NULL, AV_LOG_DEBUG, "y_stride %d u_stride %d v_stride %d\n", y_stride, u_stride, v_stride);
+
     if (dtc->fp_out) {
-        fwrite(frame->data[0], 1, frame->linesize[0] * frame->height, dtc->fp_out);
-        fwrite(frame->data[1], 1, frame->linesize[1] * frame->height / 2, dtc->fp_out);
-        fwrite(frame->data[2], 1, frame->linesize[2] * frame->height / 2, dtc->fp_out);
+        for (int i = 0; i < height_in; i++)
+            fwrite(frame->data[0] + i * frame->linesize[0], 1, width_in, dtc->fp_out);
+
+        for (int i = 0; i < height_in / 2; i++)
+            fwrite(frame->data[1] + i * frame->linesize[1], 1,  width_in / 2, dtc->fp_out);
+
+        for (int i = 0; i < height_in / 2; i++)
+            fwrite(frame->data[2] + i * frame->linesize[2], 1,  width_in / 2, dtc->fp_out);
     }
 }
 

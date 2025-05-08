@@ -10,13 +10,13 @@
             "request": "launch",
             "program": "${workspaceFolder}/ff_tools",
             "args": [
-                "--input=/mnt/winshare/yuv/test0_2560x1440.yuv",
-                "--output=/mnt/winshare/yuv/test0_2560x1440_out.yuv", /* yuv420p only */
-                "--nn_results=/home/timkingh/code/b_open_source/video_learning/ff_tools/output/nn_out_5_three_people_meeting_room_1080p_2.txt",
-                "--width=2560", "--height=1440", "--frames=1",
-                "--disp_flg=0", /* 0 - madi, 1 - madp, 2 - dspy, 3 - nn results */
+                "--input=/mnt/winshare/yuv/md_test/dspy/anker_0_864x480.yuv",
+                "--output=/mnt/winshare/yuv/md_test/dspy/anker_0_864x480_dspy.yuv", /* yuv420p only */
+                "--nn_results=/mnt/winshare/heron_test/seg_dump.txt",
+                "--width=864", "--height=480", "--frames=3",
+                "--disp_flg=2", /* 0 - madi, 1 - madp, 2 - dspy, 3 - nn results */
                 "--input_fmt=0", /* 0 - YUV420, 1 - YUV420sp */
-                "--out_scale=2", /* output scaling factor for output yuv */
+                "--out_scale=1", /* output scaling factor for output yuv */
                 "--aligned_size=16", /* aligned size for input yuv, 16 for H.264 */
             ],
             "preLaunchTask": "build",
