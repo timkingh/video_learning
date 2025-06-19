@@ -117,6 +117,8 @@ int main(int argc, char **argv)
     ctx->input_cmp = getarg("origin.yuv", "-o", "--output");
     ctx->output = getarg("psnr.txt", "-p", "--psnr");
     ctx->out_yuv = getarg("combo.yuv", "-q", "--combo_yuv");
+    ctx->input_fmt = (PixFmt)getarg(1, "--input_fmt");
+    ctx->output_fmt = (PixFmt)getarg(0, "--output_fmt");
 
     ctx->width = getarg(1920, "-w", "--width");
     ctx->height = getarg(1080, "-h", "--height");

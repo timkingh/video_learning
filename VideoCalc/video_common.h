@@ -33,6 +33,11 @@ enum RET {
 	RET_OK = 0,
 };
 
+typedef enum pix_fmt {
+    PIX_FMT_YUV420P = 0,
+    PIX_FMT_YUV420SP = 1
+} PixFmt;
+
 typedef struct {
 	string input;
 	string input_cmp;
@@ -49,6 +54,8 @@ typedef struct {
 	uint32_t mode;
 	uint32_t var_ratio_flg;
 	uint32_t log_frames;
+    PixFmt input_fmt;
+    PixFmt output_fmt;
 
     /* histogram */
 	vector<vector<int>> hist_org; /* Plane 0 1 2 */

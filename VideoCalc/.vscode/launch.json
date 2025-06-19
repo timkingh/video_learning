@@ -10,9 +10,13 @@
             "request": "launch",
             "program": "${workspaceFolder}/VideoCalc",
             "args": [
-                "-i=/mnt/winshare/oqe/311_1080p_10000kbps_h265_300frames.yuv",
-                "-o=/mnt/winshare/311_1080p_10000kbps_h265_300frames_out.yuv",
-                "-m=7", "-w=1920", "-h=1080", "-f=300"
+                "-i=/mnt/winshare/swan_test/vi_0_0_3840x2160_nv12.yuv",
+                "--input_fmt=1", /* 0 - YUV420p, 1 - YUV420sp */
+                "-o=/mnt/winshare/swan_test/vi_0_0_3840x2160_yuv420p.yuv",
+                "--output_fmt=0",
+                "-w=3840", "-h=2160",
+                "-f=1", /* frame number */
+                "-m=7", /* 7: transform yuv format */
             ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
