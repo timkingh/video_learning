@@ -90,6 +90,48 @@ static RET trans_yuv420sp_to_yuv420p(TransYuvCtx *trans_ctx)
     return ret;
 }
 
+static RET trans_yuv420p_to_yuv420sp(TransYuvCtx *trans_ctx)
+{
+    RET ret = RET_OK;
+    uint8_t *yuv420p = trans_ctx->src_buf;
+    uint8_t *yuv420sp = trans_ctx->dst_buf;
+    int width = trans_ctx->calc_ctx->width;
+    int height = trans_ctx->calc_ctx->height;
+    size_t frm_len = width * height * 3 / 2;
+    int y_size = width * height;
+    int uv_size = y_size / 4;
+
+    // Read the YUV data from the input file
+    if (fread(yuv420p, 1, width * height * 3 / 2, trans_ctx->fp_in) != frm_len) {
+        perror("fread");
+        return RET_NOK;
+    }
+
+    // 复制Y分量
+    memcpy(yuv420sp, yuv420p, y_size);
+
+    // 获取YUV420P中的U和V分量指针
+    unsigned char* u_p = yuv420p + y_size;
+    unsigned char* v_p = u_p + uv_size;
+
+    // YUV420SP的UV分量起始位置（NV12格式）
+    unsigned char* uv_sp = yuv420sp + y_size;
+
+    // 合并U和V分量到交错排列的UV平面
+    for (int i = 0; i < uv_size; i++) {
+        uv_sp[2 * i] = u_p[i];    // U分量
+        uv_sp[2 * i + 1] = v_p[i]; // V分量
+    }
+
+    // Write the modified YUV data to the output file
+    if (fwrite(yuv420sp, 1, width * height * 3 / 2, trans_ctx->fp_out) != frm_len) {
+        perror("fwrite");
+        return RET_NOK;
+    }
+
+    return ret;
+}
+
 static RET trans_yuv_fmt_process(TransYuvCtx *trans_ctx)
 {
     RET ret = RET_OK;
@@ -100,6 +142,8 @@ static RET trans_yuv_fmt_process(TransYuvCtx *trans_ctx)
     if (in_fmt == PIX_FMT_YUV420SP && out_fmt == PIX_FMT_YUV420P) {
         // Convert YUV420SP to YUV420P
         ret = trans_yuv420sp_to_yuv420p(trans_ctx);
+    } else if (in_fmt == PIX_FMT_YUV420P && out_fmt == PIX_FMT_YUV420SP) {
+        ret = trans_yuv420p_to_yuv420sp(trans_ctx);
     }
 
     return ret;
