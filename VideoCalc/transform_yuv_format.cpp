@@ -1,4 +1,4 @@
-#include "draw_num_on_yuv.h"
+#include "transform_yuv_format.h"
 
 typedef struct {
     CalcCtx *calc_ctx;
@@ -150,7 +150,7 @@ static RET draw_number_on_yuv_process(DrawNumCtx *draw_ctx)
     return RET_OK;
 }
 
-RET draw_number_on_yuv(CalcCtx *ctx)
+RET transform_yuv_format(CalcCtx *ctx)
 {
     DrawNumCtx draw_ctx;
     memset(&draw_ctx, 0, sizeof(DrawNumCtx));

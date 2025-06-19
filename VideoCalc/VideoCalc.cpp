@@ -7,7 +7,7 @@
 #include "weight_yuv.h"
 #include "quant_matrix.h"
 #include "parse_hview_av1_stream.h"
-#include "draw_num_on_yuv.h"
+#include "transform_yuv_format.h"
 
 using namespace std;
 
@@ -159,7 +159,7 @@ int main(int argc, char **argv)
         calc_quant_matrix,
         cdef_find_dir,
         parse_hview_av1_stream,
-        draw_number_on_yuv
+        transform_yuv_format
     };
 
     open_file(ctx);

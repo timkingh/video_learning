@@ -3,6 +3,6 @@
 
 #include "video_common.h"
 
-RET draw_number_on_yuv(CalcCtx *ctx);
+RET transform_yuv_format(CalcCtx *ctx);
 
 #endif

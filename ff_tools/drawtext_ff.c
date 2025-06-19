@@ -765,7 +765,7 @@ static void dump_frame(DrawTextCtx *dtc, const AVFrame *frame)
     int v_stride = frame->linesize[2];
     int scale = dtc->dtp->out_scale;
 
-    av_log(NULL, AV_LOG_INFO, "input %dx%d output %dx%d\n", width_in, height_in, width_out, height_out);
+    av_log(NULL, AV_LOG_INFO, "input %dx%d output yuv420p %dx%d\n", width_in, height_in, width_out, height_out);
     av_log(NULL, AV_LOG_DEBUG, "y_stride %d u_stride %d v_stride %d\n", y_stride, u_stride, v_stride);
 
     if (dtc->fp_out) {
