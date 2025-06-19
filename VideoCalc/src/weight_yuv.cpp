@@ -60,7 +60,6 @@ static RET output_combo_yuv(uint8_t *buf0, uint8_t *buf1, FILE *fp, uint32_t len
 
 RET weight_yuv(CalcCtx *ctx)
 {
-	uint32_t frame_size = ctx->width * ctx->height;
 	const char *input_file = ctx->input.c_str();
 	const char *output_file = ctx->input_cmp.c_str();
 	const char *combo_file = ctx->out_yuv.c_str();
@@ -86,7 +85,7 @@ RET weight_yuv(CalcCtx *ctx)
 	if (fp_out == NULL) {
 		perror("fopen org");
 		return RET_NOK;
-	}	
+	}
 
 	fp_combo = fopen(combo_file, "wb");
 	if (fp_combo == NULL) {
@@ -99,20 +98,20 @@ RET weight_yuv(CalcCtx *ctx)
 		printf("malloc buf failed\n");
 		return RET_NOK;
 	}
-	
+
 	buf_out = (uint8_t *)malloc(ctx->width * ctx->height * 2);
 	if (buf_out == NULL) {
 		printf("malloc buf_out failed\n");
 		return RET_NOK;
 	}
 
-	for (i = 0; i < ctx->frames; i++) {			
+	for (i = 0; i < ctx->frames; i++) {
 		uint8_t *p0 = buf;
 		uint8_t *p1 = buf_out;
 
 		for (j = 0; j < 3; j++) {
 			uint32_t len = (j == 0) ? y_len : u_len;
-			
+
 		    if (param.getline(lines, 512)) {
 		        int match_cnt = SSCANF(lines, "frame %d plane %d minscale %d mindenom %d minoff %d",
 		                               &w.frames, &w.plane, &w.scale, &w.denom, &w.offset);
@@ -120,7 +119,7 @@ RET weight_yuv(CalcCtx *ctx)
 					printf("fetch param failed! match_cnt %d\n", match_cnt);
 		        }
 		    }
-			
+
 			if (RET_OK != handle_weight(p0, fp_yuv_in, len, w, p1)) {
 				printf("frame %d fread %s finished\n", i, (j == 0) ? "Luma" : ((j == 1) ? "Chroma U" : "Chroma V"));
 				break;
@@ -129,7 +128,7 @@ RET weight_yuv(CalcCtx *ctx)
 			p0 += len;
 			p1 += len;
 		}
-		
+
 		output_weighted_yuv(buf_out, fp_out, y_len + u_len * 2);
 		output_combo_yuv(buf, buf_out, fp_combo, y_len + u_len * 2);
 	}

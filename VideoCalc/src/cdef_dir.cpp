@@ -99,7 +99,7 @@ RET cdef_find_dir(CalcCtx *ctx)
         return RET_NOK;
     }
 
-    for (k = 0; k < ctx->frames; k++) {
+    for (k = 0; k < (int)ctx->frames; k++) {
         read_frame_from_file(ctx, fp_yuv_in, (uint8_t *)ctx->frm_buf0);
 
         for (int b16_y = 0; b16_y < b16_h; b16_y++) {

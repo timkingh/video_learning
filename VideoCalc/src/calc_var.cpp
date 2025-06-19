@@ -12,26 +12,26 @@ enum {
     MADI_UV = 5,
 };
 
-static RET calc_ave(uint8_t *buf, FILE *fp, uint32_t len, float *ave)
-{
-	size_t read_len;
-	uint32_t j;
-	double sum = 0;
+// static RET calc_ave(uint8_t *buf, FILE *fp, uint32_t len, float *ave)
+// {
+// 	size_t read_len;
+// 	uint32_t j;
+// 	double sum = 0;
 
-	read_len = fread(buf, 1, len, fp);
-	if (0 == read_len || read_len < len) {
-		printf("fread finished!\n");
-		return RET_NOK;
-	}
+// 	read_len = fread(buf, 1, len, fp);
+// 	if (0 == read_len || read_len < len) {
+// 		printf("fread finished!\n");
+// 		return RET_NOK;
+// 	}
 
-	for (j = 0; j < len; j++) {
-		sum += buf[j];
-	}
+// 	for (j = 0; j < len; j++) {
+// 		sum += buf[j];
+// 	}
 
-	*ave = (float)((sum) / len);
+// 	*ave = (float)((sum) / len);
 
-	return RET_OK;
-}
+// 	return RET_OK;
+// }
 
 static int calc_ave_block(uint8_t *buf, int stride, int blk_size)
 {
@@ -47,15 +47,15 @@ static int calc_ave_block(uint8_t *buf, int stride, int blk_size)
 	return (sum / (blk_size * blk_size));
 }
 
-static float calc_variance(uint8_t *buf, uint32_t len, float ave)
-{
-	double sum_square = 0;
-	for (uint32_t j = 0; j < len; j++) {
-		sum_square += (buf[j] - ave) * (buf[j] - ave);
-	}
+// static float calc_variance(uint8_t *buf, uint32_t len, float ave)
+// {
+// 	double sum_square = 0;
+// 	for (uint32_t j = 0; j < len; j++) {
+// 		sum_square += (buf[j] - ave) * (buf[j] - ave);
+// 	}
 
-	return (float)((sum_square + len / 2) / len);
-}
+// 	return (float)((sum_square + len / 2) / len);
+// }
 
 static int calc_variance_blcok(uint8_t *buf, int stride, int ave, int blk_size)
 {
@@ -71,15 +71,15 @@ static int calc_variance_blcok(uint8_t *buf, int stride, int ave, int blk_size)
 	return ((sum_square + (blk_size * blk_size) / 2) / (blk_size * blk_size));
 }
 
-static uint64_t calc_madi(uint8_t *buf, uint32_t len, uint8_t ave)
-{
-	uint64_t madi = 0;
-	for (uint32_t j = 0; j < len; j++) {
-		madi += abs(buf[j] - ave);
-	}
+// static uint64_t calc_madi(uint8_t *buf, uint32_t len, uint8_t ave)
+// {
+// 	uint64_t madi = 0;
+// 	for (uint32_t j = 0; j < len; j++) {
+// 		madi += abs(buf[j] - ave);
+// 	}
 
-	return madi;
-}
+// 	return madi;
+// }
 
 static int calc_madi_block(uint8_t *buf, int stride, int ave, int blk_size)
 {
@@ -131,7 +131,7 @@ static RET store_calc_result(CalcCtx *ctx, int pos_x, int pos_y,
                              int ave[7], int var[7], int madi[7])
 {
     int stride = ctx->width / 8;
-    int offset, k;
+    int k;
     uint32_t *dst;
 
     for (k = 0; k < 4; k++) { /* Y0 ~ Y3 in blk16x16 */
@@ -215,23 +215,16 @@ static RET calc_block_var(CalcCtx *ctx, uint8_t *buf, FILE *fp_out)
 
 RET calc_var(CalcCtx *ctx)
 {
-	uint32_t frame_size = ctx->width * ctx->height;
 	const char *input_file = ctx->input.c_str();
 	const char *output_file = ctx->output.c_str();
 	uint8_t *buf;
 	uint32_t j, i;
-	uint32_t y_len = ctx->width * ctx->height;
-	uint32_t u_len = y_len / 4;
 	FILE *fp_yuv_in;
 	FILE *fp_out;
 	int64_t start_time = time_mdate();
 	int64_t end_time;
-	float average[3] = { 0 };
-	float variance[3] = { 0 };
-	uint64_t madi[3] = { 0 };
 	float *var_buf = NULL, *mean_buf = NULL;
 	uint64_t *mad_buf = NULL;
-	uint32_t var_idx = 0, mean_idx = 0, mad_idx = 0;
 
 	fp_yuv_in = fopen(input_file, "rb");
 	if (fp_yuv_in == NULL) {

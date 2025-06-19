@@ -139,7 +139,6 @@ static RET quant_matrix_research(CalcCtx *ctx, FILE *fp)
     uint16_t quant8_bias_lu[64];
     uint16_t bias_float;
     uint32_t diff_cnt = 0;
-    static int min_mf = 0xFFFF;
     static int max_mf = 0;
     static int max_quant4_mf = 0;
     static int max_quant4_bias = 0;

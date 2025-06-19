@@ -103,6 +103,7 @@ static RET parse_hview_av1_stream_read(ParseCtx *ps_ctx)
     return RET_OK;
 }
 
+#if 0
 static RET parse_hview_stream_flag(ParseCtx *ps_ctx)
 {
     uint8_t *buf = ps_ctx->src_buf;
@@ -162,6 +163,7 @@ static RET parse_hview_stream_frame(ParseCtx *ps_ctx)
 
     return RET_OK;
 }
+#endif
 
 static RET parse_hview_stream_frame_v2(ParseCtx *ps_ctx)
 {
@@ -170,8 +172,6 @@ static RET parse_hview_stream_frame_v2(ParseCtx *ps_ctx)
     uint32_t *flag_end = NULL;
     uint32_t *frame_size = NULL;
     uint32_t parse_len = 0;
-    uint32_t strm_pos = 0;
-    uint32_t flag_len = 0;
 
     while(parse_len < ps_ctx->read_len) {
         /* hview avi info: 24 bytes

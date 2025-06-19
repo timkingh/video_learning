@@ -17,7 +17,7 @@ RET calc_psnr(CalcCtx *ctx)
 	int w = ctx->width;
 	int h = ctx->height;
 	int frame_num = ctx->frames;
-	int frame_size = w * h * 3 / 2;
+	uint32_t frame_size = w * h * 3 / 2;
 	const char *input_file = ctx->input.c_str();
 	const char *output_file = ctx->input_cmp.c_str();
 	unsigned char *y_org, *y_buf;
@@ -69,14 +69,14 @@ RET calc_psnr(CalcCtx *ctx)
 		{
 			break;
 		}
-		
+
 		if ((real_frm_cnt % ctx->log_frames) == (ctx->log_frames - 1)) {
 			printf("fread frame %03d\n", real_frm_cnt);
 		}
 
 		real_frm_cnt++;
 		ssd = 0;
-		for (j = 0; j < frame_size; j++)
+		for (j = 0; j < (int)frame_size; j++)
 			ssd += (y_buf[j] - y_org[j])*(y_buf[j] - y_org[j]);
 
 		ssd_global += ssd;

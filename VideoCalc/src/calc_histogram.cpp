@@ -32,19 +32,19 @@ static RET calc_hist(uint8_t *buf, FILE *fp, uint32_t len, vector<int> &hist)
 	return RET_OK;
 }
 
-static void disp_hist(CalcCtx *ctx, FILE *fp)
-{
-	for (uint32_t i = 0; i < ctx->frames; i++) {
-		for (uint32_t j = 0; j < 3; j++) {
-			vector<int> vec = ctx->hist_org[i * 3 + j];
-			FPRINT(fp, "frame %3d plane %d\n", i, j);
+// static void disp_hist(CalcCtx *ctx, FILE *fp)
+// {
+// 	for (uint32_t i = 0; i < ctx->frames; i++) {
+// 		for (uint32_t j = 0; j < 3; j++) {
+// 			vector<int> vec = ctx->hist_org[i * 3 + j];
+// 			FPRINT(fp, "frame %3d plane %d\n", i, j);
 
-			for (int k = 0; k < vec.size(); k++) {
-				FPRINT(fp, "pixel %3d --- %8d\n", k, vec[k]);
-			}
-		}
-	}
-}
+// 			for (uint32_t k = 0; k < vec.size(); k++) {
+// 				FPRINT(fp, "pixel %3d --- %8d\n", k, vec[k]);
+// 			}
+// 		}
+// 	}
+// }
 
 static void scale_hist(vector<int> &hist_in, vector<int> &hist_out, weight_t &w)
 {
@@ -65,7 +65,7 @@ static uint32_t calc_hist_distortion(vector<int> &vec1, vector<int> &vec2)
 	uint32_t dist = 0;
 	assert(vec1.size() == vec2.size());
 
-	for (int i = 0; i < vec1.size(); i++) {
+	for (uint32_t i = 0; i < vec1.size(); i++) {
 		dist += abs(vec1[i] - vec2[i]);
 	}
 	return dist;
@@ -91,20 +91,20 @@ static void calc_frame_distortion(CalcCtx *ctx, FILE *fp)
 						w.denom = denom;
 						w.scale = scale;
 						w.offset = offset;
-						
+
 						scale_hist(ref, weight, w);
 						dist = calc_hist_distortion(weight, cur);
 						if (dist  < min_dist) {
 							best_w = w;
 							min_dist = dist;
 						}
-						//FPRINT(fp, "frame %d plane %d dist %d min_dist %d scale %d denom %d off %d\n", i + 1, j, 
+						//FPRINT(fp, "frame %d plane %d dist %d min_dist %d scale %d denom %d off %d\n", i + 1, j,
 										//dist, min_dist, w.scale, w.denom, w.offset);
 					}
 				}
 			}
-			
-			FPRINT(fp, "frame %d plane %d minscale %d mindenom %d minoff %d mindist %d\n", i + 1, j, 
+
+			FPRINT(fp, "frame %d plane %d minscale %d mindenom %d minoff %d mindist %d\n", i + 1, j,
 							best_w.scale, best_w.denom, best_w.offset, min_dist);
 		}
 
@@ -116,7 +116,6 @@ static void calc_frame_distortion(CalcCtx *ctx, FILE *fp)
 
 RET calc_histogram(CalcCtx *ctx)
 {
-	uint32_t frame_size = ctx->width * ctx->height;
 	const char *input_file = ctx->input.c_str();
 	const char *output_file = ctx->output.c_str();
 	uint8_t *buf;
