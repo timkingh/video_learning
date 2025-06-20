@@ -10,11 +10,11 @@
             "request": "launch",
             "program": "${workspaceFolder}/VideoCalc",
             "args": [
-                "-i=/mnt/winshare/swan_test/vi_0_0_3840x2160_nv12.yuv",
-                "--input_fmt=1", /* 0 - YUV420p, 1 - YUV420sp */
-                "-o=/mnt/winshare/swan_test/vi_0_0_3840x2160_yuv420p.yuv",
+                "-i=/mnt/winshare/swan_test/test1_1280x720_yuv422p.yuv",
+                "--input_fmt=2", /* 0 - YUV420p, 1 - YUV420sp, 2 - YUV422p */
+                "-o=/mnt/winshare/swan_test/test1_1280x720_yuv420p.yuv",
                 "--output_fmt=0",
-                "-w=3840", "-h=2160",
+                "-w=1280", "-h=720",
                 "-f=1", /* frame number */
                 "-m=7", /* 7: transform yuv format */
             ],

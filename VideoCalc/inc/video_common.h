@@ -35,7 +35,11 @@ enum RET {
 
 typedef enum pix_fmt {
     PIX_FMT_YUV420P = 0,
-    PIX_FMT_YUV420SP = 1
+    PIX_FMT_YUV420SP = 1,
+    PIX_FMT_YUV422P = 2,
+    PIX_FMT_YUV422SP = 3,
+    PIX_FMT_YUV444P = 4,
+    PIX_FMT_YUV444SP = 5,
 } PixFmt;
 
 typedef struct {

@@ -13,41 +13,68 @@ using namespace std;
 
 extern RET cdef_find_dir(CalcCtx *ctx);
 
-enum MODE {
-    CALC_PSNR = 0,
-    CALC_VAR = 1,
-    CALC_HIST = 2, /* Histogram */
-    WEIGHT_YUV = 3,
-    QUANT_MATRIX = 4,
-};
-
 static void show_help()
 {
+    cout << "-m 0: calculate PSNR" << endl
+         << "-m 1: calculate Variance" << endl
+         << "-m 2: calculate histogram" << endl
+         << "-m 3: calculate weighted yuv" << endl
+         << "-m 4: calculate quant matrix" << endl
+         << "-m 5: cdef find direction" << endl
+         << "-m 6: parse hview av1 stream" << endl
+         << "-m 7: transform yuv format" << endl
+         << "  -i: input file" << endl
+         << "  -o: output file" << endl
+         << "  -p: output file for PSNR/Variance/Histogram" << endl
+         << "  -q: output file for weighted yuv" << endl
+         << "  -w: width" << endl
+         << "  -h: height" << endl
+         << "  -f: frames" << endl
+         << "          --fps: framerate" << endl
+         << "--var_ratio_flg: variance ratio flag" << endl
+         << "   --log_frames: log frames" << endl
+         << "    --input_fmt: input format(0:yuv420p, 1:yuv420sp, 2:yuv422p)" << endl
+         << "   --output_fmt: output format(0:yuv420p, 1:yuv420sp)" << endl
+         << "     --rand_cnt: random count" << endl
+         << "  --dump_matrix: dump matrix" << endl
+         << "  --mf_fixed_point_bits: matrix fixed point bits" << endl
+         << "--bias_fixed_point_bits: bias fixed point bits" << endl << endl;
+
     cout << "Usage: calculate PSNR" << endl
          << "VidoeCalc -i=modify.yuv -o=origin.yuv -m=0 "
          << "-w=1920 -h=1080 --frames=300 -p=psnr.txt --log_frames=10"
-         << endl;
+         << endl << endl;
 
     cout << "Usage: calculate Variance" << endl
          << "VideoCalc -i=input.yuv -m=1 --var_ratio_flg=1 "
          << "-w=1920 -h=1080 --frames=300 -p=variance.txt"
-         << endl;
+         << endl << endl;
 
     cout << "Usage: calculate histogram" << endl
          << "VidoeCalc -i=modify.yuv -m=2 "
          << "-w=1920 -h=1080 --frames=300 -p=hist.txt"
-         << endl;
+         << endl << endl;
 
     cout << "Usage: calculate weighted yuv" << endl
          << "VideoCalc -i=input.yuv -o=weighted.yuv -m=3 "
          << "-w=1920 -h=1080 --frames=300 -p=param.txt --combo_yuv=combo.yuv "
-         << endl;
+         << endl << endl;
 
     cout << "Usage: calculate quant matrix" << endl
          << "VideoCalc -m=4 -p=quant.txt --rand_cnt=10 --log_frames=3 "
          << "--mf_diff_thresh=2 --mf_fixed_point_bits=23 --dump_matrix=1 "
          << "--default_matrix=0"
-         << endl;
+         << endl << endl;
+
+    cout << "Usage: parse hview av1 stream" << endl
+         << "VideoCalc -i=input.ivf -m=5 -p=hview_av1_stream.txt"
+         << endl << endl;
+
+    cout << "Usage: transform yuv format" << endl
+         << "VideoCalc -i=input.yuv -o=output.yuv -m=7 "
+         << "--input_fmt=0(yuv420p) --output_fmt=1(yuv420sp) "
+         << "-w=1920 -h=1080 -f=10"
+         << endl << endl;
 }
 
 static RET buf_init(CalcCtx *ctx)
