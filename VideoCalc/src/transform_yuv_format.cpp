@@ -186,7 +186,66 @@ static RET trans_yuv422p_to_yuv420p(TransYuvCtx *trans_ctx)
         }
     }
 
-        // Write the modified YUV data to the output file
+    // Write the modified YUV data to the output file
+    if (fwrite(yuv420p, 1, frm_len_420, trans_ctx->fp_out) != frm_len_420) {
+        perror("fwrite");
+        return RET_NOK;
+    }
+
+    return ret;
+}
+
+static RET trans_yuv422sp_to_yuv420p(TransYuvCtx *trans_ctx)
+{
+    RET ret = RET_OK;
+    uint8_t *yuv422sp = trans_ctx->src_buf;
+    uint8_t *yuv420p = trans_ctx->dst_buf;
+    int width = trans_ctx->calc_ctx->width;
+    int height = trans_ctx->calc_ctx->height;
+    size_t frm_len_420 = width * height * 3 / 2;
+    size_t frm_len_422 = width * height * 2;
+    int y_size = width * height;
+
+    // Read the YUV data from the input file
+    if (fread(yuv422sp, 1, frm_len_422, trans_ctx->fp_in) != frm_len_422) {
+        perror("fread");
+        return RET_NOK;
+    }
+
+    unsigned char* y_plane = yuv420p;          // Y分量起始位置
+    unsigned char* u_plane = yuv420p + y_size; // U分量起始位置
+    unsigned char* v_plane = u_plane + y_size / 4; // V分量起始位置
+
+    // 1. 直接复制Y分量（1:1拷贝）
+    memcpy(y_plane, yuv422sp, y_size);
+
+    // 2. 处理UV分量（从交错的UV平面分离并下采样）
+    unsigned char* uv_422sp = yuv422sp + y_size; // YUV422SP的UV交错平面起始位置
+
+    for (int y = 0; y < height; y += 2) {
+        for (int x = 0; x < width; x += 2) {
+            // 计算当前2x2块在源和目标中的位置
+            int src_pos = y * width + x;
+            int dst_pos = (y/2) * (width/2) + (x/2);
+
+            // 获取相邻4个UV像素（注意YUV422SP是UV交错排列）
+            unsigned char u1 = uv_422sp[src_pos];
+            unsigned char v1 = uv_422sp[src_pos + 1];
+            unsigned char u2 = uv_422sp[src_pos + 2];
+            unsigned char v2 = uv_422sp[src_pos + 3];
+
+            unsigned char u3 = uv_422sp[src_pos + width];
+            unsigned char v3 = uv_422sp[src_pos + width + 1];
+            unsigned char u4 = uv_422sp[src_pos + width + 2];
+            unsigned char v4 = uv_422sp[src_pos + width + 3];
+
+            // 计算U和V的平均值（使用整数运算避免浮点）
+            u_plane[dst_pos] = (u1 + u2 + u3 + u4) / 4;
+            v_plane[dst_pos] = (v1 + v2 + v3 + v4) / 4;
+        }
+    }
+
+    // Write the modified YUV data to the output file
     if (fwrite(yuv420p, 1, frm_len_420, trans_ctx->fp_out) != frm_len_420) {
         perror("fwrite");
         return RET_NOK;
@@ -209,8 +268,8 @@ static RET trans_yuv_fmt_process(TransYuvCtx *trans_ctx)
         ret = trans_yuv420p_to_yuv420sp(trans_ctx);
     } else if (in_fmt == PIX_FMT_YUV422P && out_fmt == PIX_FMT_YUV420P) {
         ret = trans_yuv422p_to_yuv420p(trans_ctx);
-    } else if (in_fmt == PIX_FMT_YUV420P && out_fmt == PIX_FMT_YUV422P) {
-
+    } else if (in_fmt == PIX_FMT_YUV422SP && out_fmt == PIX_FMT_YUV420P) {
+        ret = trans_yuv422sp_to_yuv420p(trans_ctx);
     } else if (in_fmt == PIX_FMT_YUV420SP && out_fmt == PIX_FMT_YUV420SP) {
     }
 
