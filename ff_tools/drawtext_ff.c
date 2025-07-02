@@ -706,21 +706,25 @@ static RET calc_frame_dspy(DrawTextCtx *dtc)
 static RET fread_nn_results(DrawTextCtx *dtc)
 {
     Node *node = dtc->node_list[NN_RET];
+    int align = dtc->tools_ctx->aligned_size;
     int blk_size = 16;
-    int blk_num = FFALIGN(dtc->width, blk_size) / blk_size *
-                  FFALIGN(dtc->height, blk_size) / blk_size;
-    int i, cnt;
+    int blk_num = FFALIGN(dtc->width, align) / blk_size *
+                  FFALIGN(dtc->height, align) / blk_size;
+    int i, cnt, frame_seq;
 
     dtc->node_num[NN_RET] = 0;
     for (i = 0; i < blk_num; i++) {
-        cnt = fscanf(dtc->fp_in_nn_results, "blk_idx %d (%d, %d) object_map %d\n",
-                    &node->node_id, &node->x, &node->y, &node->mad[NN_RET]);
-        if (cnt != 4) {
+        cnt = fscanf(dtc->fp_in_nn_results, "frame %d blk_idx %d (%d, %d) object_map %d\n",
+                    &frame_seq, &node->node_id, &node->x, &node->y, &node->mad[NN_RET]);
+        if (cnt != 5) {
             av_log(NULL, AV_LOG_ERROR, "failed to read nn_ret blk_idx %d\n", i);
             return RET_NOK;
         }
         dtc->node_num[NN_RET]++;
-        assert(i == node->node_id);
+
+        if ((node->node_id + 1) >= blk_num) {
+            break;
+        }
 
         node++;
     }
